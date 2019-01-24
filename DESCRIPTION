@@ -1,0 +1,25 @@
+Package: first90
+Version: 1.0
+Title: What the Package Does (One Line, Title Case)
+Description: What the package does (one paragraph).
+Authors@R: c(person("Jeffrey", "Eaton", email = "jeffrey.eaton@imperial.ac.uk", role = c("aut", "cre")),
+             person("Mathieu", "Maheu-Giroux", email = "mathieu.maheu-giroux@mcgill.ca", role = "aut"),
+             person("Roma", "Bhatkoti", email = "nli0@cdc.gov", role = "aut"))
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+ByteCompile: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.1
+Depends:
+    data.table
+Imports:
+    mvtnorm,
+    Matrix,
+    fastmatch (>= 1.1)
+LinkingTo:
+    BH
+Suggests: 
+    testthat, data.table
+URL: https://github.com/mrc-ide/first90
+BugReports: https://github.com/mrc-ide/first90/issues

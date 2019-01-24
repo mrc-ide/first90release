@@ -1,0 +1,158 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  fig.width = 5,
+  fig.height = 4)
+
+devtools::load_all("~/Google Drive/McGill/Research/Wisbech/first90/R")
+library(data.table)
+```
+# first90
+
+UNAIDS put forward the ambitious 90-90-90 target to end the AIDS epidemic by 2030. This target aims for 90% of people living with HIV (PLHIV) to be aware of their HIV-positive status, 90% of those diagnosed to receive antiretroviral therapy, and 90% of those on treatment to have a suppressed viral load by 2020 (each reaching 95% by 2030). HIV testing remains an important bottleneck in this cascade, however, and obtaining reliable epidemiological data on the proportion of PLHIV aware of their status is difficult. Such information is nevertheless crucial to effectively monitor HIV prevention efforts. Tracking progress towards achievement of this “first 90” target could be improved by combining population-based surveys and programmatic data on the number of HIV tests performed (and yield) in a coherent deterministic/statistical model. This type of integrative systems modelling is especially useful to fully consider HIV incidence, mortality, testing behaviours, as well as to coherently combine different sources of data. 
+
+The goal of the first90 package is to provide annual estimates of the proportion of PLHIV that are aware of their status, by combining estimates of PLHIV from EPP/Spectrum, annual programmatic data on the number of HIV tests performed (and yield), and nationally-representative survey of HIV testing behaviors. 
+
+## Installation
+
+Install via Github using `devtools`:
+
+``` r
+devtools::install_github("mrc-ide/first90")
+```
+
+This is a private repository. Installation via Github requires a Personal Access Token (PAT). To create a token, visit 
+[https://github.com/settings/tokens/new](https://github.com/settings/tokens/new). Ensure that the box "repo" is ticked,
+and click "Generate token".
+
+Create a file in home directory `~/.Renviron` with the following line (replacing `<YOUR TOKEN>` with token that appears):
+
+```
+GITHUB_PAT = <YOUR TOKEN>
+```
+
+Save the file, restart R, and use the command `install_github()` above.
+
+## Example: Malawi
+
+This example demonstrates basic model steps.
+
+```{r example, fig.height = 8, fig.width = 8, warning = FALSE}
+cnt <- "Malawi"
+age_group <- c('15-24','25-34','35-49')
+
+# Read PJNZ file(s)
+pjnz <- "~/Google Drive/McGill/Research/Wisbech/Spectrum files/Malawi_2018_version_8.PJNZ"
+fp <- prepare_inputs(pjnz)
+
+# We visualize the PJNZ data
+plot_pjnz(fp)
+```
+
+The following functions enable users to produce invidual plots.
+```
+pjnz_summary <- get_pjnz_summary_data(fp)
+plot_pjnz_pop(pjnz_summary)
+plot_pjnz_plhiv(pjnz_summary)
+plot_pjnz_prv(pjnz_summary)
+plot_pjnz_inc(pjnz_summary)
+```
+
+```{r, fig.height = 8, fig.width = 8, warning = FALSE}
+# All surveys should be included. If serology was not collected, the model should
+# be fitted overall
+data(survey_hts)
+dat <- dat_test <- select_hts(survey_hts, cnt, age_group)
+
+# We prepare the program data
+data(prgm_dat)
+prg_dat <- select_prgmdata(prgm_dat, cnt, age_group)
+
+# We visualize the program data
+plot_inputdata(prg_dat, fp)
+```
+
+The following functions enable users to produce invidual plots.
+```
+plot_input_tot(prgm_dat, fp)
+plot_input_totpos(prgm_dat, fp)
+plot_input_anctot(prgm_dat, fp)
+plot_input_ancpos(prgm_dat, fp)
+```
+```{r, fig.height = 10, fig.width = 8.5, warning = FALSE}
+# ---- Enter parameters here ----
+# We create the likelihood data
+likdat <- prepare_hts_likdat(dat, prg_dat, fp)
+
+# Starting parameters
+data(theta0)
+ll_hts(theta0, fp, likdat)
+
+opt <- optim(theta0, ll_hts, fp = fp, likdat = likdat, method = "BFGS", 
+             control = list(fnscale = -1, trace = 4, REPORT = 1, maxit = 250), hessian = TRUE)
+
+simul <- simul.test(opt, fp, sim = 400)
+
+# ---- Plots for FITS ----
+fp <- create_hts_param(opt$par, fp)
+mod <- simmod(fp)
+
+# ---- The Fitted Parameters ----
+optimized_par(opt)
+
+# ---- Functions for individuals model fits ----
+data(survey_hts)
+out_evertest <- get_out_evertest(mod, fp)
+
+plot_out(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+```
+  
+The model fits by age and sex.
+```{r, fig.height = 5, fig.width = 8.5, warning=FALSE}
+plot_out_strat(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+```
+The following functions enable users to produce invidual plots.
+```
+plot_out_nbtest(mod, fp, likdat, cnt, simul)
+plot_out_nbpostest(mod, fp, likdat, cnt, simul)
+plot_out_evertestneg(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+plot_out_evertestpos(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+plot_out_evertest(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+plot_out_90s(mod, fp, likdat, cnt, out_evertest, simul)
+plot_out_evertest_fbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+plot_out_evertest_mbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+```
+We can compare HIV tests' positivity through time, the estimated *true* yield of new HIV diagnoses, and compare those to population-level HIV prevalence.
+
+```{r, fig.height = 5, fig.width = 5, warning = FALSE}
+par(mfrow = c(1,1))
+plot_prv_pos_yld(mod, fp, likdat, cnt, yr_pred = 2018) 
+```
+
+We can also examine some ouptuts related to the distribution of HIV tests performed in those susceptibles to HIV and PLHIV by different awareness and treatment status. (First sets of graphs is on the absolute scale, second one on the relative scale.)
+
+```{r, fig.height = 5, fig.width = 8.5, warning = FALSE}
+par(mfrow = c(1,2))
+plot_retest_test_neg(mod, fp, likdat, cnt)
+plot_retest_test_pos(mod, fp, likdat, cnt)
+
+par(mfrow = c(1,2))
+plot_retest_test_neg(mod, fp, likdat, cnt, relative = TRUE)
+plot_retest_test_pos(mod, fp, likdat, cnt, relative = TRUE)
+```
+
+Finally, tabular outputs can be obtained by using the following functions.
+```{r, warning = FALSE}
+# ---- Tabular outputs ----
+tab_out_evertest(mod, fp, simul = simul)
+tab_out_aware(mod, fp, simul = simul)
+tab_out_artcov(mod, fp)
+```
