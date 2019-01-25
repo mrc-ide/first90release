@@ -136,11 +136,10 @@ getCI <- function(df) {
   n_col <- ncol(df)
   # Function for the confidence interval of the estimates
   CI <- apply(X = df[,(6:n_col)], MARGIN = 1,
-              FUN = quantile, probs = c(0.5, 0.025, 0.975), na.rm = TRUE)
-  median <- CI[1,]
-  lower <- CI[2,]
-  upper <- CI[3,]
-  df1 <- data.frame(df[c(1:5)], median, lower, upper)
+              FUN = quantile, probs = c(0.025, 0.975), na.rm = TRUE)
+  lower <- CI[1,]
+  upper <- CI[2,]
+  df1 <- data.frame(df[c(1:5)], lower, upper)
   return(df1)
 }
 
