@@ -188,14 +188,17 @@ svy_hts_interface <- function(survey_hts, cnt, age_group = c('15-24','25-34','35
 add_ss_indices <- function(dat, ss) {
 
   df <- dat
+
+  ## Convert 15+ to 15-99 for parsing below
+  agegr_tmp <- sub("15\\+", "15-99", df$agegr)
   
-  df$agestart <- type.convert(sub("([0-9]+)-([0-9]+)", "\\1", df$agegr))
-  ageend <- type.convert(sub("([0-9]+)-([0-9]+)", "\\2", df$agegr))+1L
+  df$agestart <- type.convert(sub("([0-9]+)-([0-9]+)", "\\1", agegr_tmp))
+  ageend <- type.convert(sub("([0-9]+)-([0-9]+)", "\\2", agegr_tmp))+1L
 
   df$aidx <- df$agestart - ss$AGE_START + 1L
   df$agspan <- ageend - df$agestart
 
-  ## # HIV age group incdices
+  ## # HIV age group indices
   hag_breaks <- ss$agfirst.idx + ss$AGE_START - 1L
   df$haidx <- match(df$agestart, hag_breaks)
   end_haidx <- match(ageend, hag_breaks)
@@ -210,7 +213,7 @@ add_ss_indices <- function(dat, ss) {
   df$hagspan[df$agestart >= max(hag_breaks) & ageend >= max(hag_breaks)] <- 1L
 
   
-  df$sidx <- match(df$sex, c("both", "male", "female")) - 1L
+ df$sidx <- match(df$sex, c("both", "male", "female")) - 1L
   df$hvidx <- match(df$hivstatus, c("all", "negative", "positive")) - 1L
   df$yidx <- df$year - ss$proj_start + 1L
 

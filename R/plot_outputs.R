@@ -1019,26 +1019,41 @@ tab_out_evertest <- function(mod, fp, age_grp = '15-49', gender = 'both', hiv = 
 
 #' @export
 tab_out_aware <- function(mod, fp, age_grp = '15-49', gender = 'both', year_range = c(2010, 2018), simul = NULL, end_year = TRUE) {
-  if (length(year_range) == 1) { year_range <- c(year_range, year_range) }
+  if (length(year_range) == 1) {
+    year_range <- c(year_range, year_range)
+  }
+
   if (is.null(simul)) {
     out <- get_out_aware(mod, fp, age_grp, gender)
-    if (end_year == TRUE) { out$value <- end_of_year(out$year, out$value) }
+
+    if (end_year == TRUE) {
+      out$value <- end_of_year(out$year, out$value)
+    }
     out$value <- round(out$value * 100, 1)
     tab_aware <- subset(out, year >= year_range[1] & year <= year_range[2])
+
   } else {
+
     out <- get_out_aware(mod, fp, age_grp, gender)
-    if (end_year == TRUE) { out$value <- end_of_year(out$year, out$value) }
+    if (end_year == TRUE) {
+      out$value <- end_of_year(out$year, out$value)
+    }
+    
     out$value <- round(out$value * 100, 1)
     outci <- getCI(simul$diagnoses)
     outci <- subset(outci, agegr == age_grp & sex == gender) 
+
     if (end_year == TRUE) { 
       outci$median <- end_of_year(outci$year, outci$median)
       outci$lower <- end_of_year(outci$year, outci$lower)
-      outci$upper <- end_of_year(outci$year, outci$upper) }
+      outci$upper <- end_of_year(outci$year, outci$upper)
+    }
+
     outci$median <- round(outci$median * 100, 1)
     outci$lower <- round(outci$lower * 100, 1)
     outci$upper <- round(outci$upper * 100, 1)
     outci <- subset(outci, year >= year_range[1] & year <= year_range[2]) 
+
     tab_aware <- merge(out, outci)
   }
   
