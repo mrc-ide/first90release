@@ -1004,10 +1004,8 @@ tab_out_evertest <- function(mod, fp, age_grp = '15-49', gender = 'both', hiv = 
     outci <- getCI(simul$ever.test)
     outci <- subset(outci, agegr == age_grp & sex == gender & hivstatus == hiv)
     if (end_year == TRUE) {
-      outci$median <- end_of_year(outci$year, outci$median)
       outci$lower <- end_of_year(outci$year, outci$lower)
       outci$upper <- end_of_year(outci$year, outci$upper) }
-    outci$median <- round(outci$median * 100, 1)
     outci$lower <- round(outci$lower * 100, 1)
     outci$upper <- round(outci$upper * 100, 1)
     outci <- subset(outci, year >= year_range[1] & year <= year_range[2]) 
@@ -1044,12 +1042,10 @@ tab_out_aware <- function(mod, fp, age_grp = '15-49', gender = 'both', year_rang
     outci <- subset(outci, agegr == age_grp & sex == gender) 
 
     if (end_year == TRUE) { 
-      outci$median <- end_of_year(outci$year, outci$median)
       outci$lower <- end_of_year(outci$year, outci$lower)
       outci$upper <- end_of_year(outci$year, outci$upper)
     }
 
-    outci$median <- round(outci$median * 100, 1)
     outci$lower <- round(outci$lower * 100, 1)
     outci$upper <- round(outci$upper * 100, 1)
     outci <- subset(outci, year >= year_range[1] & year <= year_range[2]) 
