@@ -984,7 +984,7 @@ plot_out_strat <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, simul
 end_of_year <- function(year, value){
   if (length(unique(year)) != length(year)) { print('non unique years'); break }
   new_x <- year + 0.5
-  new_value <- approx(year, value, new_x, method = 'linear')$y
+  new_value <- approx(year, value, new_x, method = 'linear', rule = 2)$y
   return(new_value)
 } 
 

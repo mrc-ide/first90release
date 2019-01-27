@@ -1,5 +1,5 @@
 Package: first90
-Version: 1.0-3
+Version: 1.0-4
 Title: What the Package Does (One Line, Title Case)
 Description: What the package does (one paragraph).
 Authors@R: c(person("Jeffrey", "Eaton", email = "jeffrey.eaton@imperial.ac.uk", role = c("aut", "cre")),
