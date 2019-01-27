@@ -4,13 +4,14 @@ get_pjnz_summary_data <- function(fp) {
   mod <- simmod(fp)
   start <- fp$ss$proj_start
   end <- start + fp$ss$PROJ_YEARS - 1L
+
   list(
     year = start:end,
-    pop = apply(mod[1:35,,,], 4, FUN=sum),
+    pop = apply(mod[,,,], 4, FUN=sum),
     prevalence = attr(mod, "prev15to49"),
     incidence = attr(mod, "incid15to49"),
-    plhiv = apply(attr(mod, "hivpop")[,1:8,,], 4, FUN=sum) + apply(attr(mod, "artpop")[,,1:8,,], 5, FUN=sum),
-    art_coverage = apply(attr(mod, "artpop")[,,1:8,,], 5, FUN=sum)
+    plhiv = apply(attr(mod, "hivpop")[,,,], 4, FUN=sum) + apply(attr(mod, "artpop")[,,,,], 5, FUN=sum),
+    art_coverage = colSums(fp$art15plus_num)
   )
 }
 

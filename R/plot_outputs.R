@@ -984,7 +984,7 @@ plot_out_strat <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, simul
 end_of_year <- function(year, value){
   if (length(unique(year)) != length(year)) { print('non unique years'); break }
   new_x <- year + 0.5
-  new_value <- approx(year, value, new_x, method = 'linear')$y
+  new_value <- approx(year, value, new_x, method = 'linear', rule = 2)$y
   return(new_value)
 } 
 
@@ -1072,11 +1072,37 @@ tab_out_nbaware <- function(mod, fp, age_grp = '15-49', gender = 'both', year_ra
 
 #' @export
 tab_out_artcov <- function(mod, fp, gender = 'both', year_range = c(2010, 2018)) {
-  # ART coverage is already end-of-year, no need to adjust
-  if (length(year_range) == 1) { year_range <- c(year_range, year_range) }
-    out <- get_out_art(mod, fp, gender)
-    out$value <- round(out$value * 100, 1)
-    tab_artcov <- subset(out, year >= year_range[1] & year <= year_range[2])
+  ## ART coverage is already end-of-year, no need to adjust
+  
+  if (length(year_range) == 1) {
+    year_range <- c(year_range, year_range)
+  }
+
+  artcov_m <- data.frame(year = fp$ss$proj_start + seq_len(fp$ss$PROJ_YEARS) - 1L,
+                         outcome = "artcov",
+                         agegr = "15+",
+                         sex = "male",
+                         hivstatus = "positive",
+                         value = fp$art15plus_num[1,] / colSums(mod[,1,2,]))
+
+  artcov_f <- data.frame(year = fp$ss$proj_start + seq_len(fp$ss$PROJ_YEARS) - 1L,
+                         outcome = "artcov",
+                         agegr = "15+",
+                         sex = "female",
+                         hivstatus = "positive",
+                         value = fp$art15plus_num[2,] / colSums(mod[,2,2,]))
+
+  artcov_b <- data.frame(year = fp$ss$proj_start + seq_len(fp$ss$PROJ_YEARS) - 1L,
+                         outcome = "artcov",
+                         agegr = "15+",
+                         sex = "both",
+                         hivstatus = "positive",
+                         value = colSums(fp$art15plus_num) / colSums(mod[,,2,],,2))
+
+  out <- rbind(artcov_b, artcov_m, artcov_f)
+  out$value <- round(out$value * 100, 1)
+  tab_artcov <- subset(out, year >= year_range[1] & year <= year_range[2] &
+                            sex %in% gender)
   row.names(tab_artcov) <- NULL
   tab_artcov
 }

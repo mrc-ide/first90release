@@ -10,6 +10,8 @@
 #' * Aware of HIV+ status
 #' * On ART
 #'
+#' PLHIV is mid-year estimate. All other outcomes are end of year estimate.
+#'
 #' @examples
 #'
 #' write.csv(spectrum_output_table(mod, fp), 
@@ -18,20 +20,34 @@
 #' @export 
 spectrum_output_table <- function(mod, fp) {
 
-  year <- fp$ss$proj_start + seq_len(fp$ss$PROJ_YEARS) - 1L
-
-  plhiv <- t(colSums(mod[,,2,]))
-  colnames(plhiv) <- paste0("plhiv_", c("m", "f"))
+  aware_m <- get_out_aware(mod, fp, "15+", "male")
+  aware_f <- get_out_aware(mod, fp, "15+", "female")
+  evertest_m <- get_out_evertest(mod, fp, "15+", "male", "positive")
+  evertest_f <- get_out_evertest(mod, fp, "15+", "female", "positive")
   
-  onart <- t(colSums(attr(mod, "artpop"),,3))
+  aware_m$value <- end_of_year(aware_m$year, aware_m$value)
+  aware_f$value <- end_of_year(aware_f$year, aware_m$value)
+  evertest_m$value <- end_of_year(evertest_m$year, evertest_m$value)
+  evertest_m$value <- end_of_year(evertest_m$year, evertest_m$value)
+  
+  year_out <- aware_m$year
+  year_proj <- fp$ss$proj_start + seq_len(fp$ss$PROJ_YEARS) - 1L
+  out_idx <- year_proj %in% year_out
+
+  plhiv <- t(colSums(mod[,,2,out_idx]))
+  colnames(plhiv) <- paste0("plhiv_", c("m", "f"))
+
+  onart <- t(fp$art15plus_num[,out_idx])
   colnames(onart) <- paste0("onart_", c("m", "f"))
 
-  aware <- onart + t(colSums(attr(mod, "diagnpop"),,2))
-  colnames(aware) <- paste0("aware_", c("m", "f"))
+  evertest <- cbind(evertest_m = evertest_m$value,
+                    evertest_f = evertest_f$value) * plhiv
+  aware <- cbind(aware_m = aware_m$value,
+                 aware_f = aware_f$value) * plhiv
 
-  evertest <- aware + t(colSums(attr(mod, "testnegpop")[,,2,]))
-  colnames(evertest) <- paste0("evertest_", c("m", "f"))
-
-  data.frame(year, plhiv, evertest, aware, onart)
+  data.frame(year = year_out,
+             plhiv,
+             evertest,
+             aware,
+             onart)
 }
-  
