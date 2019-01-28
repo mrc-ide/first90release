@@ -44,6 +44,7 @@ cnt <- first90::read_country(pjnz)
 fp <- first90::prepare_inputs(pjnz)
 # first90::prepare_inputs can also take a list of files, if using regional files
 # e.g. fp <- first90::prepare_inputs(list.files("~/Documents/Data/", "CotedIvoire.*PJNZ$", full.names=TRUE, ignore.case=TRUE))
+fp$popadjust <- FALSE
 
 # We visualize the PJNZ data
 first90::plot_pjnz(fp)
