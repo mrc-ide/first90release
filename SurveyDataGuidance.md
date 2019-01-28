@@ -1,7 +1,10 @@
 ## Guidance on survey data
 
-Please provide survey data on the proportion of people ever tested by sex, age group (15-24, 25-34, and 35-49 years), and HIV serostatus (if available). This needs to be a data-frame with the following columns. If these columns names are wrong the model
-will either not run, or the results will not be accurate. In order to visualize model fits, it is usefull to also provide information on the proportion of people ever tested among the 15-49 years old overall, and stratified by sex and HIV serostatus (if available).
+Please provide survey data on the proportion of people ever tested by sex, age group (15-24, 25-34, and 35-49 years), 
+and HIV serostatus (if available). This needs to be a data-frame with the following columns. 
+If these columns names are wrong the model will either not run, or the results will not be accurate. 
+In order to visualize model fits, it is useful to also provide information on the proportion of people ever tested 
+among the 15-49 years old overall, and stratified by sex and HIV serostatus (if available).
 
 * country: Must exactly match the value extracted from your Spectrum file:
 
