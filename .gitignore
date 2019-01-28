@@ -6,6 +6,6 @@
 .Rapp.history
 .DS_Store
 .idea
-tests/testthat/sample_files/*
+tests/testthat/sample_files
 *.tar.gz
 *.Rcheck

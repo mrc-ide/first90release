@@ -8,6 +8,8 @@ Please edit that file and run `knitr::knit("README.Rmd") from the root of this d
 
 # first90
 
+[![Travis-CI Build Status](https://travis-ci.com/mrc-ide/first90release.svg?branch=master)](https://travis-ci.com/mrc-ide/first90release)
+
 UNAIDS put forward the ambitious 90-90-90 target to end the AIDS epidemic by 2030. This target aims for 90% of people living with HIV (PLHIV) to be aware of their HIV-positive status, 90% of those diagnosed to receive antiretroviral therapy, and 90% of those on treatment to have a suppressed viral load by 2020 (each reaching 95% by 2030). HIV testing remains an important bottleneck in this cascade, however, and obtaining reliable epidemiological data on the proportion of PLHIV aware of their status is difficult. Such information is nevertheless crucial to effectively monitor HIV prevention efforts. Tracking progress towards achievement of this “first 90” target could be improved by combining population-based surveys and programmatic data on the number of HIV tests performed (and yield) in a coherent deterministic/statistical model. This type of integrative systems modelling is especially useful to fully consider HIV incidence, mortality, testing behaviours, as well as to coherently combine different sources of data. 
 
 The goal of the first90 package is to provide annual estimates of the proportion of PLHIV that are aware of their status, by combining estimates of PLHIV from EPP/Spectrum, annual programmatic data on the number of HIV tests performed (and yield), and nationally-representative survey of HIV testing behaviors. 
@@ -302,26 +304,26 @@ Finally, tabular outputs can be obtained by using the following functions.
 # ---- Tabular outputs ----
 first90::tab_out_evertest(mod, fp, simul = simul)
 #>   year  outcome agegr  sex hivstatus value lower upper
-#> 1 2010 evertest 15-49 both       all   9.8   8.4  12.4
-#> 2 2011 evertest 15-49 both       all  11.6   9.9  14.0
-#> 3 2012 evertest 15-49 both       all  13.2  11.3  16.2
-#> 4 2013 evertest 15-49 both       all  14.6  12.4  18.9
-#> 5 2014 evertest 15-49 both       all  15.9  13.2  21.4
-#> 6 2015 evertest 15-49 both       all  17.1  13.7  23.9
-#> 7 2016 evertest 15-49 both       all  18.2  14.2  26.6
-#> 8 2017 evertest 15-49 both       all  19.1  14.7  28.9
-#> 9 2018 evertest 15-49 both       all  20.0  15.0  30.7
+#> 1 2010 evertest 15-49 both       all   9.8   8.3  12.6
+#> 2 2011 evertest 15-49 both       all  11.6   9.9  14.2
+#> 3 2012 evertest 15-49 both       all  13.2  11.2  16.4
+#> 4 2013 evertest 15-49 both       all  14.6  12.3  18.8
+#> 5 2014 evertest 15-49 both       all  15.9  13.1  21.3
+#> 6 2015 evertest 15-49 both       all  17.1  13.8  23.5
+#> 7 2016 evertest 15-49 both       all  18.2  14.2  25.4
+#> 8 2017 evertest 15-49 both       all  19.1  14.6  27.6
+#> 9 2018 evertest 15-49 both       all  20.0  14.9  29.8
 first90::tab_out_aware(mod, fp, simul = simul)
 #>   year outcome agegr  sex hivstatus value lower upper
-#> 1 2010   aware 15-49 both  positive  27.2  27.2  29.2
-#> 2 2011   aware 15-49 both  positive  33.8  33.8  34.6
+#> 1 2010   aware 15-49 both  positive  27.2  27.2  29.3
+#> 2 2011   aware 15-49 both  positive  33.8  33.8  34.7
 #> 3 2012   aware 15-49 both  positive  40.5  40.5  41.2
-#> 4 2013   aware 15-49 both  positive  46.5  46.5  47.7
-#> 5 2014   aware 15-49 both  positive  51.7  51.6  53.3
-#> 6 2015   aware 15-49 both  positive  56.8  56.8  58.6
-#> 7 2016   aware 15-49 both  positive  62.5  62.5  64.3
-#> 8 2017   aware 15-49 both  positive  67.8  67.7  69.6
-#> 9 2018   aware 15-49 both  positive  72.3  72.2  74.1
+#> 4 2013   aware 15-49 both  positive  46.5  46.5  47.4
+#> 5 2014   aware 15-49 both  positive  51.7  51.6  53.0
+#> 6 2015   aware 15-49 both  positive  56.8  56.8  58.4
+#> 7 2016   aware 15-49 both  positive  62.5  62.5  63.9
+#> 8 2017   aware 15-49 both  positive  67.8  67.7  69.1
+#> 9 2018   aware 15-49 both  positive  72.3  72.2  73.6
 first90::tab_out_nbaware(mod, fp)
 #>   year      outcome agegr  sex hivstatus  value
 #> 1 2010 number aware 15-49 both  positive 195845
@@ -345,3 +347,18 @@ first90::tab_out_artcov(mod, fp)
 #> 8 2017  artcov   15+ both  positive  71.4
 #> 9 2018  artcov   15+ both  positive  75.9
 ```
+
+## Running tests
+Some tests require sample files. If you have access, Spectrum files are available on SharePoint [here](https://imperiallondon-my.sharepoint.com/:f:/r/personal/epidem_ic_ac_uk/Documents/UNAIDS%20Ref%20Group%20Shared%20Drive/Ref%20Group%20Meetings/Meetings%202018/first%2090%20workshop%20-%20Wisbech%20August%202018?csf=1&e=MFospr)
+To use them, create a directory with `mkdir tests/testhat/sample_files` and copy the Malawi .PJNZ file into it.
+
+Or if you access to the private repo, you can clone it:
+
+```
+git clone https://github.com/mrc-ide/shiny90_sample_files tests/testthat/sample_files
+```
+
+Then run
+`r
+devtools::test()
+`
