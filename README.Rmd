@@ -2,7 +2,8 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- README.md is generated from README.Rmd.
+Please edit that file and run `knitr::knit("README.Rmd") from the root of this directory` -->
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
@@ -12,7 +13,7 @@ knitr::opts_chunk$set(
   fig.width = 5,
   fig.height = 4)
 
-devtools::load_all("~/Google Drive/McGill/Research/Wisbech/first90/R")
+devtools::load_all("R")
 library(data.table)
 ```
 # first90
@@ -26,133 +27,157 @@ The goal of the first90 package is to provide annual estimates of the proportion
 Install via Github using `devtools`:
 
 ``` r
-devtools::install_github("mrc-ide/first90")
+devtools::install_github("mrc-ide/first90release")
 ```
-
-This is a private repository. Installation via Github requires a Personal Access Token (PAT). To create a token, visit 
-[https://github.com/settings/tokens/new](https://github.com/settings/tokens/new). Ensure that the box "repo" is ticked,
-and click "Generate token".
-
-Create a file in home directory `~/.Renviron` with the following line (replacing `<YOUR TOKEN>` with token that appears):
-
-```
-GITHUB_PAT = <YOUR TOKEN>
-```
-
-Save the file, restart R, and use the command `install_github()` above.
 
 ## Example: Malawi
 
 This example demonstrates basic model steps.
 
 ```{r example, fig.height = 8, fig.width = 8, warning = FALSE}
-cnt <- "Malawi"
-age_group <- c('15-24','25-34','35-49')
-
 # Read PJNZ file(s)
-pjnz <- "~/Google Drive/McGill/Research/Wisbech/Spectrum files/Malawi_2018_version_8.PJNZ"
-fp <- prepare_inputs(pjnz)
+pjnz <- "~/Downloads/Malawi_2018_version_8.PJNZ"
+cnt <- first90::read_country(pjnz)
+
+fp <- first90::prepare_inputs(pjnz)
+# first90::prepare_inputs can also take a list of files, if using regional files
+# e.g. fp <- first90::prepare_inputs(list.files("~/Documents/Data/", "CotedIvoire.*PJNZ$", full.names=TRUE, ignore.case=TRUE))
 
 # We visualize the PJNZ data
-plot_pjnz(fp)
+first90::plot_pjnz(fp)
 ```
 
 The following functions enable users to produce invidual plots.
 ```
-pjnz_summary <- get_pjnz_summary_data(fp)
-plot_pjnz_pop(pjnz_summary)
-plot_pjnz_plhiv(pjnz_summary)
-plot_pjnz_prv(pjnz_summary)
-plot_pjnz_inc(pjnz_summary)
+pjnz_summary <- first90::get_pjnz_summary_data(fp)
+first90::plot_pjnz_pop(pjnz_summary)
+first90::plot_pjnz_plhiv(pjnz_summary)
+first90::plot_pjnz_prv(pjnz_summary)
+first90::plot_pjnz_inc(pjnz_summary)
 ```
 
 ```{r, fig.height = 8, fig.width = 8, warning = FALSE}
-# All surveys should be included. If serology was not collected, the model should
-# be fitted overall
-data(survey_hts)
-dat <- dat_test <- select_hts(survey_hts, cnt, age_group)
+age_group <- c('15-24','25-34','35-49')
+# Import and prepare your survey data. See [guidance](SurveyDataGuidance.md)
+survey_hts <- data.frame(country="Malawi",
+                                  surveyid="Survey1",
+                                  year=2000,
+                                  agegr="15-99",
+                                  sex="both",
+                                  outcome="evertest",
+                                  hivstatus="positive",
+                                  est=0.553,
+                                  se=0.0159,
+                                  ci_l=2.5652e-12,
+                                  ci_u=8958e-12,
+                                  counts=16168)
 
-# We prepare the program data
-data(prgm_dat)
-prg_dat <- select_prgmdata(prgm_dat, cnt, age_group)
+dat <- first90::select_hts(survey_hts, cnt, age_group)
+
+# Import and prepare your programmatic data. See [guidance](ProgramDataGuidance.md)
+prgm_dat <- data.frame(country = "Malawi",
+                            year = 2010,
+                            sex = 'both',
+                            tot = 215269,
+                            totpos = 50115,
+                            vct = NA,
+                            vctpos = NA,
+                            anc = NA,
+                            ancpos = NA)
+prg_dat <- first90::select_prgmdata(prgm_dat, cnt, age_group)
 
 # We visualize the program data
-plot_inputdata(prg_dat, fp)
+first90::plot_inputdata(prg_dat, fp)
 ```
 
 The following functions enable users to produce invidual plots.
 ```
-plot_input_tot(prgm_dat, fp)
-plot_input_totpos(prgm_dat, fp)
-plot_input_anctot(prgm_dat, fp)
-plot_input_ancpos(prgm_dat, fp)
+first90::plot_input_tot(prgm_dat, fp)
+first90::plot_input_totpos(prgm_dat, fp)
+first90::plot_input_anctot(prgm_dat, fp)
+first90::plot_input_ancpos(prgm_dat, fp)
 ```
 ```{r, fig.height = 10, fig.width = 8.5, warning = FALSE}
 # ---- Enter parameters here ----
 # We create the likelihood data
-likdat <- prepare_hts_likdat(dat, prg_dat, fp)
+likdat <- first90::prepare_hts_likdat(dat, prg_dat, fp)
 
 # Starting parameters
-data(theta0)
-ll_hts(theta0, fp, likdat)
+data("theta0", package="first90")
+first90::ll_hts(theta0, fp, likdat)
 
 opt <- optim(theta0, ll_hts, fp = fp, likdat = likdat, method = "BFGS", 
              control = list(fnscale = -1, trace = 4, REPORT = 1, maxit = 250), hessian = TRUE)
 
-simul <- simul.test(opt, fp, sim = 400)
+simul <- first90::simul.test(opt, fp, sim = 400)
 
 # ---- Plots for FITS ----
-fp <- create_hts_param(opt$par, fp)
-mod <- simmod(fp)
+fp <- first90::create_hts_param(opt$par, fp)
+mod <- first90::simmod(fp)
 
 # ---- The Fitted Parameters ----
-optimized_par(opt)
+first90::optimized_par(opt)
 
 # ---- Functions for individuals model fits ----
-data(survey_hts)
-out_evertest <- get_out_evertest(mod, fp)
+out_evertest <- first90::get_out_evertest(mod, fp)
 
-plot_out(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+first90::plot_out(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
 ```
   
 The model fits by age and sex.
 ```{r, fig.height = 5, fig.width = 8.5, warning=FALSE}
-plot_out_strat(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+first90::plot_out_strat(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
 ```
 The following functions enable users to produce invidual plots.
 ```
-plot_out_nbtest(mod, fp, likdat, cnt, simul)
-plot_out_nbpostest(mod, fp, likdat, cnt, simul)
-plot_out_evertestneg(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
-plot_out_evertestpos(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
-plot_out_evertest(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
-plot_out_90s(mod, fp, likdat, cnt, out_evertest, simul)
-plot_out_evertest_fbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
-plot_out_evertest_mbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+first90::plot_out_nbtest(mod, fp, likdat, cnt, simul)
+first90::plot_out_nbpostest(mod, fp, likdat, cnt, simul)
+first90::plot_out_evertestneg(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+first90::plot_out_evertestpos(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+first90::plot_out_evertest(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+first90::plot_out_90s(mod, fp, likdat, cnt, out_evertest, survey_hts, simul)
+first90::plot_out_evertest_fbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+first90::plot_out_evertest_mbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
 ```
 We can compare HIV tests' positivity through time, the estimated *true* yield of new HIV diagnoses, and compare those to population-level HIV prevalence.
 
 ```{r, fig.height = 5, fig.width = 5, warning = FALSE}
 par(mfrow = c(1,1))
-plot_prv_pos_yld(mod, fp, likdat, cnt, yr_pred = 2018) 
+first90::plot_prv_pos_yld(mod, fp, likdat, cnt, yr_pred = 2018)
 ```
 
 We can also examine some ouptuts related to the distribution of HIV tests performed in those susceptibles to HIV and PLHIV by different awareness and treatment status. (First sets of graphs is on the absolute scale, second one on the relative scale.)
 
 ```{r, fig.height = 5, fig.width = 8.5, warning = FALSE}
 par(mfrow = c(1,2))
-plot_retest_test_neg(mod, fp, likdat, cnt)
-plot_retest_test_pos(mod, fp, likdat, cnt)
+first90::plot_retest_test_neg(mod, fp, likdat, cnt)
+first90::plot_retest_test_pos(mod, fp, likdat, cnt)
 
 par(mfrow = c(1,2))
-plot_retest_test_neg(mod, fp, likdat, cnt, relative = TRUE)
-plot_retest_test_pos(mod, fp, likdat, cnt, relative = TRUE)
+first90::plot_retest_test_neg(mod, fp, likdat, cnt, relative = TRUE)
+first90::plot_retest_test_pos(mod, fp, likdat, cnt, relative = TRUE)
 ```
 
 Finally, tabular outputs can be obtained by using the following functions.
 ```{r, warning = FALSE}
 # ---- Tabular outputs ----
-tab_out_evertest(mod, fp, simul = simul)
-tab_out_aware(mod, fp, simul = simul)
-tab_out_artcov(mod, fp)
+first90::tab_out_evertest(mod, fp, simul = simul)
+first90::tab_out_aware(mod, fp, simul = simul)
+first90::tab_out_nbaware(mod, fp)
+first90::tab_out_artcov(mod, fp)
 ```
+
+## Running tests
+Some tests require sample files. If you have access, Spectrum files are available on SharePoint [here](https://imperiallondon-my.sharepoint.com/:f:/r/personal/epidem_ic_ac_uk/Documents/UNAIDS%20Ref%20Group%20Shared%20Drive/Ref%20Group%20Meetings/Meetings%202018/first%2090%20workshop%20-%20Wisbech%20August%202018?csf=1&e=MFospr)
+To use them, create a directory with `mkdir tests/testhat/sample_files` and copy the Malawi .PJNZ file into it.
+
+Or if you access to the private repo, you can clone it:
+
+```
+git clone https://github.com/mrc-ide/shiny90_sample_files tests/testthat/sample_files
+```
+
+Then run
+`r
+devtools::test()
+`

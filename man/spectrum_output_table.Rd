@@ -20,10 +20,14 @@ Presently this returns point estimates for age 15+ population by sex:
 \item Aware of HIV+ status
 \item On ART
 }
+
+PLHIV is mid-year estimate. All other outcomes are end of year estimate.
 }
 \examples{
 
+\dontrun{
 write.csv(spectrum_output_table(mod, fp), 
           "~/Downloads/Malawi-shiny90-example-output.csv", 
            row.names = FALSE)
+}
 }
