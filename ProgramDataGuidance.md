@@ -1,8 +1,6 @@
 ## Guidance on program data
 
-This should be data sourced from national testing programs. For each year provide either sex 
-aggregated data (1 row with sex = "both") or sex disaggregated data (2 rows with sex="male" and 
-sex="female" respectively). This should be for age-group 15-99 only.
+This should be data sourced from national testing programs (both public and private sectors testing should be included). The number of HIV tests should refer to the number of tests whose results were provided back to clients. For each year provide either sex aggregated data (1 row with both sex combined; sex = "both") or sex disaggregated data (2 rows with sex="male" and sex="female", respectively). This should be for age-group 15-99 only. 
 
 This needs to be a data-frame with the following columns. If these columns names are wrong the model
 will either not run, or the results will not be accurate.
@@ -13,7 +11,7 @@ will either not run, or the results will not be accurate.
  country <- read_country(pjnz)
 ```
 
-* year: Year in which the survey was conducted; year of survey fieldwork midpoint if survey spanned multiple years.
+* year: Calendar year in which the HIV tests were performed.
 * sex: For each year EITHER provide disaggregated values for "male" and "female", or an aggregated value for "both"
 * agegr: This should be "15-99" for all rows.
 * tot: This is the annual number of tests performed at the national level among the population aged 15+ years of age. 
