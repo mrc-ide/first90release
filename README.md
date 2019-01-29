@@ -1,20 +1,17 @@
----
-output: github_document
----
 
 <!-- README.md is generated from README.Rmd.
 Please edit that file and run `knitr::knit("README.Rmd") from the root of this directory` -->
-
-
-# first90
+first90
+=======
 
 [![Travis-CI Build Status](https://travis-ci.com/mrc-ide/first90release.svg?branch=master)](https://travis-ci.com/mrc-ide/first90release)
 
-UNAIDS put forward the ambitious 90-90-90 target to end the AIDS epidemic by 2030. This target aims for 90% of people living with HIV (PLHIV) to be aware of their HIV-positive status, 90% of those diagnosed to receive antiretroviral therapy, and 90% of those on treatment to have a suppressed viral load by 2020 (each reaching 95% by 2030). HIV testing remains an important bottleneck in this cascade, however, and obtaining reliable epidemiological data on the proportion of PLHIV aware of their status is difficult. Such information is nevertheless crucial to effectively monitor HIV prevention efforts. Tracking progress towards achievement of this “first 90” target could be improved by combining population-based surveys and programmatic data on the number of HIV tests performed (and yield) in a coherent deterministic/statistical model. This type of integrative systems modelling is especially useful to fully consider HIV incidence, mortality, testing behaviours, as well as to coherently combine different sources of data. 
+UNAIDS put forward the ambitious 90-90-90 target to end the AIDS epidemic by 2030. This target aims for 90% of people living with HIV (PLHIV) to be aware of their HIV-positive status, 90% of those diagnosed to receive antiretroviral therapy, and 90% of those on treatment to have a suppressed viral load by 2020 (each reaching 95% by 2030). HIV testing remains an important bottleneck in this cascade, however, and obtaining reliable epidemiological data on the proportion of PLHIV aware of their status is difficult. Such information is nevertheless crucial to effectively monitor HIV prevention efforts. Tracking progress towards achievement of this “first 90” target could be improved by combining population-based surveys and programmatic data on the number of HIV tests performed (and yield) in a coherent deterministic/statistical model. This type of integrative systems modelling is especially useful to fully consider HIV incidence, mortality, testing behaviours, as well as to coherently combine different sources of data.
 
-The goal of the first90 package is to provide annual estimates of the proportion of PLHIV that are aware of their status, by combining estimates of PLHIV from EPP/Spectrum, annual programmatic data on the number of HIV tests performed (and yield), and nationally-representative survey of HIV testing behaviors. 
+The goal of the first90 package is to provide annual estimates of the proportion of PLHIV that are aware of their status, by combining estimates of PLHIV from EPP/Spectrum, annual programmatic data on the number of HIV tests performed (and yield), and nationally-representative survey of HIV testing behaviors.
 
-## Installation
+Installation
+------------
 
 Install via Github using `devtools`:
 
@@ -22,12 +19,12 @@ Install via Github using `devtools`:
 devtools::install_github("mrc-ide/first90release")
 ```
 
-## Example: Malawi
+Example: Malawi
+---------------
 
 This example demonstrates basic model steps.
 
-
-```r
+``` r
 # Read PJNZ file(s)
 pjnz <- "~/Downloads/Malawi_2018_version_8.PJNZ"
 cnt <- first90::read_country(pjnz)
@@ -41,19 +38,17 @@ fp$popadjust <- FALSE
 first90::plot_pjnz(fp)
 ```
 
-![plot of chunk example](man/figures/README-example-1.png)
+![](man/figures/README-example-1.png)
 
 The following functions enable users to produce invidual plots.
-```
-pjnz_summary <- first90::get_pjnz_summary_data(fp)
-first90::plot_pjnz_pop(pjnz_summary)
-first90::plot_pjnz_plhiv(pjnz_summary)
-first90::plot_pjnz_prv(pjnz_summary)
-first90::plot_pjnz_inc(pjnz_summary)
-```
 
+    pjnz_summary <- first90::get_pjnz_summary_data(fp)
+    first90::plot_pjnz_pop(pjnz_summary)
+    first90::plot_pjnz_plhiv(pjnz_summary)
+    first90::plot_pjnz_prv(pjnz_summary)
+    first90::plot_pjnz_inc(pjnz_summary)
 
-```r
+``` r
 age_group <- c('15-24','25-34','35-49')
 # Import and prepare your survey data. See [guidance](SurveyDataGuidance.md)
 survey_hts <- data.frame(country="Malawi",
@@ -77,27 +72,26 @@ prgm_dat <- data.frame(country = "Malawi",
                             sex = 'both',
                             tot = 215269,
                             totpos = 50115,
-                            vct = NA,
-                            vctpos = NA,
-                            anc = NA,
-                            ancpos = NA)
+                            vct = 107634,
+                            vctpos = 25057,
+                            anc = 107635,
+                            ancpos = 25058)
 prg_dat <- first90::select_prgmdata(prgm_dat, cnt, age_group)
 
 # We visualize the program data
 first90::plot_inputdata(prg_dat, fp)
 ```
 
-![plot of chunk unnamed-chunk-1](man/figures/README-unnamed-chunk-1-1.png)
+![](man/figures/README-unnamed-chunk-1-1.png)
 
 The following functions enable users to produce invidual plots.
-```
-first90::plot_input_tot(prgm_dat, fp)
-first90::plot_input_totpos(prgm_dat, fp)
-first90::plot_input_anctot(prgm_dat, fp)
-first90::plot_input_ancpos(prgm_dat, fp)
-```
 
-```r
+    first90::plot_input_tot(prgm_dat, fp)
+    first90::plot_input_totpos(prgm_dat, fp)
+    first90::plot_input_anctot(prgm_dat, fp)
+    first90::plot_input_ancpos(prgm_dat, fp)
+
+``` r
 # ---- Enter parameters here ----
 # We create the likelihood data
 likdat <- first90::prepare_hts_likdat(dat, prg_dat, fp)
@@ -243,82 +237,79 @@ out_evertest <- first90::get_out_evertest(mod, fp)
 first90::plot_out(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
 ```
 
-![plot of chunk unnamed-chunk-2](man/figures/README-unnamed-chunk-2-1.png)
-  
+![](man/figures/README-unnamed-chunk-2-1.png)
+
 The model fits by age and sex.
 
-```r
+``` r
 first90::plot_out_strat(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
 ```
 
-![plot of chunk unnamed-chunk-3](man/figures/README-unnamed-chunk-3-1.png)
-The following functions enable users to produce invidual plots.
-```
-first90::plot_out_nbtest(mod, fp, likdat, cnt, simul)
-first90::plot_out_nbpostest(mod, fp, likdat, cnt, simul)
-first90::plot_out_evertestneg(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
-first90::plot_out_evertestpos(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
-first90::plot_out_evertest(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
-first90::plot_out_90s(mod, fp, likdat, cnt, out_evertest, survey_hts, simul)
-first90::plot_out_evertest_fbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
-first90::plot_out_evertest_mbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
-```
+![](man/figures/README-unnamed-chunk-3-1.png) The following functions enable users to produce invidual plots.
+
+    first90::plot_out_nbtest(mod, fp, likdat, cnt, simul)
+    first90::plot_out_nbpostest(mod, fp, likdat, cnt, simul)
+    first90::plot_out_evertestneg(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+    first90::plot_out_evertestpos(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+    first90::plot_out_evertest(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+    first90::plot_out_90s(mod, fp, likdat, cnt, out_evertest, survey_hts, simul)
+    first90::plot_out_evertest_fbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+    first90::plot_out_evertest_mbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+
 We can compare HIV tests' positivity through time, the estimated *true* yield of new HIV diagnoses, and compare those to population-level HIV prevalence.
 
-
-```r
+``` r
 par(mfrow = c(1,1))
 first90::plot_prv_pos_yld(mod, fp, likdat, cnt, yr_pred = 2018)
 ```
 
-![plot of chunk unnamed-chunk-4](man/figures/README-unnamed-chunk-4-1.png)
+![](man/figures/README-unnamed-chunk-4-1.png)
 
 We can also examine some ouptuts related to the distribution of HIV tests performed in those susceptibles to HIV and PLHIV by different awareness and treatment status. (First sets of graphs is on the absolute scale, second one on the relative scale.)
 
-
-```r
+``` r
 par(mfrow = c(1,2))
 first90::plot_retest_test_neg(mod, fp, likdat, cnt)
 first90::plot_retest_test_pos(mod, fp, likdat, cnt)
 ```
 
-![plot of chunk unnamed-chunk-5](man/figures/README-unnamed-chunk-5-1.png)
+![](man/figures/README-unnamed-chunk-5-1.png)
 
-```r
+``` r
 
 par(mfrow = c(1,2))
 first90::plot_retest_test_neg(mod, fp, likdat, cnt, relative = TRUE)
 first90::plot_retest_test_pos(mod, fp, likdat, cnt, relative = TRUE)
 ```
 
-![plot of chunk unnamed-chunk-5](man/figures/README-unnamed-chunk-5-2.png)
+![](man/figures/README-unnamed-chunk-5-2.png)
 
 Finally, tabular outputs can be obtained by using the following functions.
 
-```r
+``` r
 # ---- Tabular outputs ----
 first90::tab_out_evertest(mod, fp, simul = simul)
 #>   year  outcome agegr  sex hivstatus value lower upper
-#> 1 2010 evertest 15-49 both       all   9.8   8.4  12.3
-#> 2 2011 evertest 15-49 both       all  11.5  10.0  14.0
-#> 3 2012 evertest 15-49 both       all  13.1  11.2  16.1
-#> 4 2013 evertest 15-49 both       all  14.6  12.2  18.6
+#> 1 2010 evertest 15-49 both       all   9.8   8.3  12.5
+#> 2 2011 evertest 15-49 both       all  11.5  10.0  14.2
+#> 3 2012 evertest 15-49 both       all  13.1  11.3  16.1
+#> 4 2013 evertest 15-49 both       all  14.6  12.2  18.4
 #> 5 2014 evertest 15-49 both       all  15.8  13.0  21.1
-#> 6 2015 evertest 15-49 both       all  16.9  13.6  23.7
-#> 7 2016 evertest 15-49 both       all  18.0  14.1  26.6
-#> 8 2017 evertest 15-49 both       all  19.0  14.6  29.3
-#> 9 2018 evertest 15-49 both       all  19.8  15.0  31.5
+#> 6 2015 evertest 15-49 both       all  16.9  13.5  23.9
+#> 7 2016 evertest 15-49 both       all  18.0  14.1  26.4
+#> 8 2017 evertest 15-49 both       all  19.0  14.5  28.5
+#> 9 2018 evertest 15-49 both       all  19.8  14.8  30.5
 first90::tab_out_aware(mod, fp, simul = simul)
 #>   year outcome agegr  sex hivstatus value lower upper
-#> 1 2010   aware 15-49 both  positive  27.3  27.3  29.0
-#> 2 2011   aware 15-49 both  positive  33.9  33.9  34.7
+#> 1 2010   aware 15-49 both  positive  27.3  27.3  29.2
+#> 2 2011   aware 15-49 both  positive  33.9  33.9  34.8
 #> 3 2012   aware 15-49 both  positive  40.7  40.7  41.3
-#> 4 2013   aware 15-49 both  positive  46.7  46.7  47.6
-#> 5 2014   aware 15-49 both  positive  51.8  51.7  53.1
-#> 6 2015   aware 15-49 both  positive  56.9  56.8  58.6
-#> 7 2016   aware 15-49 both  positive  62.5  62.5  64.3
-#> 8 2017   aware 15-49 both  positive  67.7  67.6  69.5
-#> 9 2018   aware 15-49 both  positive  72.1  72.0  74.0
+#> 4 2013   aware 15-49 both  positive  46.7  46.7  47.5
+#> 5 2014   aware 15-49 both  positive  51.8  51.7  53.3
+#> 6 2015   aware 15-49 both  positive  56.9  56.8  58.7
+#> 7 2016   aware 15-49 both  positive  62.5  62.5  64.1
+#> 8 2017   aware 15-49 both  positive  67.7  67.6  69.2
+#> 9 2018   aware 15-49 both  positive  72.1  72.0  73.6
 first90::tab_out_nbaware(mod, fp)
 #>   year      outcome agegr  sex hivstatus  value
 #> 1 2010 number aware 15-49 both  positive 196422
@@ -343,17 +334,13 @@ first90::tab_out_artcov(mod, fp)
 #> 9 2018  artcov   15+ both  positive  75.7
 ```
 
-## Running tests
-Some tests require sample files. If you have access, Spectrum files are available on SharePoint [here](https://imperiallondon-my.sharepoint.com/:f:/r/personal/epidem_ic_ac_uk/Documents/UNAIDS%20Ref%20Group%20Shared%20Drive/Ref%20Group%20Meetings/Meetings%202018/first%2090%20workshop%20-%20Wisbech%20August%202018?csf=1&e=MFospr)
-To use them, create a directory with `mkdir tests/testhat/sample_files` and copy the Malawi .PJNZ file into it.
+Running tests
+-------------
+
+Some tests require sample files. If you have access, Spectrum files are available on SharePoint [here](https://imperiallondon-my.sharepoint.com/:f:/r/personal/epidem_ic_ac_uk/Documents/UNAIDS%20Ref%20Group%20Shared%20Drive/Ref%20Group%20Meetings/Meetings%202018/first%2090%20workshop%20-%20Wisbech%20August%202018?csf=1&e=MFospr) To use them, create a directory with `mkdir tests/testhat/sample_files` and copy the Malawi .PJNZ file into it.
 
 Or if you access to the private repo, you can clone it:
 
-```
-git clone https://github.com/mrc-ide/shiny90_sample_files tests/testthat/sample_files
-```
+    git clone https://github.com/mrc-ide/shiny90_sample_files tests/testthat/sample_files
 
-Then run
-`r
-devtools::test()
-`
+Then run `r devtools::test()`
