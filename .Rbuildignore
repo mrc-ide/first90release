@@ -2,3 +2,4 @@
 ^data-raw$
 ^LICENSE\.md$
 ^dev$
+^.travis.yml$

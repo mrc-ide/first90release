@@ -1,293 +1,359 @@
+---
+output: github_document
+---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-first90
-=======
+<!-- README.md is generated from README.Rmd.
+Please edit that file and run `knitr::knit("README.Rmd") from the root of this directory` -->
 
-UNAIDS put forward the ambitious 90-90-90 target to end the AIDS epidemic by 2030. This target aims for 90% of people living with HIV (PLHIV) to be aware of their HIV-positive status, 90% of those diagnosed to receive antiretroviral therapy, and 90% of those on treatment to have a suppressed viral load by 2020 (each reaching 95% by 2030). HIV testing remains an important bottleneck in this cascade, however, and obtaining reliable epidemiological data on the proportion of PLHIV aware of their status is difficult. Such information is nevertheless crucial to effectively monitor HIV prevention efforts. Tracking progress towards achievement of this “first 90” target could be improved by combining population-based surveys and programmatic data on the number of HIV tests performed (and yield) in a coherent deterministic/statistical model. This type of integrative systems modelling is especially useful to fully consider HIV incidence, mortality, testing behaviours, as well as to coherently combine different sources of data.
 
-The goal of the first90 package is to provide annual estimates of the proportion of PLHIV that are aware of their status, by combining estimates of PLHIV from EPP/Spectrum, annual programmatic data on the number of HIV tests performed (and yield), and nationally-representative survey of HIV testing behaviors.
+# first90
 
-Installation
-------------
+[![Travis-CI Build Status](https://travis-ci.com/mrc-ide/first90release.svg?branch=master)](https://travis-ci.com/mrc-ide/first90release)
+
+UNAIDS put forward the ambitious 90-90-90 target to end the AIDS epidemic by 2030. This target aims for 90% of people living with HIV (PLHIV) to be aware of their HIV-positive status, 90% of those diagnosed to receive antiretroviral therapy, and 90% of those on treatment to have a suppressed viral load by 2020 (each reaching 95% by 2030). HIV testing remains an important bottleneck in this cascade, however, and obtaining reliable epidemiological data on the proportion of PLHIV aware of their status is difficult. Such information is nevertheless crucial to effectively monitor HIV prevention efforts. Tracking progress towards achievement of this “first 90” target could be improved by combining population-based surveys and programmatic data on the number of HIV tests performed (and yield) in a coherent deterministic/statistical model. This type of integrative systems modelling is especially useful to fully consider HIV incidence, mortality, testing behaviours, as well as to coherently combine different sources of data. 
+
+The goal of the first90 package is to provide annual estimates of the proportion of PLHIV that are aware of their status, by combining estimates of PLHIV from EPP/Spectrum, annual programmatic data on the number of HIV tests performed (and yield), and nationally-representative survey of HIV testing behaviors. 
+
+## Installation
 
 Install via Github using `devtools`:
 
 ``` r
-devtools::install_github("mrc-ide/first90")
+devtools::install_github("mrc-ide/first90release")
 ```
 
-This is a private repository. Installation via Github requires a Personal Access Token (PAT). To create a token, visit <https://github.com/settings/tokens/new>. Ensure that the box "repo" is ticked, and click "Generate token".
-
-Create a file in home directory `~/.Renviron` with the following line (replacing `<YOUR TOKEN>` with token that appears):
-
-    GITHUB_PAT = <YOUR TOKEN>
-
-Save the file, restart R, and use the command `install_github()` above.
-
-Example: Malawi
----------------
+## Example: Malawi
 
 This example demonstrates basic model steps.
 
-``` r
-cnt <- "Malawi"
-age_group <- c('15-24','25-34','35-49')
 
+```r
 # Read PJNZ file(s)
-pjnz <- "~/Google Drive/McGill/Research/Wisbech/Spectrum files/Malawi_2018_version_8.PJNZ"
-fp <- prepare_inputs(pjnz)
+pjnz <- "~/Downloads/Malawi_2018_version_8.PJNZ"
+cnt <- first90::read_country(pjnz)
+
+fp <- first90::prepare_inputs(pjnz)
+# first90::prepare_inputs can also take a list of files, if using regional files
+# e.g. fp <- first90::prepare_inputs(list.files("~/Documents/Data/", "CotedIvoire.*PJNZ$", full.names=TRUE, ignore.case=TRUE))
+fp$popadjust <- FALSE
 
 # We visualize the PJNZ data
-plot_pjnz(fp)
+first90::plot_pjnz(fp)
 ```
 
-![](man/figures/README-example-1.png)
+![plot of chunk example](man/figures/README-example-1.png)
 
 The following functions enable users to produce invidual plots.
+```
+pjnz_summary <- first90::get_pjnz_summary_data(fp)
+first90::plot_pjnz_pop(pjnz_summary)
+first90::plot_pjnz_plhiv(pjnz_summary)
+first90::plot_pjnz_prv(pjnz_summary)
+first90::plot_pjnz_inc(pjnz_summary)
+```
 
-    pjnz_summary <- get_pjnz_summary_data(fp)
-    plot_pjnz_pop(pjnz_summary)
-    plot_pjnz_plhiv(pjnz_summary)
-    plot_pjnz_prv(pjnz_summary)
-    plot_pjnz_inc(pjnz_summary)
 
-``` r
-# All surveys should be included. If serology was not collected, the model should
-# be fitted overall
-data(survey_hts)
-dat <- dat_test <- select_hts(survey_hts, cnt, age_group)
+```r
+age_group <- c('15-24','25-34','35-49')
+# Import and prepare your survey data. See [guidance](SurveyDataGuidance.md)
+survey_hts <- data.frame(country="Malawi",
+                                  surveyid="Survey1",
+                                  year=2000,
+                                  agegr="15-99",
+                                  sex="both",
+                                  outcome="evertest",
+                                  hivstatus="positive",
+                                  est=0.553,
+                                  se=0.0159,
+                                  ci_l=2.5652e-12,
+                                  ci_u=8958e-12,
+                                  counts=16168)
 
-# We prepare the program data
-data(prgm_dat)
-prg_dat <- select_prgmdata(prgm_dat, cnt, age_group)
+dat <- first90::select_hts(survey_hts, cnt, age_group)
+
+# Import and prepare your programmatic data. See [guidance](ProgramDataGuidance.md)
+prgm_dat <- data.frame(country = "Malawi",
+                            year = 2010,
+                            sex = 'both',
+                            tot = 215269,
+                            totpos = 50115,
+                            vct = NA,
+                            vctpos = NA,
+                            anc = NA,
+                            ancpos = NA)
+prg_dat <- first90::select_prgmdata(prgm_dat, cnt, age_group)
 
 # We visualize the program data
-plot_inputdata(prg_dat, fp)
+first90::plot_inputdata(prg_dat, fp)
 ```
 
-![](man/figures/README-unnamed-chunk-1-1.png)
+![plot of chunk unnamed-chunk-1](man/figures/README-unnamed-chunk-1-1.png)
 
 The following functions enable users to produce invidual plots.
+```
+first90::plot_input_tot(prgm_dat, fp)
+first90::plot_input_totpos(prgm_dat, fp)
+first90::plot_input_anctot(prgm_dat, fp)
+first90::plot_input_ancpos(prgm_dat, fp)
+```
 
-    plot_input_tot(prgm_dat, fp)
-    plot_input_totpos(prgm_dat, fp)
-    plot_input_anctot(prgm_dat, fp)
-    plot_input_ancpos(prgm_dat, fp)
-
-``` r
+```r
 # ---- Enter parameters here ----
 # We create the likelihood data
-likdat <- prepare_hts_likdat(dat, prg_dat, fp)
+likdat <- first90::prepare_hts_likdat(dat, prg_dat, fp)
 
 # Starting parameters
-data(theta0)
-ll_hts(theta0, fp, likdat)
-#> [1] -13801.64
+data("theta0", package="first90")
+first90::ll_hts(theta0, fp, likdat)
+#> [1] -3427.233
 
 opt <- optim(theta0, ll_hts, fp = fp, likdat = likdat, method = "BFGS", 
              control = list(fnscale = -1, trace = 4, REPORT = 1, maxit = 250), hessian = TRUE)
-#> initial  value 13801.640245 
-#> iter   2 value 8534.729033
-#> iter   3 value 6012.879598
-#> iter   4 value 5959.329582
-#> iter   5 value 5347.251127
-#> iter   6 value 4614.303482
-#> iter   7 value 4411.501226
-#> iter   8 value 4347.134154
-#> iter   9 value 4280.783307
-#> iter  10 value 4183.540230
-#> iter  11 value 4124.194076
-#> iter  12 value 4035.166598
-#> iter  13 value 4005.548672
-#> iter  14 value 3975.052745
-#> iter  15 value 3938.852808
-#> iter  16 value 3914.482890
-#> iter  17 value 3877.065883
-#> iter  18 value 3852.556175
-#> iter  19 value 3816.662841
-#> iter  20 value 3602.969351
-#> iter  21 value 3474.652594
-#> iter  22 value 3364.761592
-#> iter  23 value 3186.673116
-#> iter  24 value 3068.396406
-#> iter  25 value 2980.821757
-#> iter  26 value 2883.062528
-#> iter  27 value 2752.062613
-#> iter  28 value 2695.152034
-#> iter  29 value 2632.177829
-#> iter  30 value 2605.798911
-#> iter  31 value 2569.553112
-#> iter  32 value 2511.754026
-#> iter  33 value 2385.772192
-#> iter  34 value 2296.874753
-#> iter  35 value 2233.635205
-#> iter  36 value 2191.844359
-#> iter  37 value 2155.164806
-#> iter  38 value 2001.722851
-#> iter  39 value 1982.408574
-#> iter  40 value 1934.754416
-#> iter  41 value 1864.043628
-#> iter  42 value 1841.536140
-#> iter  43 value 1764.507459
-#> iter  44 value 1647.811384
-#> iter  45 value 1542.302552
-#> iter  46 value 1382.316787
-#> iter  47 value 1272.413850
-#> iter  48 value 1253.242377
-#> iter  49 value 1130.062404
-#> iter  50 value 1019.733511
-#> iter  51 value 996.674939
-#> iter  52 value 985.160317
-#> iter  53 value 980.457466
-#> iter  54 value 971.728088
-#> iter  55 value 968.203247
-#> iter  56 value 965.470428
-#> iter  57 value 963.480493
-#> iter  58 value 961.978989
-#> iter  59 value 960.360585
-#> iter  60 value 959.249424
-#> iter  61 value 958.327285
-#> iter  62 value 957.745761
-#> iter  63 value 957.517254
-#> iter  64 value 957.441684
-#> iter  65 value 957.395900
-#> iter  66 value 957.355779
-#> iter  67 value 957.303001
-#> iter  68 value 957.235538
-#> iter  69 value 957.132734
-#> iter  70 value 956.976147
-#> iter  71 value 956.772458
-#> iter  72 value 956.573834
-#> iter  73 value 956.444601
-#> iter  74 value 956.383929
-#> iter  75 value 956.351233
-#> iter  76 value 956.332351
-#> iter  77 value 956.323973
-#> iter  78 value 956.319430
-#> iter  79 value 956.317595
-#> iter  80 value 956.316623
-#> iter  81 value 956.316391
-#> iter  82 value 956.316336
-#> iter  82 value 956.316329
-#> iter  82 value 956.316328
-#> final  value 956.316328 
+#> initial  value 3427.232508 
+#> iter   2 value 369.945759
+#> iter   3 value 222.457279
+#> iter   4 value 158.009632
+#> iter   5 value 117.799406
+#> iter   6 value 102.687225
+#> iter   7 value 94.719857
+#> iter   8 value 87.048252
+#> iter   9 value 77.684113
+#> iter  10 value 68.187378
+#> iter  11 value 62.329042
+#> iter  12 value 60.508361
+#> iter  13 value 57.721118
+#> iter  14 value 54.631766
+#> iter  15 value 53.447347
+#> iter  16 value 51.597621
+#> iter  17 value 50.119554
+#> iter  18 value 48.384023
+#> iter  19 value 47.229686
+#> iter  20 value 45.934468
+#> iter  21 value 44.587330
+#> iter  22 value 43.560255
+#> iter  23 value 42.702447
+#> iter  24 value 42.174042
+#> iter  25 value 41.427545
+#> iter  26 value 40.476660
+#> iter  27 value 40.037037
+#> iter  28 value 39.403998
+#> iter  29 value 39.059523
+#> iter  30 value 38.775756
+#> iter  31 value 38.249146
+#> iter  32 value 38.131343
+#> iter  33 value 38.010536
+#> iter  34 value 37.360660
+#> iter  35 value 36.950264
+#> iter  36 value 36.811929
+#> iter  37 value 36.700664
+#> iter  38 value 36.536124
+#> iter  39 value 36.458675
+#> iter  40 value 36.389936
+#> iter  41 value 36.344504
+#> iter  42 value 36.244944
+#> iter  43 value 36.143299
+#> iter  44 value 35.820013
+#> iter  45 value 35.462645
+#> iter  46 value 34.627209
+#> iter  47 value 34.273282
+#> iter  48 value 33.167439
+#> iter  49 value 31.999808
+#> iter  50 value 31.357133
+#> iter  51 value 30.496347
+#> iter  52 value 30.107522
+#> iter  53 value 29.338619
+#> iter  54 value 28.866870
+#> iter  55 value 28.293301
+#> iter  56 value 28.010430
+#> iter  57 value 27.453825
+#> iter  58 value 26.405110
+#> iter  59 value 26.021922
+#> iter  60 value 25.718035
+#> iter  61 value 25.691085
+#> iter  62 value 25.620782
+#> iter  63 value 25.607961
+#> iter  64 value 25.555273
+#> iter  65 value 25.547471
+#> iter  66 value 25.545472
+#> iter  67 value 25.517417
+#> iter  68 value 25.506539
+#> iter  69 value 25.490988
+#> iter  70 value 25.489505
+#> iter  71 value 25.477084
+#> iter  72 value 25.471116
+#> iter  73 value 25.462894
+#> iter  74 value 25.455307
+#> iter  75 value 25.452654
+#> iter  76 value 25.448729
+#> iter  77 value 25.447455
+#> iter  78 value 25.447015
+#> iter  79 value 25.445473
+#> iter  80 value 25.445343
+#> iter  81 value 25.444019
+#> iter  82 value 25.442543
+#> iter  83 value 25.441782
+#> iter  84 value 25.441665
+#> iter  85 value 25.440748
+#> iter  86 value 25.439836
+#> iter  87 value 25.439417
+#> iter  88 value 25.439339
+#> iter  89 value 25.439154
+#> iter  90 value 25.438856
+#> iter  91 value 25.438543
+#> iter  92 value 25.438384
+#> iter  93 value 25.438247
+#> iter  94 value 25.438067
+#> iter  95 value 25.438051
+#> iter  95 value 25.438051
+#> iter  96 value 25.438050
+#> iter  97 value 25.437732
+#> iter  98 value 25.437346
+#> iter  99 value 25.437097
+#> iter  99 value 25.437097
+#> final  value 25.437097 
 #> converged
 
-simul <- simul.test(opt, fp, sim = 400)
-#> Loading required package: MASS
-#> Loading required package: Matrix
+simul <- first90::simul.test(opt, fp, sim = 400)
 
 # ---- Plots for FITS ----
-fp <- create_hts_param(opt$par, fp)
-mod <- simmod(fp)
+fp <- first90::create_hts_param(opt$par, fp)
+mod <- first90::simmod(fp)
 
 # ---- The Fitted Parameters ----
-optimized_par(opt)
+first90::optimized_par(opt)
+#> Loading required package: Matrix
 #>                               Parameter_Name Estimate  LCI  UCI
-#> 1                    RR testing: men in 2005     0.81 0.74 0.88
-#> 2                    RR testing: men in 2012     0.44 0.41 0.46
-#> 3                              RR re-testing     1.13 1.09 1.19
-#> 4                  RR testing: PLHIV unaware     0.92 0.82 1.04
-#> 5  RR re-testing: PLHIV aware (not ART) 2010     1.70 1.50 1.93
-#> 6  RR re-testing: PLHIV aware (not ART) 2017     1.16 0.93 1.43
-#> 7  RR re-testing: PLHIV on ART (*RR not ART)     0.03 0.00 0.17
-#> 8                         RR among 25-34 men     1.53 1.38 1.68
-#> 9                           RR among 35+ men     0.82 0.74 0.92
-#> 10                      RR among 25-34 women     1.28 1.20 1.37
-#> 11                        RR among 35+ women     0.62 0.58 0.66
-#> 12            % of OI tested for HIV in 2015     0.82 0.74 0.86
-#> 13      SD penatly for testing rate (female)     0.10 0.10 0.10
-#> 14   SD penatly for RR PLHIV aware (not ART)     0.25 0.01 0.25
+#> 1                    RR testing: men in 2005     0.82 0.63 0.96
+#> 2                    RR testing: men in 2012     0.89 0.78 0.97
+#> 3                         RR re-testing 2010     1.98 1.65 2.43
+#> 4                         RR re-testing 2015     1.98 1.62 2.49
+#> 5                  RR testing: PLHIV unaware     1.53 1.48 1.57
+#> 6  RR re-testing: PLHIV aware (not ART) 2010     1.06 0.11 4.92
+#> 7  RR re-testing: PLHIV aware (not ART) 2017     1.06 0.08 5.53
+#> 8  RR re-testing: PLHIV on ART (*RR not ART)     0.14 0.01 0.73
+#> 9                         RR among 25-34 men     1.56 1.38 1.75
+#> 10                          RR among 35+ men     3.25 2.99 3.52
+#> 11                      RR among 25-34 women     2.13 1.95 2.31
+#> 12                        RR among 35+ women     3.85 3.58 4.11
+#> 13                        RR OI Dx (ART Cov)     1.60 1.50 1.60
 
 # ---- Functions for individuals model fits ----
-data(survey_hts)
-out_evertest <- get_out_evertest(mod, fp)
+out_evertest <- first90::get_out_evertest(mod, fp)
 
-plot_out(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+first90::plot_out(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
 ```
 
-![](man/figures/README-unnamed-chunk-2-1.png)
-
+![plot of chunk unnamed-chunk-2](man/figures/README-unnamed-chunk-2-1.png)
+  
 The model fits by age and sex.
 
-``` r
-plot_out_strat(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+```r
+first90::plot_out_strat(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
 ```
 
-![](man/figures/README-unnamed-chunk-3-1.png) The following functions enable users to produce invidual plots.
-
-    plot_out_nbtest(mod, fp, likdat, cnt, simul)
-    plot_out_nbpostest(mod, fp, likdat, cnt, simul)
-    plot_out_evertestneg(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
-    plot_out_evertestpos(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
-    plot_out_evertest(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
-    plot_out_90s(mod, fp, likdat, cnt, out_evertest, simul)
-    plot_out_evertest_fbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
-    plot_out_evertest_mbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
-
+![plot of chunk unnamed-chunk-3](man/figures/README-unnamed-chunk-3-1.png)
+The following functions enable users to produce invidual plots.
+```
+first90::plot_out_nbtest(mod, fp, likdat, cnt, simul)
+first90::plot_out_nbpostest(mod, fp, likdat, cnt, simul)
+first90::plot_out_evertestneg(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+first90::plot_out_evertestpos(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+first90::plot_out_evertest(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+first90::plot_out_90s(mod, fp, likdat, cnt, out_evertest, survey_hts, simul)
+first90::plot_out_evertest_fbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+first90::plot_out_evertest_mbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul)
+```
 We can compare HIV tests' positivity through time, the estimated *true* yield of new HIV diagnoses, and compare those to population-level HIV prevalence.
 
-``` r
+
+```r
 par(mfrow = c(1,1))
-plot_prv_pos_yld(mod, fp, likdat, cnt, yr_pred = 2018) 
+first90::plot_prv_pos_yld(mod, fp, likdat, cnt, yr_pred = 2018)
 ```
 
-![](man/figures/README-unnamed-chunk-4-1.png)
+![plot of chunk unnamed-chunk-4](man/figures/README-unnamed-chunk-4-1.png)
 
 We can also examine some ouptuts related to the distribution of HIV tests performed in those susceptibles to HIV and PLHIV by different awareness and treatment status. (First sets of graphs is on the absolute scale, second one on the relative scale.)
 
-``` r
+
+```r
 par(mfrow = c(1,2))
-plot_retest_test_neg(mod, fp, likdat, cnt)
-plot_retest_test_pos(mod, fp, likdat, cnt)
+first90::plot_retest_test_neg(mod, fp, likdat, cnt)
+first90::plot_retest_test_pos(mod, fp, likdat, cnt)
 ```
 
-![](man/figures/README-unnamed-chunk-5-1.png)
+![plot of chunk unnamed-chunk-5](man/figures/README-unnamed-chunk-5-1.png)
 
-``` r
+```r
 
 par(mfrow = c(1,2))
-plot_retest_test_neg(mod, fp, likdat, cnt, relative = TRUE)
-plot_retest_test_pos(mod, fp, likdat, cnt, relative = TRUE)
+first90::plot_retest_test_neg(mod, fp, likdat, cnt, relative = TRUE)
+first90::plot_retest_test_pos(mod, fp, likdat, cnt, relative = TRUE)
 ```
 
-![](man/figures/README-unnamed-chunk-5-2.png)
+![plot of chunk unnamed-chunk-5](man/figures/README-unnamed-chunk-5-2.png)
 
 Finally, tabular outputs can be obtained by using the following functions.
 
-``` r
+```r
 # ---- Tabular outputs ----
-tab_out_evertest(mod, fp, simul = simul)
+first90::tab_out_evertest(mod, fp, simul = simul)
 #>   year  outcome agegr  sex hivstatus value lower upper
-#> 1 2010 evertest 15-49 both       all  58.6  58.3  59.3
-#> 2 2011 evertest 15-49 both       all  63.6  63.3  64.2
-#> 3 2012 evertest 15-49 both       all  67.3  67.1  67.9
-#> 4 2013 evertest 15-49 both       all  70.0  69.8  70.5
-#> 5 2014 evertest 15-49 both       all  72.2  72.1  72.7
-#> 6 2015 evertest 15-49 both       all  74.5  74.3  75.0
-#> 7 2016 evertest 15-49 both       all  77.6  77.4  78.1
-#> 8 2017 evertest 15-49 both       all  81.2  81.0  81.8
-#> 9 2018 evertest 15-49 both       all  83.6  83.3  84.7
-tab_out_aware(mod, fp, simul = simul)
+#> 1 2010 evertest 15-49 both       all   9.8   8.4  12.3
+#> 2 2011 evertest 15-49 both       all  11.5  10.0  14.0
+#> 3 2012 evertest 15-49 both       all  13.1  11.2  16.1
+#> 4 2013 evertest 15-49 both       all  14.6  12.2  18.6
+#> 5 2014 evertest 15-49 both       all  15.8  13.0  21.1
+#> 6 2015 evertest 15-49 both       all  16.9  13.6  23.7
+#> 7 2016 evertest 15-49 both       all  18.0  14.1  26.6
+#> 8 2017 evertest 15-49 both       all  19.0  14.6  29.3
+#> 9 2018 evertest 15-49 both       all  19.8  15.0  31.5
+first90::tab_out_aware(mod, fp, simul = simul)
 #>   year outcome agegr  sex hivstatus value lower upper
-#> 1 2010   aware 15-49 both  positive  64.2  63.3  66.3
-#> 2 2011   aware 15-49 both  positive  68.5  67.7  70.4
-#> 3 2012   aware 15-49 both  positive  72.0  71.2  73.7
-#> 4 2013   aware 15-49 both  positive  74.8  74.2  76.3
-#> 5 2014   aware 15-49 both  positive  77.2  76.6  78.6
-#> 6 2015   aware 15-49 both  positive  79.6  79.1  80.9
-#> 7 2016   aware 15-49 both  positive  82.5  82.0  83.7
-#> 8 2017   aware 15-49 both  positive  85.6  85.1  86.8
-#> 9 2018   aware 15-49 both  positive  87.6  87.2  88.8
-tab_out_artcov(mod, fp)
+#> 1 2010   aware 15-49 both  positive  27.3  27.3  29.0
+#> 2 2011   aware 15-49 both  positive  33.9  33.9  34.7
+#> 3 2012   aware 15-49 both  positive  40.7  40.7  41.3
+#> 4 2013   aware 15-49 both  positive  46.7  46.7  47.6
+#> 5 2014   aware 15-49 both  positive  51.8  51.7  53.1
+#> 6 2015   aware 15-49 both  positive  56.9  56.8  58.6
+#> 7 2016   aware 15-49 both  positive  62.5  62.5  64.3
+#> 8 2017   aware 15-49 both  positive  67.7  67.6  69.5
+#> 9 2018   aware 15-49 both  positive  72.1  72.0  74.0
+first90::tab_out_nbaware(mod, fp)
+#>   year      outcome agegr  sex hivstatus  value
+#> 1 2010 number aware 15-49 both  positive 196422
+#> 2 2011 number aware 15-49 both  positive 250084
+#> 3 2012 number aware 15-49 both  positive 307925
+#> 4 2013 number aware 15-49 both  positive 361154
+#> 5 2014 number aware 15-49 both  positive 408229
+#> 6 2015 number aware 15-49 both  positive 454451
+#> 7 2016 number aware 15-49 both  positive 503265
+#> 8 2017 number aware 15-49 both  positive 547402
+#> 9 2018 number aware 15-49 both  positive 584422
+first90::tab_out_artcov(mod, fp)
 #>   year outcome agegr  sex hivstatus value
-#> 1 2010  artcov 15-49 both  positive  24.0
-#> 2 2011  artcov 15-49 both  positive  29.9
-#> 3 2012  artcov 15-49 both  positive  36.9
-#> 4 2013  artcov 15-49 both  positive  43.3
-#> 5 2014  artcov 15-49 both  positive  48.9
-#> 6 2015  artcov 15-49 both  positive  53.7
-#> 7 2016  artcov 15-49 both  positive  59.4
-#> 8 2017  artcov 15-49 both  positive  65.3
-#> 9 2018  artcov 15-49 both  positive  70.1
+#> 1 2010  artcov   15+ both  positive  29.4
+#> 2 2011  artcov   15+ both  positive  36.7
+#> 3 2012  artcov   15+ both  positive  44.5
+#> 4 2013  artcov   15+ both  positive  50.2
+#> 5 2014  artcov   15+ both  positive  55.7
+#> 6 2015  artcov   15+ both  positive  59.9
+#> 7 2016  artcov   15+ both  positive  66.7
+#> 8 2017  artcov   15+ both  positive  71.2
+#> 9 2018  artcov   15+ both  positive  75.7
 ```
+
+## Running tests
+Some tests require sample files. If you have access, Spectrum files are available on SharePoint [here](https://imperiallondon-my.sharepoint.com/:f:/r/personal/epidem_ic_ac_uk/Documents/UNAIDS%20Ref%20Group%20Shared%20Drive/Ref%20Group%20Meetings/Meetings%202018/first%2090%20workshop%20-%20Wisbech%20August%202018?csf=1&e=MFospr)
+To use them, create a directory with `mkdir tests/testhat/sample_files` and copy the Malawi .PJNZ file into it.
+
+Or if you access to the private repo, you can clone it:
+
+```
+git clone https://github.com/mrc-ide/shiny90_sample_files tests/testthat/sample_files
+```
+
+Then run
+`r
+devtools::test()
+`

@@ -1,0 +1,8 @@
+# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+
+language: R
+warnings_are_errors: false
+before_install:
+  - git clone https://$github_pat@github.com/mrc-ide/shiny90_sample_files tests/testthat/sample_files
+cache:
+  packages: true
