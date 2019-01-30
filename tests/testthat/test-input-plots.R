@@ -29,7 +29,7 @@ test_that("combine_rows can combine sex disaggregated and aggregated rows to giv
                                 year = c(2010, 2010, 2011, 2012),
                                 sex = c('female', 'male', 'female', 'both'),
                                 tot = c(100, 100, 100, 500),
-                                totpos = NA,
+                                totpos = c(100, 100, 100, 500),
                                 vct = NA,
                                 vctpos = NA,
                                 anc = NA,
@@ -57,6 +57,25 @@ test_that("combine_rows discards aggregated rows if dis-aggregated are provided"
 
     expect_identical(result$tot, c(200))
     expect_identical(result$year, c(2010))
+})
+
+test_that("combine_rows aggregates totpos", {
+
+    test_prgm_dat <- data.frame(country = "Malawi",
+                                year = c(2010, 2010, 2011, 2011),
+                                sex = c('female','male','female', 'male'),
+                                tot = c(200, 200, 200, 200),
+                                totpos = c(100, 100,100, 100),
+                                vct = NA,
+                                vctpos = NA,
+                                anc = NA,
+                                ancpos = NA)
+
+    result <- combine_rows(test_prgm_dat)
+
+    expect_identical(result$tot, c(400, 400))
+    expect_identical(result$totpos, c(200, 200))
+    expect_identical(result$year, c(2010, 2011))
 })
 
 test_that("plot_input_tot does not error given NAs", {
