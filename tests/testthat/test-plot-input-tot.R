@@ -58,6 +58,55 @@ test_that("combine_rows discards disaggregated rows if aggregated are provided",
     expect_identical(result$year, c(2010))
 })
 
+test_that("combine_rows treats inconsistent rows as NA", {
+
+    test_prgm_dat <- data.frame(country = "Malawi",
+                                year = c(2010, 2010),
+                                sex = c('female', 'female'),
+                                tot = c(100, 200),
+                                totpos = NA,
+                                vct = NA,
+                                vctpos = NA,
+                                anc = NA,
+                                ancpos = NA)
+
+    result <- combine_rows(test_prgm_dat, "tot")
+
+    expect_equal(nrow(result), 0)
+
+    test_prgm_dat <- data.frame(country = "Malawi",
+                                year = c(2010, 2010),
+                                sex = c('both', 'both'),
+                                tot = c(200, 100),
+                                totpos = NA,
+                                vct = NA,
+                                vctpos = NA,
+                                anc = NA,
+                                ancpos = NA)
+
+    result <- combine_rows(test_prgm_dat, "tot")
+
+    expect_equal(nrow(result), 0)
+})
+
+test_that("combine_rows merges duplicate rows", {
+
+    test_prgm_dat <- data.frame(country = "Malawi",
+                                year = c(2010, 2010),
+                                sex = c('both', 'both'),
+                                tot = c(100, 100),
+                                totpos = NA,
+                                vct = NA,
+                                vctpos = NA,
+                                anc = NA,
+                                ancpos = NA)
+
+    result <- combine_rows(test_prgm_dat, "tot")
+
+    expect_identical(result$tot, c(100))
+    expect_identical(result$year, c(2010))
+})
+
 test_that("plot_input_tot does not error given NAs", {
 
     test_prgm_dat <- data.frame(country = "Malawi",

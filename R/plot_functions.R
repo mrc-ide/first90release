@@ -82,9 +82,32 @@ plot_pjnz <- function(fp, yr_pred = 2018) {
 
 combine_rows <- function(prgdat, col_name){
 
+    remove_duplicate_years <- function(df) {
+        if (sum(df[[col_name]], na.rm = TRUE) == 0){
+            df
+        }
+        else {
+            df <- df[!duplicated(df),]
+            df <- aggregate(get(col_name)~year, data = df, function(...){
+                if (length(...) > 1){
+                    NA
+                }
+                else {
+                    sum(...)
+                }
+            })
+            setNames(df, c("year", col_name))
+        }
+    }
+
     prg_b <- prgdat[which(prgdat$sex == "both"), c(col_name,"year")]
     prg_f <- prgdat[which(prgdat$sex == "female"), ]
     prg_m <- prgdat[which(prgdat$sex == "male"), ]
+
+    # remove duplicate rows
+    prg_f <- remove_duplicate_years(prg_f)
+    prg_m <- remove_duplicate_years(prg_m)
+    prg_b <- remove_duplicate_years(prg_b)
 
     prg_disagg <- rbind(prg_f, prg_m)
 
@@ -119,7 +142,7 @@ combine_rows <- function(prgdat, col_name){
         prg_t
     }
     else {
-        prg_b
+        na.omit(prg_b)
     }
 
 }
