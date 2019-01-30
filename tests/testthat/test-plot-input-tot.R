@@ -78,6 +78,58 @@ test_that("combine_rows aggregates totpos", {
     expect_identical(result$year, c(2010, 2011))
 })
 
+test_that("combine_rows treats inconsistent rows as NA", {
+
+    test_prgm_dat <- data.frame(country = "Malawi",
+                                year = c(2010, 2010),
+                                sex = c('female', 'female'),
+                                tot = c(100, 200),
+                                totpos = NA,
+                                vct = NA,
+                                vctpos = NA,
+                                anc = NA,
+                                ancpos = NA)
+
+    result <- combine_rows(test_prgm_dat)
+
+    expect_identical(result$tot, c(NA))
+    expect_identical(result$year, c(2010))
+
+    test_prgm_dat <- data.frame(country = "Malawi",
+                                year = c(2010, 2010),
+                                sex = c('both', 'both'),
+                                tot = c(200, 100),
+                                totpos = NA,
+                                vct = NA,
+                                vctpos = NA,
+                                anc = NA,
+                                ancpos = NA)
+
+    result <- combine_rows(test_prgm_dat)
+
+    expect_identical(result$tot, c(NA))
+    expect_identical(result$year, c(2010))
+})
+
+test_that("combine_rows merges duplicate rows", {
+
+    test_prgm_dat <- data.frame(country = "Malawi",
+                                year = c(2010, 2010),
+                                sex = c('both', 'both'),
+                                tot = c(100, 100),
+                                totpos = NA,
+                                vct = NA,
+                                vctpos = NA,
+                                anc = NA,
+                                ancpos = NA)
+
+    result <- combine_rows(test_prgm_dat)
+
+    expect_identical(result$tot, c(100))
+    expect_identical(result$year, c(2010))
+})
+
+
 test_that("plot_input_tot does not error given NAs", {
 
     test_prgm_dat <- data.frame(country = "Malawi",
@@ -170,7 +222,7 @@ test_that("plot_input_tot does not error given inconsistent data", {
     test_prgm_dat <- data.frame(country = "Malawi",
                                 year = c(2010, 2010),
                                 sex = c('female', 'female'),
-                                tot = 100,
+                                tot = c(100, 200),
                                 totpos = 50,
                                 vct = NA,
                                 vctpos = NA,
@@ -182,7 +234,7 @@ test_that("plot_input_tot does not error given inconsistent data", {
     test_prgm_dat <- data.frame(country = "Malawi",
                                 year = c(2010, 2010),
                                 sex = c('both', 'both'),
-                                tot = 100,
+                                tot = c(100, 200),
                                 totpos = 50,
                                 vct = NA,
                                 vctpos = NA,
