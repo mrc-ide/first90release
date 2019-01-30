@@ -144,3 +144,31 @@ test_that("plot_input_tot does not error given incomplete data", {
 
     plot_input_tot(test_prgm_dat, fp)
 })
+
+test_that("plot_input_tot does not error given inconsistent data", {
+
+    test_prgm_dat <- data.frame(country = "Malawi",
+                                year = c(2010, 2010),
+                                sex = c('female', 'female'),
+                                tot = 100,
+                                totpos = 50,
+                                vct = NA,
+                                vctpos = NA,
+                                anc = NA,
+                                ancpos = NA)
+
+    plot_input_tot(test_prgm_dat, fp)
+
+    test_prgm_dat <- data.frame(country = "Malawi",
+                                year = c(2010, 2010),
+                                sex = c('both', 'both'),
+                                tot = 100,
+                                totpos = 50,
+                                vct = NA,
+                                vctpos = NA,
+                                anc = NA,
+                                ancpos = NA)
+
+    plot_input_tot(test_prgm_dat, fp)
+
+})
