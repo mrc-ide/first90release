@@ -64,3 +64,30 @@ test_that("plot_input_totpos does not error given mixed sex aggregated and sex d
 
     plot_input_totpos(test_prgm_dat, fp)
 })
+
+test_that("plot_input_totpos does not error given incomplete data", {
+
+    test_prgm_dat <- data.frame(country = "Malawi",
+                                year = 2010,
+                                sex = 'female',
+                                tot = 100,
+                                totpos = 50,
+                                vct = NA,
+                                vctpos = NA,
+                                anc = NA,
+                                ancpos = NA)
+
+    plot_input_totpos(test_prgm_dat, fp)
+
+    test_prgm_dat <- data.frame(country = "Malawi",
+                                year = 2010,
+                                sex = 'male',
+                                tot = 100,
+                                totpos = 50,
+                                vct = NA,
+                                vctpos = NA,
+                                anc = NA,
+                                ancpos = NA)
+
+    plot_input_totpos(test_prgm_dat, fp)
+})
