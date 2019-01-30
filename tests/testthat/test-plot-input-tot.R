@@ -78,58 +78,6 @@ test_that("combine_rows aggregates totpos", {
     expect_identical(result$year, c(2010, 2011))
 })
 
-test_that("combine_rows treats inconsistent rows as NA", {
-
-    test_prgm_dat <- data.frame(country = "Malawi",
-                                year = c(2010, 2010),
-                                sex = c('female', 'female'),
-                                tot = c(100, 200),
-                                totpos = NA,
-                                vct = NA,
-                                vctpos = NA,
-                                anc = NA,
-                                ancpos = NA)
-
-    result <- combine_rows(test_prgm_dat)
-
-    expect_identical(result$tot, c(NA))
-    expect_identical(result$year, c(2010))
-
-    test_prgm_dat <- data.frame(country = "Malawi",
-                                year = c(2010, 2010),
-                                sex = c('both', 'both'),
-                                tot = c(200, 100),
-                                totpos = NA,
-                                vct = NA,
-                                vctpos = NA,
-                                anc = NA,
-                                ancpos = NA)
-
-    result <- combine_rows(test_prgm_dat)
-
-    expect_identical(result$tot, c(NA))
-    expect_identical(result$year, c(2010))
-})
-
-test_that("combine_rows merges duplicate rows", {
-
-    test_prgm_dat <- data.frame(country = "Malawi",
-                                year = c(2010, 2010),
-                                sex = c('both', 'both'),
-                                tot = c(100, 100),
-                                totpos = NA,
-                                vct = NA,
-                                vctpos = NA,
-                                anc = NA,
-                                ancpos = NA)
-
-    result <- combine_rows(test_prgm_dat)
-
-    expect_identical(result$tot, c(100))
-    expect_identical(result$year, c(2010))
-})
-
-
 test_that("plot_input_tot does not error given NAs", {
 
     test_prgm_dat <- data.frame(country = "Malawi",
@@ -188,59 +136,4 @@ test_that("plot_input_tot does not error given mixed sex aggregated and sex dis-
                                 ancpos = 25058)
 
     plot_input_tot(test_prgm_dat, fp)
-})
-
-test_that("plot_input_tot does not error given incomplete data", {
-
-    test_prgm_dat <- data.frame(country = "Malawi",
-                                year = 2010,
-                                sex = 'female',
-                                tot = 100,
-                                totpos = 50,
-                                vct = NA,
-                                vctpos = NA,
-                                anc = NA,
-                                ancpos = NA)
-
-    plot_input_tot(test_prgm_dat, fp)
-
-    test_prgm_dat <- data.frame(country = "Malawi",
-                                year = 2010,
-                                sex = 'male',
-                                tot = 100,
-                                totpos = 50,
-                                vct = NA,
-                                vctpos = NA,
-                                anc = NA,
-                                ancpos = NA)
-
-    plot_input_tot(test_prgm_dat, fp)
-})
-
-test_that("plot_input_tot does not error given inconsistent data", {
-
-    test_prgm_dat <- data.frame(country = "Malawi",
-                                year = c(2010, 2010),
-                                sex = c('female', 'female'),
-                                tot = c(100, 200),
-                                totpos = 50,
-                                vct = NA,
-                                vctpos = NA,
-                                anc = NA,
-                                ancpos = NA)
-
-    plot_input_tot(test_prgm_dat, fp)
-
-    test_prgm_dat <- data.frame(country = "Malawi",
-                                year = c(2010, 2010),
-                                sex = c('both', 'both'),
-                                tot = c(100, 200),
-                                totpos = 50,
-                                vct = NA,
-                                vctpos = NA,
-                                anc = NA,
-                                ancpos = NA)
-
-    plot_input_tot(test_prgm_dat, fp)
-
 })
