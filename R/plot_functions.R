@@ -110,10 +110,13 @@ combine_rows <- function(prgdat, col_name){
         }
 
         prg_t <- rbind(prg_b, prg_re_agg)
-        prg_t <- prg_t[order(prg_t[,'year'],prg_t[,'sex']),]
 
-        prg_t[!duplicated(prg_t$year),]
+        if (nrow(prg_t)>0){
+            prg_t <- prg_t[order(prg_t[,'year'],prg_t[,'sex']),]
+            prg_t <- prg_t[!duplicated(prg_t$year),]
+        }
 
+        prg_t
     }
     else {
         prg_b
