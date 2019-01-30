@@ -5,6 +5,59 @@ filePath <- normalizePath(pjnz)
 
 fp <- prepare_inputs(filePath)
 
+test_that("combine_rows can combine sex disaggregated rows to give totals", {
+
+    test_prgm_dat <- data.frame(country = "Malawi",
+                                year = c(2010, 2010, 2011, 2012, 2012),
+                                sex = c('female', 'male', 'female', 'female', 'male'),
+                                tot = c(100, 200, 400, 700, 100),
+                                totpos = NA,
+                                vct = NA,
+                                vctpos = NA,
+                                anc = NA,
+                                ancpos = NA)
+    result <- combine_rows(test_prgm_dat, "tot")
+
+    expect_identical(result$tot, c(300, 800))
+    expect_identical(result$year, c(2010, 2012))
+})
+
+test_that("combine_rows can combine sex disaggregated and aggregated rows to give totals", {
+
+    test_prgm_dat <- data.frame(country = "Malawi",
+                                year = c(2010, 2010, 2011, 2012),
+                                sex = c('female', 'male', 'female', 'both'),
+                                tot = c(100, 100, 100, 500),
+                                totpos = NA,
+                                vct = NA,
+                                vctpos = NA,
+                                anc = NA,
+                                ancpos = NA)
+
+    result <- combine_rows(test_prgm_dat, "tot")
+
+    expect_identical(result$tot, c(200, 500))
+    expect_identical(result$year, c(2010, 2012))
+})
+
+test_that("combine_rows discards disaggregated rows if aggregated are provided", {
+
+    test_prgm_dat <- data.frame(country = "Malawi",
+                                year = c(2010, 2010, 2010),
+                                sex = c('female', 'male', 'both'),
+                                tot = c(100, 100, 400),
+                                totpos = NA,
+                                vct = NA,
+                                vctpos = NA,
+                                anc = NA,
+                                ancpos = NA)
+
+    result <- combine_rows(test_prgm_dat, "tot")
+
+    expect_identical(result$tot, c(400))
+    expect_identical(result$year, c(2010))
+})
+
 test_that("plot_input_tot does not error given NAs", {
 
     test_prgm_dat <- data.frame(country = "Malawi",
