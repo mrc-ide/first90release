@@ -28,9 +28,9 @@ spectrum_output_table <- function(mod, fp) {
   evertest_f <- get_out_evertest(mod, fp, "15+", "female", "positive")
   
   aware_m$value <- end_of_year(aware_m$year, aware_m$value)
-  aware_f$value <- end_of_year(aware_f$year, aware_m$value)
+  aware_f$value <- end_of_year(aware_f$year, aware_f$value)
   evertest_m$value <- end_of_year(evertest_m$year, evertest_m$value)
-  evertest_m$value <- end_of_year(evertest_m$year, evertest_m$value)
+  evertest_f$value <- end_of_year(evertest_f$year, evertest_f$value)
   
   year_out <- aware_m$year
   year_proj <- fp$ss$proj_start + seq_len(fp$ss$PROJ_YEARS) - 1L
