@@ -79,82 +79,113 @@ plot_pjnz <- function(fp, yr_pred = 2018) {
   plot_pjnz_plhiv(summary, yr_pred)
 }
 
+combine_rows <- function(prgdat) {
+
+    prg_f <- prgdat[which(prgdat$sex == 'female' & !is.na(prgdat$tot)),]
+    prg_m <- prgdat[which(prgdat$sex == 'male' & !is.na(prgdat$tot)),]
+    prg_t <- prgdat[which(prgdat$sex == 'both' & !is.na(prgdat$tot)),]
+
+    uni_year <- unique(prg_f$year)
+    tot_prg <- NULL
+    if (dim(prg_f)[1] > 0) {
+        for (i in 1:length(uni_year)) {
+            tot_prg.i <- prg_f[prg_f$year == uni_year[i],]
+            tot_prg.i$sex <- 'both'
+            tot_prg.i$tot <- ifelse(length(prg_f$tot[prg_f$year == uni_year[i]]) == 0, NA,
+                                    prg_f$tot[prg_f$year == uni_year[i]]) +
+                                ifelse(length(prg_m$tot[prg_m$year == uni_year[i]]) == 0, NA,
+                                    prg_m$tot[prg_m$year == uni_year[i]])
+
+            tot_prg.i$totpos <- ifelse(length(prg_f$totpos[prg_f$year == uni_year[i]]) == 0, NA,
+                                        prg_f$totpos[prg_f$year == uni_year[i]]) +
+                                ifelse(length(prg_m$totpos[prg_m$year == uni_year[i]]) == 0, NA,
+                                        prg_m$totpos[prg_m$year == uni_year[i]])
+
+            tot_prg.i[, c('vct','vctpos','anc','ancpos')] <- NA
+            tot_prg <- rbind(tot_prg, tot_prg.i)
+        }
+    }
+    to_add <- subset(prg_t, !(year %in% tot_prg$year))
+    rbind(tot_prg, to_add)
+}
 
 # --- Individuals functions to plot input data ----
 #' @export
 plot_input_tot <- function(prgdat, fp, yr_pred = 2018) {
-  start <- fp$ss$proj_start
-  mod <- simmod(fp)
-  plhiv <- apply(attr(mod, "hivpop")[,1:8,,], 4, FUN = sum) + 
-    apply(attr(mod, "artpop")[,,1:8,,], 5, FUN = sum)
-  pop <- apply(mod[1:35,,,], 4, FUN=  sum)
-  
-  prg_t <- subset(prgdat, sex == 'both')
-  prg_f <- subset(prgdat, sex == 'female')
-  prg_m <- subset(prgdat, sex == 'male')
-  plot(I(prg_t$tot/1000) ~ prg_t$year, 
-       ylim = c(0, max(prg_t$tot/1000, na.rm = TRUE)*1.1), 
-       xlim = c(2005, yr_pred),
-       lwd = 2, col = 'steelblue3', xlab = 'Year', ylab = 'Total number of tests (in 1,000s)', pch = 16,
-       main = expression(bold(paste("Total ", N^o, " of Tests Performed (VCT & ANC)"))))
-  lines(I(prg_t$tot/1000) ~ prg_t$year, lwd = 2, col = 'steelblue4')
-  p_test_pop <- round(prg_t$tot/pop[(prg_t$year - start)]*100, 0)
-  p_test_pop_r <- c(min(p_test_pop, na.rm=TRUE), max(p_test_pop, na.rm = TRUE))
-  text(paste('No Test/Pop = ', p_test_pop_r[1], '-', p_test_pop_r[2], '%'),
-       x = 2005, y = max(prg_t$tot/1000, na.rm = TRUE)/20, pos = 4)
-  
-  lines(I(prg_f$tot/1000) ~ prg_f$year, lty = 2, lwd = 2, col = 'steelblue4')
-  points(I(prg_f$tot/1000) ~ prg_f$year, pch = 'f')
-  lines(I(prg_m$tot/1000) ~ prg_m$year, lty = 2, lwd = 2, col = 'steelblue4')
-  points(I(prg_m$tot/1000) ~ prg_m$year, pch = 'm')
-}
+    start <- fp$ss$proj_start
+    mod <- simmod(fp)
+    pop <- apply(mod[1:35,,,], 4, FUN=sum)
 
-#' @export
-plot_input_totpos <- function(prgdat, fp, yr_pred = 2018) {
-  start <- fp$ss$proj_start
-  mod <- simmod(fp)
-  plhiv <- apply(attr(mod, "hivpop")[,1:8,,], 4, FUN = sum) + 
-    apply(attr(mod, "artpop")[,,1:8,,], 5, FUN = sum)
-  pop <- apply(mod[1:35,,,], 4, FUN = sum)
-  
-  if(sum(prgdat$totpos, na.rm = TRUE) > 0){
-    prg_t <- subset(prgdat, sex == 'both')
-    prg_f <- subset(prgdat, sex == 'female')
-    prg_m <- subset(prgdat, sex == 'male')
-    plot(I(prg_t$totpos/1000) ~ prg_t$year, 
-         ylim = c(0, max(prg_t$totpos/1000, na.rm=TRUE)*1.1), 
-         xlim = c(2005, yr_pred), pch=17,
-         lwd = 2, col = 'violetred4', xlab = 'Year', 
-         ylab = 'Total of HIV+ tests (in 1,000s)',
-         main = expression(bold(paste("Total ", N^o, " of HIV+ Tests (VCT & ANC)")))) 
-    lines(I(prg_t$totpos/1000) ~ prg_t$year, lwd = 2, col = 'violetred4')
-    yield <- round(prg_t$totpos/prg_t$tot * 100, 1)
-    y_range <- c(min(yield, na.rm = TRUE), max(yield, na.rm = TRUE))
-    p_pos_pop <- round(prg_t$totpos/plhiv[(prg_t$year - start)]*100, 0)
-    p_pos_pop_r <-  c(min(p_pos_pop, na.rm = TRUE), max(p_pos_pop, na.rm = TRUE))
-    text(paste('Positivity = ', y_range[1], '-', y_range[2], '%', sep = ''), 
-         x = 2005, y = max(prg_t$totpos/1000, na.rm = TRUE)/6, pos = 4)
-    text(paste('No Positive/PLHIV = ', p_pos_pop_r[1], '-', 
-               p_pos_pop_r[2], '%', sep=''), x = 2005, 
-         y = max(prg_t$totpos/1000, na.rm = TRUE)/20, pos = 4)
-    
-    lines(I(prg_f$totpos/1000) ~ prg_f$year, lty = 2, lwd = 2, col = 'violetred4')
-    points(I(prg_f$totpos/1000) ~ prg_f$year, pch = 'f')
-    lines(I(prg_m$totpos/1000) ~ prg_m$year, lty = 2, lwd = 2, col = 'violetred4')
-    points(I(prg_m$totpos/1000) ~ prg_m$year, pch = 'm')
+    prg_t <- subset(prgdat, sex == 'both' & !is.na(tot))
+    prg_f <- subset(prgdat, sex == 'female' & !is.na(tot))
+    prg_m <- subset(prgdat, sex == 'male' & !is.na(tot))
+
+    if (dim(prg_t)[1] > 0 | dim(prg_f)[1] > 0 | dim(prg_m)[1] > 0) {
+        tot_prg <- combine_rows(prgdat)
+        plot(I(prg_t$tot/1000) ~ prg_t$year,
+           ylim = c(0, max(tot_prg$tot/1000, na.rm = TRUE)*1.1),
+           xlim = c(2005, yr_pred),
+           lwd = 2, col = 'steelblue3', xlab = 'Year', ylab = 'Total number of tests (in 1,000s)', pch = 16,
+           main = expression(bold(paste("Total ", N^o, " of Tests Performed (VCT & ANC)"))))
+        lines(I(prg_t$tot/1000) ~ prg_t$year, lwd = 2, col = 'steelblue4')
+        p_test_pop <- round(tot_prg$tot/pop[(tot_prg$year - start)]*100, 0)
+        p_test_pop_r <- c(min(p_test_pop, na.rm = TRUE), max(p_test_pop, na.rm = TRUE))
+        text(paste('No Test/Pop = ', p_test_pop_r[1], '-', p_test_pop_r[2], '%'),
+           x = 2005, y = max(tot_prg$tot/1000, na.rm = TRUE)/20, pos = 4)
+        lines(I(prg_f$tot/1000) ~ prg_f$year, lty = 2, lwd = 2, col = 'steelblue4')
+        points(I(prg_f$tot/1000) ~ prg_f$year, pch = 'f')
+        lines(I(prg_m$tot/1000) ~ prg_m$year, lty = 2, lwd = 2, col = 'steelblue4')
+        points(I(prg_m$tot/1000) ~ prg_m$year, pch = 'm')
   }
 }
 
 #' @export
-plot_input_anctot <- function(prgdat, fp, yr_pred = 2018) {
-  start <- fp$ss$proj_start
-  mod <- simmod(fp)
-  plhiv <- apply(attr(mod, "hivpop")[,1:8,,], 4, FUN = sum) + 
+plot_input_totpos <- function(prgdat, fp, yr_pred = 2018) {
+    start <- fp$ss$proj_start
+    mod <- simmod(fp)
+    plhiv <- apply(attr(mod, "hivpop")[,1:8,,], 4, FUN = sum) +
     apply(attr(mod, "artpop")[,,1:8,,], 5, FUN = sum)
-  pop <- apply(mod[1:35,,,], 4, FUN = sum)
-  
+
+    if(sum(prgdat$totpos, na.rm = TRUE) > 0){
+        prg_t <- subset(prgdat, sex == 'both' & !is.na(totpos))
+        prg_f <- subset(prgdat, sex == 'female' & !is.na(totpos))
+        prg_m <- subset(prgdat, sex == 'male' & !is.na(totpos))
+
+        if (dim(prg_t)[1] > 0 | dim(prg_f)[1] > 0 | dim(prg_m)[1] > 0) {
+
+            tot_prg <- combine_rows(prgdat)
+
+            plot(I(prg_t$totpos/1000) ~ prg_t$year,
+                ylim = c(0, max(tot_prg$totpos/1000, na.rm = TRUE)*1.1),
+                xlim = c(2005, yr_pred), pch=17,
+                lwd = 2, col = 'violetred4', xlab = 'Year',
+                ylab = 'Total of HIV+ tests (in 1,000s)',
+                main = expression(bold(paste("Total ", N^o, " of HIV+ Tests (VCT & ANC)"))))
+
+            lines(I(prg_t$totpos/1000) ~ prg_t$year, lwd = 2, col = 'violetred4')
+            yield <- round(tot_prg$totpos/tot_prg$tot * 100, 1)
+            y_range <- c(min(yield, na.rm = TRUE), max(yield, na.rm = TRUE))
+            p_pos_pop <- round(tot_prg$totpos/plhiv[(tot_prg$year - start)]*100, 0)
+            p_pos_pop_r <-  c(min(p_pos_pop, na.rm = TRUE), max(p_pos_pop, na.rm = TRUE))
+            text(paste('Positivity = ', y_range[1], '-', y_range[2], '%', sep = ''),
+                 x = 2005, y = max(tot_prg$totpos/1000, na.rm = TRUE)/6, pos = 4)
+            text(paste('No Positive/PLHIV = ', p_pos_pop_r[1], '-',
+                       p_pos_pop_r[2], '%', sep=''), x = 2005,
+                 y = max(tot_prg$totpos/1000, na.rm = TRUE)/20, pos = 4)
+
+            lines(I(prg_f$totpos/1000) ~ prg_f$year, lty = 2, lwd = 2, col = 'violetred4')
+            points(I(prg_f$totpos/1000) ~ prg_f$year, pch = 'f')
+            lines(I(prg_m$totpos/1000) ~ prg_m$year, lty = 2, lwd = 2, col = 'violetred4')
+            points(I(prg_m$totpos/1000) ~ prg_m$year, pch = 'm')
+        }
+    }
+}
+
+#' @export
+plot_input_anctot <- function(prgdat, fp, yr_pred = 2018) {
+
   if (sum(prgdat$anc, na.rm = TRUE) > 0) {
-    prgdat <- subset(prgdat, sex == 'both')
+    prgdat <- subset(prgdat, sex != 'male')
       plot(I(prgdat$anc/1000) ~ prgdat$year,
            ylim = c(0, max(prgdat$anc/1000, na.rm = TRUE)*1.1), xlim = c(2005, yr_pred),
            lwd = 2, col = 'darkorange2', xlab = 'Year',
@@ -166,14 +197,9 @@ plot_input_anctot <- function(prgdat, fp, yr_pred = 2018) {
 
 #' @export
 plot_input_ancpos <- function(prgdat, fp, yr_pred = 2018) {
-  start <- fp$ss$proj_start
-  mod <- simmod(fp)
-  plhiv <- apply(attr(mod, "hivpop")[,1:8,,], 4, FUN = sum) + 
-    apply(attr(mod, "diagnpop")[,1:8,,], 4, FUN = sum) + apply(attr(mod, "artpop")[,,1:8,,], 5, FUN = sum)
-  pop <- apply(mod[1:35,,,], 4, FUN = sum)
-  
+
   if (sum(prgdat$ancpos, na.rm = TRUE) > 0) {
-    prgdat <- subset(prgdat, sex == 'both')
+    prgdat <- subset(prgdat, sex != 'male')
     plot(I(prgdat$ancpos/1000) ~ prgdat$year, 
          ylim = c(0, max(prgdat$ancpos/1000, na.rm = TRUE)*1.1), xlim = c(2005, yr_pred ),
          lwd = 2, col = 'deeppink2', xlab='Year', 
