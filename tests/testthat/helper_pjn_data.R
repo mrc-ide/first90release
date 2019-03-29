@@ -1,0 +1,1 @@
+pjn_data <- read.csv("testdata/sao_tome_test.pjn.csv", as.is = TRUE)
