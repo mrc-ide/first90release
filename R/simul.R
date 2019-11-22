@@ -9,7 +9,7 @@ simul.sample <- function(hessian, par, fp, sim = 3000, likdat = NULL, SIR = FALS
     # We first test is system is singular (TEMPORARY FIX)
     if (any(Matrix::diag(hessian) == 0)) {
         index <- which(Matrix::diag(hessian) == 0)
-        hessian[index, index] <- hessian[index, index] - 1e-2
+        for (i in index) { hessian[i, i] <- hessian[i, i] - 1e-2 }
         print('Hessian is exactly singular, Temporary Fix Used')
     }
     # From the hessian, simulate the model
@@ -123,7 +123,8 @@ simul.run <- function(samp, fp, progress = NULL){
 # Simulation of the dataset
 #' @export
 simul.test <- function(opt, fp, sim = 3000, likdat = NULL,
-                       SIR = FALSE, nsir = 50000, with_replacement = TRUE, sir_progress = NULL, run_progress = NULL){
+                       SIR = FALSE, nsir = 50000, with_replacement = TRUE, 
+                       sir_progress = NULL, run_progress = NULL){
 
     samp <- simul.sample(opt$hessian, opt$par, fp, sim = sim, likdat = likdat,
                         SIR = SIR, nsir = nsir, with_replacement = with_replacement, progress = sir_progress)

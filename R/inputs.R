@@ -50,11 +50,11 @@ select_prgmdata <- function(prgm_dat, cnt, age_group, prgm_dat_sex = NULL) {
 select_hts <- function(survey_hts, cnt, age_group) {
   require(first90)
 
-  # We first select stratify by HIV status for females
+  # We first select stratified by HIV status for females
   dat_f <- survey_hts[survey_hts$country == cnt & (survey_hts$hivstatus != "all") & 
                       (survey_hts$agegr %in% age_group) & survey_hts$sex == "female" & 
                       survey_hts$outcome == "evertest", ]
-  # We first select stratify by HIV status for males
+  # We first select stratified by HIV status for males
   dat_m <- survey_hts[survey_hts$country == cnt & (survey_hts$hivstatus != "all") & 
                       (survey_hts$agegr %in% age_group) & survey_hts$sex == "male" & 
                       survey_hts$outcome == "evertest", ]
@@ -120,19 +120,26 @@ select_hts <- function(survey_hts, cnt, age_group) {
       } else if (all(c('15-24','25-49') %in% age_strat_f)) {
         dat_f_i <- survey_hts[survey_hts$country == cnt & survey_hts$hivstatus == "all" & survey_hts$surveyid == other_survey[i] &
                               (survey_hts$agegr %in% c('15-24','25-49')) & survey_hts$sex == "female" & survey_hts$outcome == "evertest",]
-      } else {
+      } else if ("15-49" %in% age_strat_f) {
         dat_f_i <- survey_hts[survey_hts$country == cnt & survey_hts$hivstatus == "all" & survey_hts$surveyid == other_survey[i] &
-                              (survey_hts$agegr %in% c('15-49')) & survey_hts$sex == "female" & survey_hts$outcome == "evertest",] }
+                              (survey_hts$agegr %in% c('15-49')) & survey_hts$sex == "female" & survey_hts$outcome == "evertest",]
+      } else {
+                dat_f_i <- survey_hts[survey_hts$country == cnt & survey_hts$hivstatus == "all" & survey_hts$surveyid == other_survey[i] &
+                              (survey_hts$agegr %in% c('15-99')) & survey_hts$sex == "female" & survey_hts$outcome == "evertest",]
+      } 
       ## Female - If we have the correct age disagregation, we stick with it
       if (all(age_group %in% age_strat_m)) {
         dat_m_i <- survey_hts[survey_hts$country == cnt & survey_hts$hivstatus == "all" & survey_hts$surveyid == other_survey[i] &
                               (survey_hts$agegr %in% age_group) & survey_hts$sex == "male" & survey_hts$outcome == "evertest",]
-      } else if (all(c('15-24','25-49') %in% age_strat_m)) {
+      } else if (all(c('15-24','25-49','15-99') %in% age_strat_m)) {
         dat_m_i <- survey_hts[survey_hts$country == cnt & survey_hts$hivstatus == "all" & survey_hts$surveyid == other_survey[i] &
                               (survey_hts$agegr %in% c('15-24','25-49')) & survey_hts$sex == "male" & survey_hts$outcome == "evertest",]
-      } else {
+      } else if ("15-49" %in% age_strat_m) {
         dat_m_i <- survey_hts[survey_hts$country == cnt & survey_hts$hivstatus == "all" & survey_hts$surveyid == other_survey[i] &
                               (survey_hts$agegr %in% c('15-49')) & survey_hts$sex == "male" & survey_hts$outcome == "evertest",]
+      } else {
+        dat_m_i <- survey_hts[survey_hts$country == cnt & survey_hts$hivstatus == "all" & survey_hts$surveyid == other_survey[i] &
+                              (survey_hts$agegr %in% c('15-99')) & survey_hts$sex == "male" & survey_hts$outcome == "evertest",]
       }
       dat_fall <- rbind(dat_fall, dat_f_i)
       dat_mall <- rbind(dat_mall, dat_m_i)

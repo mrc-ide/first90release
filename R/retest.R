@@ -97,7 +97,9 @@ number_retests <- function(mod, fp, df){
 #---- Test retest ----
 # HIV-
 #' @export
-plot_retest_test_neg <- function(mod, fp, likdat, cnt, relative = F, yr_pred = 2018) {
+plot_retest_test_neg <- function(mod, fp, likdat, cnt, relative = F, 
+                                 yr_pred = 2019,
+                                 plot_title = TRUE) {
   end_date <- fp$ss$proj_start + fp$ss$PROJ_YEARS - 1L
   out_retest <- expand.grid(year = 2000:end_date, 
                                 outcome = "numbertests", 
@@ -116,10 +118,13 @@ plot_retest_test_neg <- function(mod, fp, likdat, cnt, relative = F, yr_pred = 2
   
   col1 <- rgb(230, 200, 0, 200, max=255)
   col2 <- rgb(50, 100, 155, 200, max=255)
-
+  
   if(relative == F) {
+    if (plot_title == TRUE) { main_title <- expression(bold(paste("Total ", N^o, " of HIV- Tests (in 1,000)")))
+    } else {  main_title <- ""  }
+    
     plot(out_retest$tests/1000 ~ out_retest$year, type = 'l', col = col1,
-         main = expression(bold(paste("Total ", N^o, " of HIV- Tests (in 1,000)"))),
+         main = main_title,
          xlim = c(2000, yr_pred),  ylim = c(0, max(out_retest$tests/1000)*1.2),
          ylab=expression(paste(N^o, " of HIV- Tests (in 1,000)")), xlab = 'Year', lty = 1, lwd = 1)
     polygon(x = c(out_retest$year, rev(out_retest$year)),
@@ -131,8 +136,11 @@ plot_retest_test_neg <- function(mod, fp, likdat, cnt, relative = F, yr_pred = 2
     legend('topleft', inset = 0.02, legend = c('Repeat Testers','First-Time Testers'), 
            col = c(col2, col1), bty = 'n', pch = c(15,15), pt.cex = 2, cex = 0.9)
   } else if(relative == T) {
+    if (plot_title == TRUE) { main_title <- "Proportion of HIV- Tests \n Among Never and Ever Tested"
+    } else {  main_title <- ""  }
+    
     plot((out_retest$tests/out_retest$tests)*100 ~ out_retest$year, type='l', ylim=c(0,100), col=col1, 
-         main = "Proportion of HIV- Tests \n Among Never and Ever Tested",
+         main = main_title,
          xlim = c(2000, yr_pred), ylab='Proportion of Total HIV- Tests (%)', xlab='Year', lty=1, lwd=1)
     polygon(x = c(out_retest$year, rev(out_retest$year)),
             y = c((out_retest$retest/out_retest$tests)*100, rep(100, length = length(out_retest$tests))),
@@ -149,7 +157,9 @@ plot_retest_test_neg <- function(mod, fp, likdat, cnt, relative = F, yr_pred = 2
 
 # HIV+
 #' @export
-plot_retest_test_pos <- function(mod, fp, likdat, cnt, relative = F, yr_pred = 2018, plot_legend = TRUE) {
+plot_retest_test_pos <- function(mod, fp, likdat, cnt, relative = F, 
+                                 yr_pred = 2019,
+                                 plot_legend = TRUE, plot_title = TRUE) {
   end_date <- fp$ss$proj_start + fp$ss$PROJ_YEARS - 1L
   out_retest <- expand.grid(year = 2000:end_date, 
                             outcome = "numbertests", 
@@ -171,9 +181,12 @@ plot_retest_test_pos <- function(mod, fp, likdat, cnt, relative = F, yr_pred = 2
   col2 <- rgb(150, 0, 50, 200, max=255)
   col3 <- rgb(100, 0, 100, 200, max=255)
     
+  if (plot_title == TRUE) { main_title <- "Distribution of HIV+ Tests by \n Awareness and ART Status"
+  } else {  main_title <- ""  }
+  
   if(relative == F){
     plot(out_retest$tests/1000 ~ out_retest$year, type = 'n', ylim = ylim,
-         main = "Distribution of HIV+ Tests by \n Awareness and ART Status",
+         main = main_title,
          xlim = c(2000, yr_pred),
          ylab = expression(paste(N^o, " of HIV+ Tests (in 1,000)")), xlab = 'Year')
     polygon(x = c(out_retest$year, rev(out_retest$year)),
@@ -209,7 +222,9 @@ plot_retest_test_pos <- function(mod, fp, likdat, cnt, relative = F, yr_pred = 2
 }
 
 #' @export
-plot_prv_pos_yld <- function(mod, fp, likdat, cnt, yr_pred = 2018, plot_legend = TRUE) {
+plot_prv_pos_yld <- function(mod, fp, likdat, cnt, yr_pred = 2019, 
+                             plot_legend = TRUE,
+                             plot_title = TRUE) {
   
   start <- fp$ss$proj_start
   end_date <- fp$ss$proj_start + fp$ss$PROJ_YEARS - 1L
@@ -253,8 +268,11 @@ plot_prv_pos_yld <- function(mod, fp, likdat, cnt, yr_pred = 2018, plot_legend =
   col2 <- rgb(255, 0, 130, 250, max = 255)
   col3 <- rgb(100, 0, 100, 250, max = 255)
   
+  if (plot_title == TRUE) { main_title <- "HIV Prevalence (15+), Positivity, and \n Yield of New HIV Diagnoses"
+  } else {  main_title <- ""  }
+  
     plot(I(prv * 100) ~ yr, type = 'l', ylim = ylim, 
-         main = "HIV Prevalence (15+), Positivity, and \n Yield of New HIV Diagnoses",
+         main = main_title,
          xlim = c(2000, yr_pred), col = col1, lty = 2, lwd = 1.5, 
          ylab = "Proportion (%)", xlab = 'Year')
     lines(I(yld * 100) ~ out_test$year, col = col2, lwd = 1.5)
@@ -266,88 +284,3 @@ plot_prv_pos_yld <- function(mod, fp, likdat, cnt, yr_pred = 2018, plot_legend =
 }
   
   
-  
-
-# LATERLATER (not functional function)
-plot_retest_test_gr <- function(mod, fp, likdat, cnt, relative = F, yr_pred = 2018) {
-  end_date <- fp$ss$proj_start + fp$ss$PROJ_YEARS - 1L
-  out_retest <- expand.grid(year=2000:end_date, 
-                            outcome = "numbertests", 
-                            agegr=c("15-24", "25-34", "35-49"), 
-                            sex=c("male", "female"), 
-                            hivstatus='negative')
-  out_retest$pop <- number_retests(mod, fp,
-                                   add_ss_indices(out_retest, fp$ss))$pop
-  out_retest$retests <- number_retests(mod, fp,
-                                       add_ss_indices(out_retest, fp$ss))$retests
-  out_retest$tests <- number_retests(mod, fp,
-                                     add_ss_indices(out_retest, fp$ss))$tests
-  
-  out_1524f <- subset(out_retest, agegr == '15-24' & outcome == 'numbertests' & hivstatus=='negative' & sex=='female')
-  out_2534f <- subset(out_retest, agegr == '25-34' & outcome == 'numbertests' & hivstatus=='negative' & sex=='female')
-  out_3549f <- subset(out_retest, agegr == '35-49' & outcome == 'numbertests' & hivstatus=='negative' & sex=='female')
-  out_1524m <- subset(out_retest, agegr == '15-24' & outcome == 'numbertests' & hivstatus=='negative' & sex=='male')
-  out_2534m <- subset(out_retest, agegr == '25-34' & outcome == 'numbertests' & hivstatus=='negative' & sex=='male')
-  out_3549m <- subset(out_retest, agegr == '35-49' & outcome == 'numbertests' & hivstatus=='negative' & sex=='male')
-  
-  if(relative == F) {
-    par(mfrow=c(1,2))
-    # Females
-    plot(out_1524f$tests ~ out_1524f$year, type='l', col='#408000', main="Number of Tests and retests females",
-         xlim=c(2000, yr_pred), ylab='Number Tested Among HIV-', xlab='Year', lty=1, lwd=1)
-#    polygon(x = c(out_1524f$year, rev(out_1524f$year)),
-#            y = c(out_1524f$tests, rev(out_1524f$retests)),
-#            col = rgb(211, 211, 211, 100, max = 255),
-#            border = NA)
-    lines(out_1524f$retests ~ out_1524f$year, col='#408000', lty=2, lwd=1)
-    lines(out_2534f$tests ~ out_2534f$year, col='#000080', lty=1, lwd=1)
-#    polygon(x = c(out_2534f$year, rev(out_2534f$year)),
-#            y = c(out_2534f$tests, rev(out_2534f$retests)),
-#            col = rgb(211, 211, 211, 100, max = 255),
-#            border = NA)
-    lines(out_2534f$retests ~ out_2534f$year, col='#000080', lty=2, lwd=1)
-    lines(out_3549f$tests ~ out_3549f$year, col='#804000', lty=1, lwd=1)
-#    polygon(x = c(out_3549f$year, rev(out_3549f$year)),
-#            y = c(out_3549f$tests, rev(out_3549f$retests)),
-#            col = rgb(211, 211, 211, 100, max = 255),
-#            border = NA)
-    lines(out_3549f$retests ~ out_3549f$year, col='#804000', lty=2, lwd=1)
-#    legend('topleft', inset = 0.02, legend=c('Number of tests','Number of retests'), col='navy', lty=1:2, lwd=1, pch=c(15,16))
-    # Males
-    plot(out_1524m$tests ~ out_1524m$year, type='l', col='#B030A0', main="Number of Tests and retests males",
-         xlim=c(2000, yr_pred), ylab='Number Tested Among HIV-', xlab='Year', lty=1, lwd=1)
-    polygon(x = c(out_1524m$year, rev(out_1524m$year)),
-            y = c(out_1524m$tests, rev(out_1524m$retests)),
-            col = rgb(211, 211, 211, 100, max = 255),
-            border = NA)
-    lines(out_1524m$retests ~ out_1524m$year, col='#B030A0', lty=2, lwd=1)
-    lines(out_2534m$tests ~ out_1524m$year, col='#B03060', lty=1, lwd=1)
-    polygon(x = c(out_2534m$year, rev(out_2534m$year)),
-            y = c(out_2534m$tests, rev(out_2534m$retests)),
-            col = rgb(211, 211, 211, 100, max = 255),
-            border = NA)
-    lines(out_2534m$retests ~ out_2534f$year, col='#B03060', lty=2, lwd=1)
-    lines(out_3549m$tests ~ out_3549m$year, col='#B04030', lty=1, lwd=1)
-    polygon(x = c(out_3549m$year, rev(out_3549m$year)),
-            y = c(out_3549m$tests, rev(out_3549m$retests)),
-            col = rgb(211, 211, 211, 100, max = 255),
-            border = NA)
-    lines(out_3549m$retests ~ out_3549m$year, col='#B04030', lty=2, lwd=1)
-#    legend('topleft', inset = 0.02, legend=c('Number of tests','Number of retests'), col='navy', lty=1:2, lwd=1, pch=c(15,16))
-  } else if(relative == T) {
-    plot((out_retest$tests/out_retest$tests)*100 ~ out_retest$year, type='l', ylim=c(0,100), col='navy', main="Percentage of retests",
-         xlim=c(2000, yr_pred), ylab='Proportion Tested Among HIV-', xlab='Year', lty=1, lwd=1)
-    polygon(x = c(out_retest$year, rev(out_retest$year)),
-            y = c((out_retest$tests/out_retest$tests)*100, rev((out_retest$retests/out_retest$tests)*100)),
-            col = rgb(211, 211, 211, 100, max = 255),
-            border = NA)
-    polygon(x = c(out_retest$year, rev(out_retest$year)),
-            y = c(rep(0, length = length(out_retest$tests)), rev((out_retest$retests/out_retest$tests)*100)),
-            col = rgb(211, 211, 211, 220, max = 255),
-            border = NA)
-    lines((out_retest$retests/out_retest$tests)*100 ~ out_retest$year, col='navy', lty=2, lwd=1)
-    legend('bottomright', inset = 0.02, legend=c('Total of tests','Proportion of retests'), col='navy', lty=1:2, lwd=1, pch=c(15,16))
-  } else {
-    print('True for relative scale, False for absolute scale')
-  }
-}
