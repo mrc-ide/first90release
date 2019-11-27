@@ -1,47 +1,44 @@
 #' Process programmatic data on number of tests
 #' 
 #' @export
-select_prgmdata <- function(prgm_dat, cnt, age_group, prgm_dat_sex = NULL) {
+select_prgmdata <- function(prgm_dat, cnt, age_group) {
+  # any country with HTS data? if so, we select them
   if (any(prgm_dat$country == cnt)) {
-    prgm_dat <- subset(prgm_dat, country == cnt)
-    prg_dat <- cbind(prgm_dat, agegr = '15-99', 
-                     sex = 'both')
-    if (!is.null(prgm_dat_sex) & any(prgm_dat_sex$country == cnt)) {
-      prg_dat_sex <- subset(prgm_dat_sex, country == cnt)
+    prg_dat <- subset(prgm_dat, country == cnt)
+  # for plotting purposes, we calculate the total form years with sex-disaggregated data
+  if (any(prg_dat$sex != "both")) {
+      prg_dat_both <- subset(prg_dat, sex == "both")
+      prg_dat_sex <- subset(prg_dat, sex == "male" | sex == "female") 
       yr_sex <- unique(prg_dat_sex$year)
-      prg_dat <- subset(prg_dat, !(year %in% yr_sex))
       prg_dat_sex_both <- NULL
       for (i in 1:length(yr_sex)) {
         prg.i <- subset(prg_dat_sex, year == yr_sex[i])
         tot.i <- data.frame(country = cnt, year = yr_sex[i],
+                            agegr = '15-99',
+                            sex = 'both',
                             tot = sum(prg.i$tot),
                             totpos = sum(prg.i$totpos),
                             vct = sum(prg.i$vct),
                             vctpos = sum(prg.i$vctpos),
                             anc = prg.i$anc[prg.i$sex == 'female'],
-                            ancpos = prg.i$ancpos[prg.i$sex == 'female'],
-                            agegr = '15-99',
-                            sex = 'both')
+                            ancpos = prg.i$ancpos[prg.i$sex == 'female'])
         value_verif <- prgm_dat$totpos[prgm_dat$year == yr_sex[i]]
         if (length(value_verif) > 0 & is.na(tot.i$totpos)) { 
               tot.i$totpos <- prgm_dat$totpos[prgm_dat$year == yr_sex[i]] }
         prg_dat_sex_both <- rbind(prg_dat_sex_both, tot.i)
       }
-      
-      prg_dat <- rbind(prg_dat, prg_dat_sex_both, prg_dat_sex)
+      prg_dat <- rbind(prg_dat_both, prg_dat_sex_both, prg_dat_sex)
     }  } 
   
-  if (!any(prgm_dat$country == cnt) & is.null(prgm_dat_sex)) {
+  if (!any(prgm_dat$country == cnt)) {
     prg_dat <- data.frame(country = cnt, 
-                          year = 2010:2018, tot = NA, totpos = NA,
-                          vct = NA, vctpos = NA, anc = NA, ancpos = NA,
-                          agegr = '15-99', sex = 'both')
+                          year = 2010:2018, 
+                          agegr = '15-99', sex = 'both',
+                          tot = NA, totpos = NA,
+                          vct = NA, vctpos = NA, anc = NA, ancpos = NA)
   }
-  if (!any(prgm_dat$country == cnt) & !is.null(prgm_dat_sex)) {
-    prg_dat <- subset(prgm_dat_sex, country == cnt)
-  }
-  
-  prg_dat
+  prg_dat <- prg_dat[order(prg_dat$year), ]
+  return(prg_dat)
 }
 
 #' Process survey data on hiv testing behaviors
