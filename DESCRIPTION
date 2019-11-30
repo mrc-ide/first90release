@@ -25,8 +25,9 @@ Encoding: UTF-8
 LazyData: true
 ByteCompile: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.1
 Depends:
+    R (>= 2.10),
     data.table
 Imports:
     mvtnorm,
@@ -35,6 +36,6 @@ Imports:
 LinkingTo:
     BH
 Suggests: 
-    testthat, data.table
+    testthat
 URL: https://github.com/mrc-ide/first90release, https://shiny90.unaids.org
 BugReports: https://github.com/mrc-ide/first90release/issues

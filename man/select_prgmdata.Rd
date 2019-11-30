@@ -4,7 +4,7 @@
 \alias{select_prgmdata}
 \title{Process programmatic data on number of tests}
 \usage{
-select_prgmdata(prgm_dat, cnt, age_group, prgm_dat_sex = NULL)
+select_prgmdata(prgm_dat, cnt, age_group)
 }
 \description{
 Process programmatic data on number of tests

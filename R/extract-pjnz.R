@@ -325,6 +325,8 @@ get_dp_infections <- function(dp, proj_years){
 }
       
 
+#' Get mortality probability (Sx) from Spectrum DP file
+#' 
 #' @details
 #' This function extracts Sx for ages 0:79 and 80+. Spectrum calculates a
 #' separate Sx for age 80. The population projection model in EPP-ASM needs
