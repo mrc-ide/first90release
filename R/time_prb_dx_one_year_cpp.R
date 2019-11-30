@@ -1,4 +1,6 @@
 
+#' Probability of diagnosis in one year
+#' 
 #' @export
 Rcpp::cppFunction('List prb_dx_one_yr_cpp(List s_fp,
                   IntegerVector year,

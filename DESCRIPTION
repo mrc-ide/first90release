@@ -32,9 +32,11 @@ Depends:
 Imports:
     mvtnorm,
     Matrix,
-    fastmatch (>= 1.1)
+    fastmatch (>= 1.1),
+    Rcpp
 LinkingTo:
-    BH
+    BH,
+    Rcpp
 Suggests: 
     testthat
 URL: https://github.com/mrc-ide/first90release, https://shiny90.unaids.org
