@@ -8,7 +8,8 @@ select_prgmdata <- function(prgm_dat, cnt, age_group) {
   # for plotting purposes, we calculate the total form years with sex-disaggregated data
   if (any(prg_dat$sex != "both")) {
       prg_dat_both <- subset(prg_dat, sex == "both")
-      prg_dat_sex <- subset(prg_dat, sex == "male" | sex == "female") 
+      prg_dat_sex <- subset(prg_dat, sex == "male" | sex == "female")
+      yr_both <- unique(prg_dat_both$year)
       yr_sex <- unique(prg_dat_sex$year)
       prg_dat_sex_both <- NULL
       for (i in 1:length(yr_sex)) {
@@ -22,17 +23,17 @@ select_prgmdata <- function(prgm_dat, cnt, age_group) {
                             vctpos = sum(prg.i$vctpos),
                             anc = prg.i$anc[prg.i$sex == 'female'],
                             ancpos = prg.i$ancpos[prg.i$sex == 'female'])
-        value_verif <- prgm_dat$totpos[prgm_dat$year == yr_sex[i]]
+        value_verif <- prg_dat_both$totpos[prg_dat_both$year == yr_sex[i]]
         if (length(value_verif) > 0 & is.na(tot.i$totpos)) { 
-              tot.i$totpos <- prgm_dat$totpos[prgm_dat$year == yr_sex[i]] }
+              tot.i$totpos <- prg_dat_both$totpos[prg_dat_both$year == yr_sex[i]] }
         prg_dat_sex_both <- rbind(prg_dat_sex_both, tot.i)
       }
-      prg_dat <- rbind(prg_dat_both, prg_dat_sex_both, prg_dat_sex)
+      prg_dat <- rbind(prg_dat_both[!(prg_dat_both$year %in% yr_sex), ], prg_dat_sex_both, prg_dat_sex)
     }  } 
   
   if (!any(prgm_dat$country == cnt)) {
     prg_dat <- data.frame(country = cnt, 
-                          year = 2010:2018, 
+                          year = 2010:2019, 
                           agegr = '15-99', sex = 'both',
                           tot = NA, totpos = NA,
                           vct = NA, vctpos = NA, anc = NA, ancpos = NA)
