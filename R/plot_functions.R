@@ -16,7 +16,7 @@ get_pjnz_summary_data <- function(fp) {
 }
 
 #' @export
-plot_pjnz_prv <- function(pjnz_summary, yr_pred = 2018) {
+plot_pjnz_prv <- function(pjnz_summary, yr_pred = 2019) {
   pjnz_summary <- na.omit(data.frame(year = pjnz_summary[["year"]], prv = pjnz_summary[["prevalence"]]*100))
   pjnz_summary$year <- pjnz_summary$year + 0.5
   plot(pjnz_summary$prv ~ pjnz_summary$year, 
@@ -29,7 +29,7 @@ plot_pjnz_prv <- function(pjnz_summary, yr_pred = 2018) {
 }
 
 #' @export
-plot_pjnz_inc <- function(pjnz_summary, yr_pred = 2018) {
+plot_pjnz_inc <- function(pjnz_summary, yr_pred = 2019) {
   pjnz_summary <- na.omit(data.frame(year = pjnz_summary[["year"]], inc = pjnz_summary[["incidence"]]*1000))
   pjnz_summary$year <- pjnz_summary$year + 0.5
   pjnz_summary <- subset(pjnz_summary, year >= 2000)
@@ -43,7 +43,7 @@ plot_pjnz_inc <- function(pjnz_summary, yr_pred = 2018) {
   }
 
 #' @export
-plot_pjnz_pop <- function(pjnz_summary, yr_pred = 2018) {
+plot_pjnz_pop <- function(pjnz_summary, yr_pred = 2019) {
   pjnz_summary <- na.omit(data.frame(year = pjnz_summary[["year"]], pop = pjnz_summary[["pop"]]/1000))
   pjnz_summary$year <- pjnz_summary$year + 0.5
   plot(pjnz_summary$pop ~ pjnz_summary$year, 
@@ -56,7 +56,7 @@ plot_pjnz_pop <- function(pjnz_summary, yr_pred = 2018) {
 }
 
 #' @export
-plot_pjnz_plhiv <- function(pjnz_summary, yr_pred = 2018) {
+plot_pjnz_plhiv <- function(pjnz_summary, yr_pred = 2019) {
   pjnz_summary <- na.omit(data.frame(year = pjnz_summary[["year"]], plhiv = pjnz_summary[["plhiv"]]/1000))
   pjnz_summary$year <- pjnz_summary$year + 0.5
   plot(pjnz_summary$plhiv ~ pjnz_summary$year, 
@@ -70,7 +70,7 @@ plot_pjnz_plhiv <- function(pjnz_summary, yr_pred = 2018) {
 
 
 # ---- Single function ----
-plot_pjnz <- function(fp, yr_pred = 2018) {
+plot_pjnz <- function(fp, yr_pred = 2019) {
   summary <- get_pjnz_summary_data(fp)
   par(mfrow=c(2,2))
   plot_pjnz_prv(summary, yr_pred)
@@ -111,7 +111,7 @@ combine_rows <- function(prgdat) {
 
 # --- Individuals functions to plot input data ----
 #' @export
-plot_input_tot <- function(prgdat, fp, yr_pred = 2018) {
+plot_input_tot <- function(prgdat, fp, yr_pred = 2019) {
     start <- fp$ss$proj_start
     mod <- simmod(fp)
     pop <- apply(mod[1:35,,,], 4, FUN=sum)
@@ -140,7 +140,7 @@ plot_input_tot <- function(prgdat, fp, yr_pred = 2018) {
 }
 
 #' @export
-plot_input_totpos <- function(prgdat, fp, yr_pred = 2018) {
+plot_input_totpos <- function(prgdat, fp, yr_pred = 2019) {
     start <- fp$ss$proj_start
     mod <- simmod(fp)
     plhiv <- apply(attr(mod, "hivpop")[,1:8,,], 4, FUN = sum) +
@@ -182,7 +182,7 @@ plot_input_totpos <- function(prgdat, fp, yr_pred = 2018) {
 }
 
 #' @export
-plot_input_anctot <- function(prgdat, fp, yr_pred = 2018) {
+plot_input_anctot <- function(prgdat, fp, yr_pred = 2019) {
 
   if (sum(prgdat$anc, na.rm = TRUE) > 0) {
     prgdat <- subset(prgdat, sex != 'male')
@@ -196,7 +196,7 @@ plot_input_anctot <- function(prgdat, fp, yr_pred = 2018) {
 }
 
 #' @export
-plot_input_ancpos <- function(prgdat, fp, yr_pred = 2018) {
+plot_input_ancpos <- function(prgdat, fp, yr_pred = 2019) {
 
   if (sum(prgdat$ancpos, na.rm = TRUE) > 0) {
     prgdat <- subset(prgdat, sex != 'male')
@@ -210,7 +210,7 @@ plot_input_ancpos <- function(prgdat, fp, yr_pred = 2018) {
 }
 
 # ---- Single Function Inputs Data ----
-plot_inputdata <- function(prgm_dat, fp, yr_pred = 2018) {
+plot_inputdata <- function(prgm_dat, fp, yr_pred = 2019) {
   par(mfrow = c(2,2))
   plot_input_tot(prgm_dat, fp, yr_pred)
   plot_input_totpos(prgm_dat, fp, yr_pred)
@@ -271,10 +271,12 @@ plot_oi <- function(plotprior = TRUE, par = c(logit(0.5), 0.56)) {
 }
 
 #' @export
-optimized_par <- function(opt, param = NULL){
+optimized_par <- function(opt, param = NULL) {
+  n_k2 <- length(opt$par) - 11
+  n_k1 <- n_k2 - 10
   require(Matrix)
   if (is.null(opt$hessian)) { 
-    print('You forgot to specify Hessian = TRUE; 95%CI not calculated.') 
+    print('You forgot to specify Hessian = TRUE; 95%CrI not calculated.') 
     se <- rep(NA, length(opt$par)) 
     } else {
     # We first test is system is singular (TEMPORARY FIX)
@@ -302,7 +304,7 @@ optimized_par <- function(opt, param = NULL){
                    'RR re-testing 2015', 
                    'RR testing: PLHIV unaware',
                    'RR re-testing: PLHIV aware (not ART) 2010', 
-                   'RR re-testing: PLHIV aware (not ART) 2017', 
+                   'RR re-testing: PLHIV aware (not ART) 2019', 
                    'RR re-testing: PLHIV on ART (*RR not ART)', 
                    'RR among 25-34 men',
                    'RR among 35+ men',
@@ -310,63 +312,63 @@ optimized_par <- function(opt, param = NULL){
                    'RR among 35+ women', 
                    'RR OI Dx (ART Cov)')
   
-  pt <- c(round(plogis(opt$par[21]) * 1.1, 2),
-          round(plogis(opt$par[22]) * 1.1, 2),
-          round(0.95 + plogis(opt$par[23]) * 7.05, 2),
-          round(0.95 + plogis(opt$par[24]) * 7.05, 2), 
-          round(0.05 + plogis(opt$par[25]) * (1.95 - 0.05), 2), 
-          round(plogis(opt$par[26]) * 8, 2),
-          round(plogis(opt$par[33]) * 8, 2),
-          round(plogis(opt$par[36]), 2),
-          round(0.1 + plogis(opt$par[37]) * (6 - 0.1), 2),
-          round(0.1 + plogis(opt$par[38]) * (6 - 0.1), 2),
-          round(0.1 + plogis(opt$par[39]) * (6 - 0.1), 2),
-          round(0.1 + plogis(opt$par[40]) * (6 - 0.1), 2),
-          round(0.25 + (plogis(opt$par[41])) * (1.75 - 0.25), 1))
+  pt <- c(round(plogis(opt$par[n_k2 + 1]) * 1.1, 2),
+          round(plogis(opt$par[n_k2 + 2]) * 1.1, 2),
+          round(0.95 + plogis(opt$par[n_k2 + 3]) * 7.05, 2),
+          round(0.95 + plogis(opt$par[n_k2 + 4]) * 7.05, 2), 
+          round(0.05 + plogis(opt$par[n_k2 + 5]) * (1.95 - 0.05), 2), 
+          round(plogis(opt$par[n_k1 + 1]) * 8, 2),
+          round(plogis(opt$par[n_k2 - 1]) * 8, 2),
+          round(plogis(opt$par[n_k2 + 6]), 2),
+          round(0.1 + plogis(opt$par[n_k2 + 7]) * (6 - 0.1), 2),
+          round(0.1 + plogis(opt$par[n_k2 + 8]) * (6 - 0.1), 2),
+          round(0.1 + plogis(opt$par[n_k2 + 9]) * (6 - 0.1), 2),
+          round(0.1 + plogis(opt$par[n_k2 + 10]) * (6 - 0.1), 2),
+          round(0.25 + (plogis(opt$par[n_k2 + 11])) * (1.75 - 0.25), 1))
   
   if (is.null(param)) {
-  lci <- c(round(plogis(opt$par[21] - qnorm(0.975)*se[21]) * 1.1, 2),
-           round(plogis(opt$par[22] - qnorm(0.975)*se[22]) * 1.1, 2),
-           round(0.95 + plogis(opt$par[23] - qnorm(0.975)*se[23]) * 7.05, 2),
-           round(0.95 + plogis(opt$par[24] - qnorm(0.975)*se[24]) * 7.05, 2),
-           round(0.05 + plogis(opt$par[25] - qnorm(0.975)*se[25]) * (1.95 - 0.05), 2), 
-           round(plogis(opt$par[26] - qnorm(0.975)*se[26]) * 8, 2),
-           round(plogis(opt$par[33] - qnorm(0.975)*se[33]) * 8, 2),
-           round(plogis(opt$par[36] - qnorm(0.975)*se[36]), 2),
-           round(0.1 + plogis(opt$par[37] - qnorm(0.975)*se[37]) * (6 - 0.1), 2),
-           round(0.1 + plogis(opt$par[38] - qnorm(0.975)*se[38]) * (6 - 0.1), 2),
-           round(0.1 + plogis(opt$par[39] - qnorm(0.975)*se[39]) * (6 - 0.1), 2),
-           round(0.1 + plogis(opt$par[40] - qnorm(0.975)*se[40]) * (6 - 0.1), 2),
-           round(0.25 + (plogis(opt$par[41] - qnorm(0.975)*se[41])) * (1.75 - 0.25), 1))
+  lci <- c(round(plogis(opt$par[n_k2 + 1] - qnorm(0.975) * se[n_k2 + 1]) * 1.1, 2),
+           round(plogis(opt$par[n_k2 + 2] - qnorm(0.975) * se[n_k2 + 2]) * 1.1, 2),
+           round(0.95 + plogis(opt$par[n_k2 + 3] - qnorm(0.975) * se[n_k2 + 3]) * 7.05, 2),
+           round(0.95 + plogis(opt$par[n_k2 + 4] - qnorm(0.975) * se[n_k2 + 4]) * 7.05, 2),
+           round(0.05 + plogis(opt$par[n_k2 + 5] - qnorm(0.975) * se[n_k2 + 5]) * (1.95 - 0.05), 2), 
+           round(plogis(opt$par[n_k1 + 1] - qnorm(0.975) * se[n_k1 + 1]) * 8, 2),
+           round(plogis(opt$par[n_k2 - 1] - qnorm(0.975) * se[n_k2 - 1]) * 8, 2),
+           round(plogis(opt$par[n_k2 + 6] - qnorm(0.975) * se[n_k2 + 6]), 2),
+           round(0.1 + plogis(opt$par[n_k2 + 7] - qnorm(0.975) * se[n_k2 + 7]) * (6 - 0.1), 2),
+           round(0.1 + plogis(opt$par[n_k2 + 8] - qnorm(0.975) * se[n_k2 + 8]) * (6 - 0.1), 2),
+           round(0.1 + plogis(opt$par[n_k2 + 9] - qnorm(0.975) * se[n_k2 + 9]) * (6 - 0.1), 2),
+           round(0.1 + plogis(opt$par[n_k2 + 10] - qnorm(0.975) * se[n_k2 + 10]) * (6 - 0.1), 2),
+           round(0.25 + (plogis(opt$par[n_k2 + 11] - qnorm(0.975) * se[n_k2 + 11])) * (1.75 - 0.25), 1))
   
-  uci <- c(round(plogis(opt$par[21] + qnorm(0.975)*se[21]) * 1.1, 2),
-           round(plogis(opt$par[22] + qnorm(0.975)*se[22]) * 1.1, 2),
-           round(0.95 + plogis(opt$par[23] + qnorm(0.975)*se[23]) * 7.05, 2),
-           round(0.95 + plogis(opt$par[24] + qnorm(0.975)*se[24]) * 7.05, 2),
-           round(0.05 + plogis(opt$par[25] + qnorm(0.975)*se[25]) * (1.95 - 0.05), 2), 
-           round(plogis(opt$par[26] + qnorm(0.975)*se[26]) * 8, 2),
-           round(plogis(opt$par[33] + qnorm(0.975)*se[33]) * 8, 2),
-           round(plogis(opt$par[36] + qnorm(0.975)*se[36]), 2),
-           round(0.1 + plogis(opt$par[37] + qnorm(0.975)*se[37]) * (6 - 0.1), 2),
-           round(0.1 + plogis(opt$par[38] + qnorm(0.975)*se[38]) * (6 - 0.1), 2),
-           round(0.1 + plogis(opt$par[39] + qnorm(0.975)*se[39]) * (6 - 0.1), 2),
-           round(0.1 + plogis(opt$par[40] + qnorm(0.975)*se[40]) * (6 - 0.1), 2),
-           round(0.25 + (plogis(opt$par[41] + qnorm(0.975)*se[41])) * (1.75 - 0.25), 1))
+  uci <- c(round(plogis(opt$par[n_k2 + 1] + qnorm(0.975) * se[n_k2 + 1]) * 1.1, 2),
+           round(plogis(opt$par[n_k2 + 2] + qnorm(0.975) * se[n_k2 + 2]) * 1.1, 2),
+           round(0.95 + plogis(opt$par[n_k2 + 3] + qnorm(0.975) * se[n_k2 + 3]) * 7.05, 2),
+           round(0.95 + plogis(opt$par[n_k2 + 4] + qnorm(0.975) * se[n_k2 + 4]) * 7.05, 2),
+           round(0.05 + plogis(opt$par[n_k2 + 5] + qnorm(0.975) * se[n_k2 + 5]) * (1.95 - 0.05), 2), 
+           round(plogis(opt$par[n_k1 + 1] + qnorm(0.975) * se[n_k1 + 1]) * 8, 2),
+           round(plogis(opt$par[n_k2 - 1] + qnorm(0.975) * se[n_k2 - 1]) * 8, 2),
+           round(plogis(opt$par[n_k2 + 6] + qnorm(0.975) * se[n_k2 + 6]), 2),
+           round(0.1 + plogis(opt$par[n_k2 + 7] + qnorm(0.975) * se[n_k2 + 7]) * (6 - 0.1), 2),
+           round(0.1 + plogis(opt$par[n_k2 + 8] + qnorm(0.975) * se[n_k2 + 8]) * (6 - 0.1), 2),
+           round(0.1 + plogis(opt$par[n_k2 + 9] + qnorm(0.975) * se[n_k2 + 9]) * (6 - 0.1), 2),
+           round(0.1 + plogis(opt$par[n_k2 + 10] + qnorm(0.975) * se[n_k2 + 10]) * (6 - 0.1), 2),
+           round(0.25 + (plogis(opt$par[n_k2 + 11] + qnorm(0.975) * se[n_k2 + 11])) * (1.75 - 0.25), 1))
   }
   if (!is.null(param)){
-    est <- rbind(plogis(param[,21]) * 1.1,
-            plogis(param[,22]) * 1.1,
-            0.95 + plogis(param[,23]) * 7.05, 
-            0.95 + plogis(param[,24]) * 7.05, 
-            0.05 + plogis(param[,25]) * (1.95 - 0.05), 
-            plogis(param[,26]) * 8,
-            plogis(param[,33]) * 8,
-            plogis(param[,36]),
-            0.1 + plogis(param[,37]) * (6 - 0.1),
-            0.1 + plogis(param[,38]) * (6 - 0.1),
-            0.1 + plogis(param[,39]) * (6 - 0.1),
-            0.1 + plogis(param[,40]) * (6 - 0.1),
-            0.25 + (plogis(param[,41])) * (1.75 - 0.25))
+    est <- rbind(plogis(param[, n_k2 + 1]) * 1.1,
+            plogis(param[, n_k2 + 2]) * 1.1,
+            0.95 + plogis(param[, n_k2 + 3]) * 7.05, 
+            0.95 + plogis(param[, n_k2 + 4]) * 7.05, 
+            0.05 + plogis(param[, n_k2 + 5]) * (1.95 - 0.05), 
+            plogis(param[, n_k1 + 1]) * 8,
+            plogis(param[, n_k2 - 1]) * 8,
+            plogis(param[, n_k2 + 6]),
+            0.1 + plogis(param[, n_k2 + 7]) * (6 - 0.1),
+            0.1 + plogis(param[, n_k2 + 8]) * (6 - 0.1),
+            0.1 + plogis(param[, n_k2 + 9]) * (6 - 0.1),
+            0.1 + plogis(param[, n_k2 + 10]) * (6 - 0.1),
+            0.25 + (plogis(param[, n_k2 + 11])) * (1.75 - 0.25))
     lci <- round(apply(est, 1, quantile, probs = 0.025), 2)
     uci <- round(apply(est, 1, quantile, probs = 0.975), 2)    
     

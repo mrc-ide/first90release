@@ -23,17 +23,28 @@ create_hts_param <- function(theta, fp) {
     theta_fx <- c(   0,    0, 0.27, 0.27, rep(0.9, 3)) 
     
 # We name the parameters to be fitted
-  rate_f <- exp(theta[1:20])
-  rr_m <- plogis(theta[21:22]) * 1.1
-  rr_test <- 0.95 + plogis(theta[23:24]) * 7.05 # Range is 1-8
-  rr_plhiv <- 0.05 + plogis(theta[25]) * (1.95 - 0.05)
-  rr_dxunt <- plogis(theta[26:35]) * 8 # Range is 0-8
-  rr_dxart <- plogis(theta[36]) 
-  rr_25m <- 0.1 + plogis(theta[37]) * (6 - 0.1)
-  rr_35m <- 0.1 + plogis(theta[38]) * (6 - 0.1)
-  rr_25f <- 0.1 + plogis(theta[39]) * (6 - 0.1)
-  rr_35f <- 0.1 + plogis(theta[40]) * (6 - 0.1)
-  pr_oidx <- 0.25 + (plogis(theta[41]) * (1.75 - 0.25))
+  # Every year new estimates are produced, we need to add one knot
+  # -- UPDATE HERE --
+  knots <- c(1995, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+                   2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 
+                   2020) - fp$ss$proj_start + 1L
+  knots_rr_dxunt <- c(2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019,
+                      2020) - fp$ss$proj_start + 1L
+  # -- UPDATE ABOVE --
+  
+  n_k1 <- length(knots) - 1 # we remove 1995
+  n_k2 <- n_k1 + length(knots_rr_dxunt)
+  rate_f <- exp(theta[1:n_k1])
+  rr_dxunt <- plogis(theta[(n_k1 + 1):n_k2]) * 8 # Range is 0-8
+  rr_m <- plogis(theta[(n_k2 + 1):(n_k2 + 2)]) * 1.1
+  rr_test <- 0.95 + plogis(theta[(n_k2 + 3):(n_k2 + 4)]) * 7.05 # Range is 1-8
+  rr_plhiv <- 0.05 + plogis(theta[n_k2 + 5]) * (1.95 - 0.05)
+  rr_dxart <- plogis(theta[n_k2 + 6]) 
+  rr_25m <- 0.1 + plogis(theta[n_k2 + 7]) * (6 - 0.1)
+  rr_35m <- 0.1 + plogis(theta[n_k2 + 8]) * (6 - 0.1)
+  rr_25f <- 0.1 + plogis(theta[n_k2 + 9]) * (6 - 0.1)
+  rr_35f <- 0.1 + plogis(theta[n_k2 + 10]) * (6 - 0.1)
+  pr_oidx <- 0.25 + (plogis(theta[n_k2 + 11]) * (1.75 - 0.25))
   
   # Age function for males and females
   agefn_m <- c(rep(1, 3), rep(rr_25m, 2), rep(rr_35m, 3), rr_35m * 0.8112) # last age group is 50+
@@ -41,8 +52,6 @@ create_hts_param <- function(theta, fp) {
   
   # Time trends in testing rates
   fp$t_hts_start <- as.integer(1995 - fp$ss$proj_start + 1L)
-  knots <- c(1995, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-             2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019) - fp$ss$proj_start + 1L
   base_rate_f <- approx(knots, c(0, rate_f), seq_len(fp$ss$PROJ_YEARS), rule = 2)$y
   
   knots_rr_m <- c(2005, 2012) - fp$ss$proj_start + 1L
@@ -113,7 +122,6 @@ create_hts_param <- function(theta, fp) {
   
   ## Relative testing among aware
   # Re-testing rate among PLHIV aware (not on ART)
-  knots_rr_dxunt <- c(2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019) - fp$ss$proj_start + 1L
   rate_dxunt <- approx(knots_rr_dxunt, rr_dxunt, seq_len(fp$ss$PROJ_YEARS), rule = 2)$y
   
   diagn_rate_dxunt <- sweep(diagn_rate[,,,3,, drop = FALSE], 5, rate_dxunt, "*")

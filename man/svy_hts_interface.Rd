@@ -4,8 +4,7 @@
 \alias{svy_hts_interface}
 \title{Function to present the survey data on shinny interface}
 \usage{
-svy_hts_interface(survey_hts, cnt, age_group = c("15-24", "25-34",
-  "35-49"))
+svy_hts_interface(survey_hts, cnt, age_group = c("15-24", "25-34", "35-49"))
 }
 \description{
 Function to present the survey data on shinny interface

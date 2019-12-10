@@ -36,20 +36,42 @@ spectrum_output_table <- function(mod, fp) {
   year_proj <- fp$ss$proj_start + seq_len(fp$ss$PROJ_YEARS) - 1L
   out_idx <- year_proj %in% year_out
 
-  plhiv <- t(colSums(mod[,,2,out_idx]))
+  plhiv <- t(colSums(mod[,, 2, out_idx]))
   colnames(plhiv) <- paste0("plhiv_", c("m", "f"))
 
-  onart <- t(fp$art15plus_num[,out_idx])
+  onart <- t(fp$art15plus_num[, out_idx])
   colnames(onart) <- paste0("onart_", c("m", "f"))
 
   evertest <- cbind(evertest_m = evertest_m$value,
                     evertest_f = evertest_f$value) * plhiv
   aware <- cbind(aware_m = aware_m$value,
                  aware_f = aware_f$value) * plhiv
+  
+  ## # Number adults 15+ undiagnosed and infected in the past year
+  ## prb_dx_1yr_m <- pool_prb_dx_one_yr(mod, fp, year = c(2000:2019),
+  ##                  age = c("15-24","25-34", "35-49", "50-99"),
+  ##                  sex = c("male"))
+  ## prb_dx_1yr_f <- pool_prb_dx_one_yr(mod, fp, year = c(2000:2019),
+  ##                  age = c("15-24","25-34", "35-49", "50-99"),
+  ##                  sex = c("female"))
+  ## prb_dx_1yr <- cbind(prb_dx_1yr_m = c(prb_dx_1yr_m$prb1yr, 
+  ##                                      rep(NA, length(year_out) - nrow(prb_dx_1yr_m))),
+  ##                     prb_dx_1yr_f = c(prb_dx_1yr_f$prb1yr, 
+  ##                                      rep(NA, length(year_out) - nrow(prb_dx_1yr_m)))) 
+  ## new_inf_m <- apply(fp$infections[, 1, out_idx], MARGIN = 2, FUN = sum)
+  ## new_inf_f <- apply(fp$infections[, 2, out_idx], MARGIN = 2, FUN = sum)
 
+  ## notdx_hiv_one_yr_m <- new_inf_m * (1 - prb_dx_1yr[, "prb_dx_1yr_m"])
+  ## notdx_hiv_one_yr_f <- new_inf_f * (1 - prb_dx_1yr[, "prb_dx_1yr_f"])
+  
+  ## notdx_hiv_one_yr <- cbind(notdx_hiv_one_yr_m, notdx_hiv_one_yr_f) 
+
+  notdx_hiv_one_yr <- cbind(notdx_hiv_one_yr_m = 0, notdx_hiv_one_yr_f = 0)
+  
   data.frame(year = year_out,
              plhiv,
              evertest,
              aware,
-             onart)
+             onart,
+             notdx_hiv_one_yr)
 }

@@ -11,8 +11,9 @@ ll_hts <- function(theta, fp, likdat) {
   if (!is.null(likdat$hts_pos)) {
     val3 <- ll_prgdat(mod, fp, likdat$hts_pos)
     } else { val3 <- 0 }
+ 
   val_prior <- lprior_hts(theta, mod, fp)
-  
+
   val <- val1 + val2 + val3 + val_prior
   
   return(val)
@@ -47,7 +48,19 @@ ll_prgdat <- function(mod, fp, dat) {
   return(llk)
 }
 
-
+art_constraint_penalty <- function(mod, fp, max_year = 2019) {
+  ind_year <- c(2000:max_year) - fp$ss$proj_start + 1L
+  tot_late <- apply(attr(mod, "late_diagnoses")[,,, ind_year], 4, sum)
+  tot_untreated_pop <- apply(attr(mod, "hivpop")[,,, ind_year], 4, sum)
+  ratio_late_per_1000_untreated <- tot_late / tot_untreated_pop * 1000
+  penalty <- sum(dnorm(x = 0, mean = ratio_late_per_1000_untreated, 
+                       sd = 20, log = TRUE))
+  return(penalty)
+}
+# Include this in ll_hts if you want to incorporate the likelihood constraint on ART.
+  # val_art_penalty <- art_constraint_penalty(mod, fp, max_year = 2019)
+  # val <- val1 + val2 + val3 + val_prior + val_art_penalty
+  
 # Function to prepare the data for input in the likelihood function.
 #' @export
 prepare_hts_likdat <- function(dat_evertest, dat_prg, fp) {
@@ -108,33 +121,35 @@ prepare_hts_likdat <- function(dat_evertest, dat_prg, fp) {
 
 
 lprior_hts <- function(theta, mod, fp) {
-start <- fp$ss$proj_start
 # Penalty to smooth testing rates among females aged 15-24 (reference group)
 # We calculate penalty for RR of males on the log(rate) scale (and use same SD as for females)
   knots <- c(2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-             2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019) - fp$ss$proj_start + 1L
-    penalty_f <- log(fp$hts_rate[1,2,1, knots[-1]]) - log(fp$hts_rate[1,2,1, knots[-length(knots)]])
-    penalty_rr_m <- log(plogis(theta[21])*1.1) - log(plogis(theta[22])*1.1)
-    penalty_rr_test <- theta[24] - theta[23]
-    penalty_rr_dxunt <- theta[c(27:35)] - theta[c(26:34)]
+             2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019,
+             2020) - fp$ss$proj_start + 1L
+  n_k1 <- length(knots)
+  n_k2 <- n_k1 * 2 - 10 
+    penalty_f <- log(fp$hts_rate[1,2,1, knots[-1]]) - log(fp$hts_rate[1,2,1, knots[-n_k1]])
+    penalty_rr_dxunt <- theta[c((n_k1 + 2):n_k2)] - theta[c((n_k1 + 1):(n_k2 - 1))]
+    penalty_rr_m <- log(plogis(theta[n_k2 + 2]) * 1.1) - log(plogis(theta[n_k2 + 1]) * 1.1)
+    penalty_rr_test <- theta[n_k2 + 4] - theta[n_k2 + 3]
 
   lprior <- 
     ## Prior for first baseline rate for females # exp(log(0.001) + 1.96*0.25)
     dnorm(x = theta[1], mean = log(0.001), sd = 0.25, log = TRUE) +
-    ## Prior for male RR 0.6 (95%CI: 0.07-1.05)# plogis(qlogis(0.6/1.1) + 1.96*1.46) * 1.1
-    sum(dnorm(x = theta[21], mean = qlogis(0.6/1.1), sd = 1.46, log = TRUE)) +
-    ## Relative increase among previously tested. 1.93 (95%CI: 1.08-5.00) # 0.95 + plogis(qlogis((1.93 - 0.95)/7.05) - qnorm(0.975)*1.084)*7.05
-    dnorm(x = theta[23], mean = qlogis((1.93 - 0.95)/7.05), sd = 1.084, log = TRUE) +
-    ## Relative factor for re-testing among PLHIV. 1.00 (95%CI: 0.25-1.75) # 0.05 + plogis(qlogis(0.5) - 1.96*1.1) * (1.95 - 0.05)
-    dnorm(x = theta[25], mean = qlogis(0.5), sd = 1.1, log = TRUE) +
     ## Relative testing among PLHIV diagnosed, untreated. 1.50 (95%CI: 0.14-6.00) # plogis(qlogis(1.5/8) - 1.96*1.31)*8
-    dnorm(x = theta[26], mean = qlogis(1.5/8), sd = 1.31, log = TRUE) +
+    dnorm(x = theta[n_k2], mean = qlogis(1.5/8), sd = 1.31, log = TRUE) +
+    ## Prior for male RR 0.6 (95%CI: 0.07-1.05)# plogis(qlogis(0.6/1.1) + 1.96*1.46) * 1.1
+    sum(dnorm(x = theta[n_k2 + 1], mean = qlogis(0.6/1.1), sd = 1.46, log = TRUE)) +
+    ## Relative increase among previously tested. 1.93 (95%CI: 1.08-5.00) # 0.95 + plogis(qlogis((1.93 - 0.95)/7.05) - qnorm(0.975)*1.084)*7.05
+    dnorm(x = theta[n_k2 + 3], mean = qlogis((1.93 - 0.95)/7.05), sd = 1.084, log = TRUE) +
+    ## Relative factor for re-testing among PLHIV. 1.00 (95%CI: 0.10-1.90) # 0.05 + plogis(qlogis(0.95 / 1.90) - 1.96*1.85) * (1.95 - 0.05)
+    dnorm(x = theta[n_k2 + 5], mean = qlogis(0.95 / 1.90), sd = 1.85, log = TRUE) +
     ## Relative testing among PLHIV already on ART (95%CI: 0.01-0.90) # plogis(qlogis(0.25) - 1.96*1.68)
-    dnorm(x = theta[36], mean = qlogis(0.25), sd = 1.68, log = TRUE) + 
+    dnorm(x = theta[n_k2 + 6], mean = qlogis(0.25), sd = 1.68, log = TRUE) + 
     ## Prior for age (95% CI is 0.14-5.0)# 0.1 + invlogit(logit(0.9/5.9) - 1.96*1.5) * (6 - 0.1)
-    sum(dnorm(x = theta[c(37:40)], mean = qlogis(0.9/5.9), sd = 1.685, log = TRUE)) +
+    sum(dnorm(x = theta[c((n_k2 + 7):(n_k2 + 10))], mean = qlogis(0.9/5.9), sd = 1.685, log = TRUE)) +
     ## RR OI diangosed for HIV relative to ART coverage 1.0 (0.3-1.7) # 0.25 + plogis(qlogis(0.5) - 1.96*1.75) * (1.75 - 0.25)
-    dnorm(x = theta[41], mean = qlogis(0.5), sd = 1.75, log = TRUE)
+    dnorm(x = theta[n_k2 + 11], mean = qlogis(0.5), sd = 1.75, log = TRUE)
   
   prior_sd_f <- 0.205 # exp(log(0.5) - 1.96*0.205); previous of 0.35 when double-counting
   prior_sd_rr_m <- 0.26 # exp(log(0.6) + 1.96*0.26)

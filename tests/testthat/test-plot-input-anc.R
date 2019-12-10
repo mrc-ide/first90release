@@ -17,7 +17,7 @@ test_that("plot_input_anctot does not error given NAs", {
                                 anc = NA,
                                 ancpos = NA)
 
-    plot_input_anctot(test_prgm_dat, fp)
+    expect_silent(plot_input_anctot(test_prgm_dat, fp))
 })
 
 test_that("plot_input_anctot does not error given only sex disaggregated data", {
@@ -32,7 +32,7 @@ test_that("plot_input_anctot does not error given only sex disaggregated data", 
                                 anc = 107635,
                                 ancpos = 25058)
 
-    plot_input_anctot(test_prgm_dat, fp)
+    expect_silent(plot_input_anctot(test_prgm_dat, fp))
 })
 
 test_that("plot_input_anctot does not error given sex aggregated data", {
@@ -47,7 +47,7 @@ test_that("plot_input_anctot does not error given sex aggregated data", {
                                 anc = 107635,
                                 ancpos = 25058)
 
-    plot_input_anctot(test_prgm_dat, fp)
+    expect_silent(plot_input_anctot(test_prgm_dat, fp))
 })
 
 test_that("plot_input_anctot does not error given mixed sex aggregated and sex dis-aggregated data", {
@@ -62,5 +62,5 @@ test_that("plot_input_anctot does not error given mixed sex aggregated and sex d
                                 anc = 107635,
                                 ancpos = 25058)
 
-    plot_input_anctot(test_prgm_dat, fp)
+    expect_silent(plot_input_anctot(test_prgm_dat, fp))
 })

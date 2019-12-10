@@ -1,6 +1,6 @@
 #' @export
 get_out_evertest <- function(mod, fp,
-                             agegr = c("15-24", '25-34','35-49', '15-49'),
+                             agegr = c("15-24", '25-34','35-49', '15-49', '15-64', '15+'),
                              sex = c("both", "female", "male"),
                              hivstatus = c("all", "negative", "positive") ) {
   
@@ -73,7 +73,7 @@ get_out_nbtest_pos_sex <- function(mod, fp) {
 }
 
 #' @export
-get_out_aware <- function(mod, fp, agegr = '15-49',
+get_out_aware <- function(mod, fp, agegr = c('15-49', '15-64', "15+"),
                           sex = c("both", "female", "male")) {
   end_date <- fp$ss$proj_start + fp$ss$PROJ_YEARS - 1L
   out_aware <- expand.grid(year = 2000:end_date,
@@ -143,7 +143,8 @@ get_out_pregprev <- function(mod, fp) {
 
 # ---- Individuals functions to plot model outputs ----
 #' @export
-plot_out_nbtest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2018) {
+plot_out_nbtest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2019,
+                            plot_title = TRUE) {
     require(data.table)
   
   # if fitting with HTS program data stratified by sex, we add both sex back
@@ -160,9 +161,9 @@ plot_out_nbtest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2018) 
                         ifelse(cnt == "Swaziland", "eSwatini", cnt)) 
   start <- fp$ss$proj_start
   mod <- simmod(fp)
-  plhiv <- apply(attr(mod, "hivpop")[,1:8,,], 4, FUN=sum) + 
-    apply(attr(mod, "artpop")[,,1:8,,], 5, FUN=sum)
-  pop <- apply(mod[1:35,,,], 4, FUN=sum)
+  plhiv <- apply(attr(mod, "hivpop")[,1:8,,], 4, FUN = sum) + 
+    apply(attr(mod, "artpop")[,,1:8,,], 5, FUN = sum)
+  pop <- apply(mod[1:35,,,], 4, FUN = sum)
 
   out_nbtest <- subset(get_out_nbtest(mod, fp), year <= yr_pred)
   out_nbtest$year <- out_nbtest$year + 0.5
@@ -174,7 +175,7 @@ plot_out_nbtest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2018) 
 
   
     # Decide if we plot CI or not
-    if (!is.null(simul)){
+    if (!is.null(simul)) {
         ci <- getCI(simul$number.test)
         ci <- subset(ci, sex == 'both' & year <= yr_pred)
         ci[is.na(ci)] <- 0
@@ -182,49 +183,52 @@ plot_out_nbtest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2018) 
         plot.ci <- TRUE
     }
     if (is.null(simul)) plot.ci <- FALSE
+  
+    if (plot_title == TRUE) { main_title <- expression(bold(paste("Total ", N^o, " of Tests")))
+    } else {  main_title <- ""  }
 
     col_ci <- rgb(150, 150, 150, 125, max = 255)
     
     # Total tested
     if (plot.ci == T){
-        plot(I(out_nbtest$value/1000) ~ out_nbtest$year, pch = '',
-          ylim = c(0, max(out_nbtest$value, na.rm = TRUE)/1000 * 1.25),
+        plot(I(out_nbtest$value / 1000) ~ out_nbtest$year, pch = '',
+          ylim = c(0, max(out_nbtest$value, na.rm = TRUE) / 1000 * 1.25),
           cex = 1, ylab = expression(paste(N^o, " of Tests (in 1,000)")), 
           xlab = 'Year', xlim = c(2000, yr_pred), 
-          main = expression(bold(paste("Total ", N^o, " of Tests"))))
+          main = main_title)
         polygon(x = c(ci$year, rev(ci$year)),
-          y = c(ci$upper/1000, rev(ci$lower/1000)),
+          y = c(ci$upper / 1000, rev(ci$lower / 1000)),
           col = col_ci, border = NA)
-        lines(I(out_nbtest$value/1000) ~ out_nbtest$year, lwd = 1, col = 'seagreen3')
-        text(x = 2000, y = max(out_nbtest$value, na.rm = TRUE)/1000 * 1.15, cnt_to_plot, cex = 1.25, pos = 4)
+        lines(I(out_nbtest$value / 1000) ~ out_nbtest$year, lwd = 1, col = 'seagreen3')
+        text(x = 2000, y = max(out_nbtest$value, na.rm = TRUE) / 1000 * 1.15, cnt_to_plot, cex = 1.25, pos = 4)
         
         if(length(likdat$hts$tot) > 0) {
           if (cnt %in% redact) { pchpt <- '' } else { pchpt <- 16 }
           points(I(likdat$hts$tot/1000) ~ I(likdat$hts$year + 0.5), pch = pchpt) 
-          p_test_pop <- round(likdat$hts$tot/pop[likdat$hts$year - start]*100, 0)
-          p_test_pop_r <- c(min(p_test_pop, na.rm = TRUE), max(p_test_pop, na.rm=TRUE))
+          p_test_pop <- round(likdat$hts$tot / pop[likdat$hts$year - start] * 100, 0)
+          p_test_pop_r <- c(min(p_test_pop, na.rm = TRUE), max(p_test_pop, na.rm = TRUE))
           text(paste('No Test/Pop = ', p_test_pop_r[1], '-', p_test_pop_r[2], '%'),
-               x = yr_pred, y = max(likdat$hts$tot/1000, na.rm = TRUE)/25, pos = 2)  }
+               x = yr_pred, y = max(likdat$hts$tot / 1000, na.rm = TRUE)/25, pos = 2)  }
     } else {
-      plot(I(out_nbtest$value/1000) ~ out_nbtest$year, pch='',
-           ylim = c(0, max(out_nbtest$value, na.rm=TRUE)/1000 + max(out_nbtest$value, na.rm = TRUE)/1000*0.25),
+      plot(I(out_nbtest$value/1000) ~ out_nbtest$year, pch = '',
+           ylim = c(0, max(out_nbtest$value, na.rm = TRUE) / 1000 + max(out_nbtest$value, na.rm = TRUE)/1000*0.25),
            cex = 1, ylab = expression(paste(N^o, " of Tests (in 1,000)")), 
-           xlab = 'Year', xlim=c(2000, yr_pred), 
-           main = expression(bold(paste("Total ", N^o, " of Tests"))))
+           xlab = 'Year', xlim = c(2000, yr_pred), 
+           main = main_title)
         lines(I(out_nbtest$value/1000) ~ out_nbtest$year, lwd = 1, col = 'seagreen3')
-        text(x = 2000, y = max(out_nbtest$value, na.rm = TRUE)/1000, cnt_to_plot, cex = 1.5, pos = 2)
+        text(x = 2000, y = max(out_nbtest$value, na.rm = TRUE) / 1000, cnt_to_plot, cex = 1.5, pos = 2)
 
         if(length(likdat$hts$tot) > 0) {
           if (cnt %in% redact) { pchpt <- '' } else { pchpt <- 16 }
-          points(I(likdat$hts$tot/1000) ~ I(likdat$hts$year + 0.5), pch = pchpt) 
-          p_test_pop <- round(likdat$hts$tot/pop[(likdat$hts$year - start)]*100, 0)
-          p_test_pop_r <- c(min(p_test_pop, na.rm = TRUE), max(p_test_pop, na.rm=TRUE))
+          points(I(likdat$hts$tot / 1000) ~ I(likdat$hts$year + 0.5), pch = pchpt) 
+          p_test_pop <- round(likdat$hts$tot/pop[(likdat$hts$year - start)] * 100, 0)
+          p_test_pop_r <- c(min(p_test_pop, na.rm = TRUE), max(p_test_pop, na.rm = TRUE))
           text(paste('No Test/Pop = ', p_test_pop_r[1], '-', p_test_pop_r[2], '%'),
-               x = yr_pred, y = max(likdat$hts$tot/1000, na.rm = TRUE)/20, pos = 2) }
+               x = yr_pred, y = max(likdat$hts$tot / 1000, na.rm = TRUE) / 20, pos = 2) }
     }
 }
 
-plot_out_nbtest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2018) {
+plot_out_nbtest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2019) {
   require(data.table)
   
   # redact <- c('Namibia','Uganda','Zambia','Zimbabwe')
@@ -265,46 +269,47 @@ plot_out_nbtest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 20
   
   # Total tested
   if (plot.ci == T){
-    plot(I(out_nbtest_f$value/1000) ~ out_nbtest_f$year, pch = '',
-         ylim = c(0, max_ylim /1000 * 1.25),
+    plot(I(out_nbtest_f$value / 1000) ~ out_nbtest_f$year, pch = '',
+         ylim = c(0, max_ylim / 1000 * 1.25),
          cex = 1, ylab = expression(paste(N^o, " of Tests (in 1,000)")), 
          xlab = 'Year', xlim = c(2000, yr_pred), 
          main = expression(bold(paste("Total ", N^o, " of Tests"))))
     polygon(x = c(ci_f$year, rev(ci_f$year)),
-            y = c(ci_f$upper/1000, rev(ci_f$lower/1000)),
+            y = c(ci_f$upper / 1000, rev(ci_f$lower / 1000)),
             col = col_ci, border = NA)
     polygon(x = c(ci_m$year, rev(ci_m$year)),
-            y = c(ci_m$upper/1000, rev(ci_m$lower/1000)),
+            y = c(ci_m$upper / 1000, rev(ci_m$lower / 1000)),
             col = col_ci, border = NA)
-    lines(I(out_nbtest_f$value/1000) ~ out_nbtest_f$year, lwd = 1, col = 'seagreen3')
-    lines(I(out_nbtest_m$value/1000) ~ out_nbtest_m$year, lwd = 1, col = 'seagreen3')
-    text(x = 2000, y = max(out_nbtest$value, na.rm = TRUE)/1000 * 1.15, cnt_to_plot, cex = 1.25, pos = 4)
+    lines(I(out_nbtest_f$value / 1000) ~ out_nbtest_f$year, lwd = 1, col = 'seagreen3')
+    lines(I(out_nbtest_m$value / 1000) ~ out_nbtest_m$year, lwd = 1, col = 'seagreen3')
+    text(x = 2000, y = max(out_nbtest$value, na.rm = TRUE) / 1000 * 1.15, cnt_to_plot, cex = 1.25, pos = 4)
     
     if(length(lik_f$tot) > 0 | length(lik_m$tot) > 0) {
       if (cnt %in% redact) { pchpt <- '' } else { pchpt <- 16 }
-      points(I(lik_f$tot/1000) ~ I(lik_f$year + 0.5), pch = pchpt) 
-      points(I(lik_m$tot/1000) ~ I(lik_m$year + 0.5), pch = pchpt + 1) 
+      points(I(lik_f$tot / 1000) ~ I(lik_f$year + 0.5), pch = pchpt) 
+      points(I(lik_m$tot / 1000) ~ I(lik_m$year + 0.5), pch = pchpt + 1) 
  }
   } else {
-    plot(I(out_nbtest_f$value/1000) ~ out_nbtest_f$year, pch = '',
-         ylim = c(0, max_ylim /1000 * 1.25),
+    plot(I(out_nbtest_f$value / 1000) ~ out_nbtest_f$year, pch = '',
+         ylim = c(0, max_ylim / 1000 * 1.25),
          cex = 1, ylab = expression(paste(N^o, " of Tests (in 1,000)")), 
          xlab = 'Year', xlim = c(2000, yr_pred), 
          main = expression(bold(paste("Total ", N^o, " of Tests"))))
-    lines(I(out_nbtest_f$value/1000) ~ out_nbtest_f$year, lwd = 1, col = 'seagreen3')
-    lines(I(out_nbtest_m$value/1000) ~ out_nbtest_m$year, lwd = 1, col = 'seagreen3')
-    text(x = 2000, y = max(out_nbtest$value, na.rm = TRUE)/1000, cnt_to_plot, cex = 1.5, pos = 2)
+    lines(I(out_nbtest_f$value / 1000) ~ out_nbtest_f$year, lwd = 1, col = 'seagreen3')
+    lines(I(out_nbtest_m$value / 1000) ~ out_nbtest_m$year, lwd = 1, col = 'seagreen3')
+    text(x = 2000, y = max(out_nbtest$value, na.rm = TRUE) / 1000, cnt_to_plot, cex = 1.5, pos = 2)
     
     if(length(likdat$hts$tot) > 0) {
       if (cnt %in% redact) { pchpt <- '' } else { pchpt <- 16 }
-      points(I(lik_f$tot/1000) ~ I(lik_f$year + 0.5), pch = pchpt) 
-      points(I(lik_m$tot/1000) ~ I(lik_m$year + 0.5), pch = pchpt + 1)  }
+      points(I(lik_f$tot / 1000) ~ I(lik_f$year + 0.5), pch = pchpt) 
+      points(I(lik_m$tot / 1000) ~ I(lik_m$year + 0.5), pch = pchpt + 1)  }
   }
 }
 
 
 #' @export
-plot_out_nbpostest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2018) {
+plot_out_nbpostest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2019,
+                               plot_title = TRUE) {
   require(data.table)
   
   # if fitting with HTS program data stratified by sex, we add both sex back
@@ -325,9 +330,9 @@ plot_out_nbpostest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 201
   
   start <- fp$ss$proj_start
   mod <- simmod(fp)
-  plhiv <- apply(attr(mod, "hivpop")[,1:8,,], 4, FUN=sum) + 
-    apply(attr(mod, "artpop")[,,1:8,,], 5, FUN=sum)
-  pop <- apply(mod[1:35,,,], 4, FUN=sum)
+  plhiv <- apply(attr(mod, "hivpop")[, 1:8,,], 4, FUN = sum) + 
+    apply(attr(mod, "artpop")[,, 1:8,,], 5, FUN = sum)
+  pop <- apply(mod[1:35,,,], 4, FUN = sum)
 
     out_nbtest_pos <- get_out_nbtest_pos(mod, fp)
     out_nbtest_pos <- subset(out_nbtest_pos, year <= yr_pred)
@@ -343,57 +348,60 @@ plot_out_nbpostest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 201
     }
     if (is.null(simul)) plot.ci <- FALSE
 
+    if (plot_title == TRUE) { main_title <- expression(bold(paste("Total ", N^o, " of Positive Tests")))
+    } else {  main_title <- ""  }
+    
     col_ci <- rgb(150, 150, 150, 125, max = 255)
     
     # Postive tests
     if (plot.ci == T){
         plot(I(out_nbtest_pos$value/1000) ~ out_nbtest_pos$year, pch = '',
-          ylim = c(0, max(out_nbtest_pos$value, na.rm = TRUE)/1000 * 1.25),
+          ylim = c(0, max(out_nbtest_pos$value, na.rm = TRUE) / 1000 * 1.25),
           cex = 1, ylab = expression(paste(N^o, " of Positive Tests (in 1,000)")), 
           xlab='Year', xlim = c(2000, yr_pred), 
-          main = expression(bold(paste("Total ", N^o, " of Positive Tests"))))
+          main = main_title)
         polygon(x = c(ci$year, rev(ci$year)),
-          y = c(ci$upper/1000, rev(ci$lower/1000)),
+          y = c(ci$upper / 1000, rev(ci$lower / 1000)),
           col = col_ci, border = NA)
-        lines(I(out_nbtest_pos$value/1000) ~ out_nbtest_pos$year, lwd = 1, col = 'orangered2')
+        lines(I(out_nbtest_pos$value / 1000) ~ out_nbtest_pos$year, lwd = 1, col = 'orangered2')
         if (!is.null(likdat$hts_pos$tot)) {
           if (cnt %in% redact) { pchpt <- '' } else { pchpt <- 16 }
-          points(I(likdat$hts_pos$tot/1000) ~ I(likdat$hts_pos$year + 0.5), pch = pchpt) 
+          points(I(likdat$hts_pos$tot / 1000) ~ I(likdat$hts_pos$year + 0.5), pch = pchpt) 
           yield <- round(likdat$hts$totpos / likdat$hts$tot * 100, 1)
           y_range <- c(min(yield, na.rm = TRUE), max(yield, na.rm = TRUE))
           p_pos_pop <- round(likdat$hts_pos$tot / plhiv[(likdat$hts_pos$year - start)] * 100, 0)
           p_pos_pop_r <-  c(min(p_pos_pop, na.rm = TRUE), max(p_pos_pop, na.rm = TRUE))
           text(paste('Positivity = ', y_range[1], '-', y_range[2], '%', sep=''), 
-               x = yr_pred, y = max(likdat$hts_pos$tot/1000, na.rm = TRUE)/6, pos = 2)
+               x = yr_pred, y = max(likdat$hts_pos$tot / 1000, na.rm = TRUE) / 6, pos = 2)
           text(paste('No Positive/PLHIV = ', p_pos_pop_r[1], '-', 
                      p_pos_pop_r[2], '%', sep=''), x = yr_pred, 
-               y = max(likdat$hts_pos$tot/1000, na.rm = TRUE)/20, pos = 2)
+               y = max(likdat$hts_pos$tot / 1000, na.rm = TRUE)/20, pos = 2)
         }
     } else {
-        plot(I(out_nbtest_pos$value/1000) ~ out_nbtest_pos$year, pch = '',
-          ylim = c(0, max(out_nbtest_pos$value, na.rm=TRUE)/1000 * 1.25),
+        plot(I(out_nbtest_pos$value / 1000) ~ out_nbtest_pos$year, pch = '',
+          ylim = c(0, max(out_nbtest_pos$value, na.rm = TRUE) / 1000 * 1.25),
           cex = 1, ylab = expression(paste(N^o, " of Positive Tests (in 1,000)")), 
           xlab = 'Year', xlim = c(2000, yr_pred), 
-          main = expression(bold(paste("Total ", N^o, " of Positive Tests"))))
-        lines(I(out_nbtest_pos$value/1000) ~ out_nbtest_pos$year, lwd = 1, col = 'orangered2')
+          main = main_title)
+        lines(I(out_nbtest_pos$value / 1000) ~ out_nbtest_pos$year, lwd = 1, col = 'orangered2')
         if (!is.null(likdat$hts_pos$tot)) {
           if (cnt %in% redact) { pchpt <- '' } else { pchpt <- 16 }
-            points(I(likdat$hts_pos$tot/1000) ~ I(likdat$hts_pos$year + 0.5), pch = pchpt) 
+            points(I(likdat$hts_pos$tot / 1000) ~ I(likdat$hts_pos$year + 0.5), pch = pchpt) 
           yield <- round(likdat$hts$totpos / likdat$hts$tot * 100, 1)
           y_range <- c(min(yield, na.rm = TRUE), max(yield, na.rm = TRUE))
           p_pos_pop <- round(likdat$hts_pos$tot / plhiv[(likdat$hts_pos$year - start)] * 100, 0)
           p_pos_pop_r <-  c(min(p_pos_pop, na.rm = TRUE), max(p_pos_pop, na.rm = TRUE))
           text(paste('Positivity = ', y_range[1], '-', y_range[2], '%', sep=''), 
-               x = yr_pred, y = max(likdat$hts_pos$tot/1000, na.rm = TRUE)/6, pos = 2)
+               x = yr_pred, y = max(likdat$hts_pos$tot / 1000, na.rm = TRUE) / 6, pos = 2)
           text(paste('No Positive/PLHIV = ', p_pos_pop_r[1], '-', 
-                     p_pos_pop_r[2], '%', sep=''), x = yr_pred, 
-               y = max(likdat$hts_pos$tot/1000, na.rm = TRUE)/20, pos = 2)
+                     p_pos_pop_r[2], '%', sep = ''), x = yr_pred, 
+               y = max(likdat$hts_pos$tot / 1000, na.rm = TRUE) / 20, pos = 2)
         }
     }
 }
 
 #' @export
-plot_out_nbpostest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2018) {
+plot_out_nbpostest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2019) {
   require(data.table)
   
   # redact <- c('Namibia','Uganda','Zambia','Zimbabwe')
@@ -401,9 +409,9 @@ plot_out_nbpostest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred =
   
   start <- fp$ss$proj_start
   mod <- simmod(fp)
-  plhiv <- apply(attr(mod, "hivpop")[,1:8,,], 4, FUN=sum) + 
-    apply(attr(mod, "artpop")[,,1:8,,], 5, FUN=sum)
-  pop <- apply(mod[1:35,,,], 4, FUN=sum)
+  plhiv <- apply(attr(mod, "hivpop")[,1:8,,], 4, FUN = sum) + 
+    apply(attr(mod, "artpop")[,, 1:8,,], 5, FUN = sum)
+  pop <- apply(mod[1:35,,,], 4, FUN = sum)
   
   out_nbtest_pos <- subset(get_out_nbtest_pos_sex(mod, fp), year <= yr_pred)
   out_nbtest_pos$year <- out_nbtest_pos$year + 0.5
@@ -432,43 +440,44 @@ plot_out_nbpostest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred =
   
   # Postive tests
   if (plot.ci == T){
-    plot(I(out_nbtest_pos_f$value/1000) ~ out_nbtest_pos_f$year, pch = '',
-         ylim = c(0, max_ylim/1000 * 1.25),
+    plot(I(out_nbtest_pos_f$value / 1000) ~ out_nbtest_pos_f$year, pch = '',
+         ylim = c(0, max_ylim / 1000 * 1.25),
          cex = 1, ylab = expression(paste(N^o, " of Positive Tests (in 1,000)")), 
          xlab = 'Year', xlim = c(2000, yr_pred), 
          main = expression(bold(paste("Total ", N^o, " of Positive Tests"))))
     polygon(x = c(ci_f$year, rev(ci_f$year)),
-            y = c(ci_f$upper/1000, rev(ci_f$lower/1000)),
+            y = c(ci_f$upper / 1000, rev(ci_f$lower / 1000)),
             col = col_ci, border = NA)
     polygon(x = c(ci_m$year, rev(ci_m$year)),
-            y = c(ci_m$upper/1000, rev(ci_m$lower/1000)),
+            y = c(ci_m$upper / 1000, rev(ci_m$lower / 1000)),
             col = col_ci, border = NA)
-    lines(I(out_nbtest_pos_f$value/1000) ~ out_nbtest_pos_f$year, lwd = 1, col = 'orangered2')
-    lines(I(out_nbtest_pos_m$value/1000) ~ out_nbtest_pos_m$year, lwd = 1, col = 'orangered2')
+    lines(I(out_nbtest_pos_f$value / 1000) ~ out_nbtest_pos_f$year, lwd = 1, col = 'orangered2')
+    lines(I(out_nbtest_pos_m$value / 1000) ~ out_nbtest_pos_m$year, lwd = 1, col = 'orangered2')
     
     if (length(lik_f) > 0 | length(lik_m) > 0) {
       if (cnt %in% redact) { pchpt <- '' } else { pchpt <- 16 }
-      points(I(lik_f$totpos/1000) ~ I(lik_f$year + 0.5), pch = pchpt) 
-      points(I(lik_m$totpos/1000) ~ I(lik_m$year + 0.5), pch = pchpt + 1) 
+      points(I(lik_f$totpos / 1000) ~ I(lik_f$year + 0.5), pch = pchpt) 
+      points(I(lik_m$totpos / 1000) ~ I(lik_m$year + 0.5), pch = pchpt + 1) 
     }
   } else {
-    plot(I(out_nbtest_pos_f$value/1000) ~ out_nbtest_pos_f$year, pch = '',
-         ylim = c(0, max_ylim/1000 * 1.25),
+    plot(I(out_nbtest_pos_f$value / 1000) ~ out_nbtest_pos_f$year, pch = '',
+         ylim = c(0, max_ylim / 1000 * 1.25),
          cex = 1, ylab = expression(paste(N^o, " of Positive Tests (in 1,000)")), 
          xlab = 'Year', xlim = c(2000, yr_pred), 
          main = expression(bold(paste("Total ", N^o, " of Positive Tests"))))
-    lines(I(out_nbtest_pos_f$value/1000) ~ out_nbtest_pos_f$year, lwd = 1, col = 'orangered2')
-    lines(I(out_nbtest_pos_m$value/1000) ~ out_nbtest_pos_m$year, lwd = 1, col = 'orangered2')
+    lines(I(out_nbtest_pos_f$value / 1000) ~ out_nbtest_pos_f$year, lwd = 1, col = 'orangered2')
+    lines(I(out_nbtest_pos_m$value / 1000) ~ out_nbtest_pos_m$year, lwd = 1, col = 'orangered2')
     if (!is.null(likdat$hts_pos$tot)) {
       if (cnt %in% redact) { pchpt <- '' } else { pchpt <- 16 }
-      points(I(lik_f$totpos/1000) ~ I(lik_f$year + 0.5), pch = pchpt) 
-      points(I(lik_m$totpos/1000) ~ I(lik_m$year + 0.5), pch = pchpt + 1) 
+      points(I(lik_f$totpos / 1000) ~ I(lik_f$year + 0.5), pch = pchpt) 
+      points(I(lik_m$totpos / 1000) ~ I(lik_m$year + 0.5), pch = pchpt + 1) 
     }
   }
 }
 
 #' @export
-plot_out_evertestneg <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, simul = NULL, plot_legend = TRUE, yr_pred = 2018) {
+plot_out_evertestneg <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, 
+                                 simul = NULL, plot_legend = TRUE, yr_pred = 2019) {
     
     out_evertest <- subset(out_evertest, year <= yr_pred)
     out_evertest$year <- out_evertest$year + 0.5
@@ -496,46 +505,56 @@ plot_out_evertestneg <- function(mod, fp, likdat, cnt, survey_hts, out_evertest,
         ci_f <- subset(ci, agegr == '15-49' & outcome == 'evertest' & sex =='female' & hivstatus == 'negative')
         ci_m <- subset(ci, agegr == '15-49' & outcome == 'evertest' & sex =='male' & hivstatus == 'negative')
 
-        plot(I(out_f$value*100) ~ out_f$year, pch='', ylim=c(0,100), col='maroon', main="Negative Ever Tested",
-          xlim=c(2000, yr_pred), ylab='Proportion Ever Tested Among Susceptibles', xlab='Year', lwd=1)
-        polygon(x = c(ci_f$year, rev(ci_f$year)),
-          y = c(I(ci_f$upper*100), rev(I(ci_f$lower*100))),
-          col = col_ci, border = NA)
-        polygon(x = c(ci_m$year, rev(ci_m$year)),
-          y = c(I(ci_m$upper*100), rev(I(ci_m$lower*100))),
-          col = col_ci, border = NA)
-        lines(I(out_f$value*100) ~ out_f$year, col = 'maroon', lwd = 1)
-        lines(I(out_m$value*100) ~ out_m$year, col = 'navy', lwd = 1)
-        points(I(dat_f$est*100) ~ dat_f$year, pch = 15, col = 'maroon')
-        points(I(dat_m$est*100) ~ dat_m$year, pch = 16, col = 'navy')
-        segments(x0 = dat_f$year, y0 = I(dat_f$ci_l*100), 
-                 x1 = dat_f$year, y1 = I(dat_f$ci_u*100), lwd = 1, col = 'maroon')
-        segments(x0 = dat_m$year, y0 = I(dat_m$ci_l*100), 
-                 x1 = dat_m$year, y1 = I(dat_m$ci_u*100), lwd = 1, col = 'navy')
-        if (plot_legend) { 
+    plot(I(out_f$value * 100) ~ out_f$year,
+      pch = "", ylim = c(0, 100), col = "maroon", main = "Negative Ever Tested",
+      xlim = c(2000, yr_pred), ylab = "Proportion Ever Tested Among Susceptibles", xlab = "Year", lwd = 1)
+    polygon(
+      x = c(ci_f$year, rev(ci_f$year)),
+      y = c(I(ci_f$upper * 100), rev(I(ci_f$lower * 100))),
+      col = col_ci, border = NA)
+    polygon(
+      x = c(ci_m$year, rev(ci_m$year)),
+      y = c(I(ci_m$upper * 100), rev(I(ci_m$lower * 100))),
+      col = col_ci, border = NA)
+    lines(I(out_f$value * 100) ~ out_f$year, col = "maroon", lwd = 1)
+    lines(I(out_m$value * 100) ~ out_m$year, col = "navy", lwd = 1)
+    points(I(dat_f$est * 100) ~ dat_f$year, pch = 15, col = "maroon")
+    points(I(dat_m$est * 100) ~ dat_m$year, pch = 16, col = "navy")
+    segments(
+      x0 = dat_f$year, y0 = I(dat_f$ci_l * 100),
+      x1 = dat_f$year, y1 = I(dat_f$ci_u * 100), lwd = 1, col = "maroon")
+    segments(
+      x0 = dat_m$year, y0 = I(dat_m$ci_l * 100),
+      x1 = dat_m$year, y1 = I(dat_m$ci_u * 100), lwd = 1, col = "navy")
+    if (plot_legend) { 
           legend(x = 2000, y = 100, 
                  legend = c('Women (15-49 years)','Men (15-49 years)'), 
                  col = c('maroon','navy'), bty = 'n', lwd = 1, pch = c(15,16)) }
     } else {
-        plot(I(out_f$value*100) ~ out_f$year, type='l', ylim=c(0,100), 
-             col = 'maroon', main = "Negative Ever Tested", xlab='Year', lwd=1,
-             xlim = c(2000, yr_pred), ylab = 'Proportion Ever Tested Among Susceptibles')
-        lines(I(out_m$value*100) ~ out_m$year, col = 'navy', lwd = 1)
-        points(I(dat_f$est*100) ~ dat_f$year, pch = 15, col = 'maroon')
-        points(I(dat_m$est*100) ~ dat_m$year, pch = 16, col = 'navy')
-        segments(x0 = dat_f$year, y0 = I(dat_f$ci_l*100), 
-                 x1 = dat_f$year, y1 = I(dat_f$ci_u*100), lwd = 1, col = 'maroon')
-        segments(x0 = dat_m$year, y0 = I(dat_m$ci_l*100), 
-                 x1 = dat_m$year, y1 = I(dat_m$ci_u*100), lwd = 1, col = 'navy')
+      plot(I(out_f$value * 100) ~ out_f$year,
+        type = "l", ylim = c(0, 100),
+        col = "maroon", main = "Negative Ever Tested", xlab = "Year", lwd = 1,
+        xlim = c(2000, yr_pred), ylab = "Proportion Ever Tested Among Susceptibles")
+      lines(I(out_m$value * 100) ~ out_m$year, col = "navy", lwd = 1)
+      points(I(dat_f$est * 100) ~ dat_f$year, pch = 15, col = "maroon")
+      points(I(dat_m$est * 100) ~ dat_m$year, pch = 16, col = "navy")
+      segments(
+        x0 = dat_f$year, y0 = I(dat_f$ci_l * 100),
+        x1 = dat_f$year, y1 = I(dat_f$ci_u * 100), lwd = 1, col = "maroon")
+      segments(
+        x0 = dat_m$year, y0 = I(dat_m$ci_l * 100),
+        x1 = dat_m$year, y1 = I(dat_m$ci_u * 100), lwd = 1, col = "navy")
         if (plot_legend) { 
           legend(x = 2000, y = 100, 
                  legend = c('Women (15-49 years)','Men (15-49 years)'), 
-                 col = c('maroon','navy'), bty = 'n', lwd = 2, pch = c(15,16)) }
+                 col = c('maroon','navy'), bty = 'n', lwd = 2, pch = c(15, 16)) }
     }
 }
 
 #' @export
-plot_out_evertestpos <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, simul = NULL, plot_legend = TRUE, yr_pred = 2018) {
+plot_out_evertestpos <- function(mod, fp, likdat, cnt, survey_hts, out_evertest,
+                                 simul = NULL, plot_legend = TRUE, yr_pred = 2019,
+                                 plot_title = TRUE) {
 
   out_evertest <- subset(out_evertest, year <= yr_pred)
   out_evertest$year <- out_evertest$year + 0.5
@@ -550,6 +569,9 @@ plot_out_evertestpos <- function(mod, fp, likdat, cnt, survey_hts, out_evertest,
         plot.ci <- TRUE
     }
     if (is.null(simul)) plot.ci <- FALSE
+  
+  if (plot_title == TRUE) { main_title <- "PLHIV Ever Tested"
+  } else {  main_title <- ""  }
 
     col_ci <- rgb(150, 150, 150, 125, max = 255)
     
@@ -563,45 +585,47 @@ plot_out_evertestpos <- function(mod, fp, likdat, cnt, survey_hts, out_evertest,
         ci_f <- subset(ci, agegr == '15-49' & outcome == 'evertest' & sex =='female' & hivstatus == 'positive')
         ci_m <- subset(ci, agegr == '15-49' & outcome == 'evertest' & sex =='male' & hivstatus == 'positive')
 
-        plot(I(out_f$value*100) ~ out_f$year, pch='', ylim=c(0,100), col='maroon', main='PLHIV Ever Tested',
-          xlim=c(2000, yr_pred), ylab='Proportion PLHIV Ever Tested', xlab='Year', lwd=1)
+        plot(I(out_f$value * 100) ~ out_f$year, pch = '', ylim = c(0, 100), col = 'maroon', main = main_title,
+          xlim=c(2000, yr_pred), ylab = 'Proportion PLHIV Ever Tested', xlab = 'Year', lwd = 1)
           polygon(x = c(ci_f$year, rev(ci_f$year)),
-          y = c(I(ci_f$upper*100), rev(I(ci_f$lower*100))),
+          y = c(I(ci_f$upper * 100), rev(I(ci_f$lower*100))),
           col = col_ci, border = NA)
         polygon(x = c(ci_m$year, rev(ci_m$year)),
-          y = c(I(ci_m$upper*100), rev(I(ci_m$lower*100))),
+          y = c(I(ci_m$upper * 100), rev(I(ci_m$lower * 100))),
           col = col_ci, border = NA)
-        lines(I(out_f$value*100) ~ out_f$year, col = 'maroon', lwd = 1)
-        lines(I(out_m$value*100) ~ out_m$year, col = 'navy', lwd = 1)
-        points(I(dat_f$est*100) ~ I(dat_f$year-0.1), pch = 15, col = 'maroon')
-        points(I(dat_m$est*100) ~ I(dat_m$year+0.1), pch = 16, col = 'navy')
-        segments(x0 = dat_f$year-0.1, y0 = I(dat_f$ci_l*100), 
-                 x1 = dat_f$year-0.1, y1 = I(dat_f$ci_u*100), lwd = 1, col = 'maroon')
-        segments(x0 = dat_m$year+0.1, y0 = I(dat_m$ci_l*100), 
-                 x1 = dat_m$year+0.1, y1 = I(dat_m$ci_u*100), lwd = 1, col = 'navy')
+        lines(I(out_f$value * 100) ~ out_f$year, col = 'maroon', lwd = 1)
+        lines(I(out_m$value * 100) ~ out_m$year, col = 'navy', lwd = 1)
+        points(I(dat_f$est * 100) ~ I(dat_f$year - 0.1), pch = 15, col = 'maroon')
+        points(I(dat_m$est * 100) ~ I(dat_m$year + 0.1), pch = 16, col = 'navy')
+        segments(x0 = dat_f$year - 0.1, y0 = I(dat_f$ci_l * 100), 
+                 x1 = dat_f$year - 0.1, y1 = I(dat_f$ci_u * 100), lwd = 1, col = 'maroon')
+        segments(x0 = dat_m$year + 0.1, y0 = I(dat_m$ci_l * 100), 
+                 x1 = dat_m$year + 0.1, y1 = I(dat_m$ci_u * 100), lwd = 1, col = 'navy')
         if (plot_legend) { 
           legend(x = 2000, y = 100, 
                  legend = c('Women (15-49 years)','Men (15-49 years)'), 
-                 col = c('maroon','navy'), bty = 'n', lwd = 1, pch = c(15,16)) }
+                 col = c('maroon','navy'), bty = 'n', lwd = 1, pch = c(15, 16)) }
     } else {
-        plot(I(out_f$value*100) ~ out_f$year, type='l', ylim = c(0,100), col = 'maroon', main = 'PLHIV Ever Tested',
+        plot(I(out_f$value * 100) ~ out_f$year, type='l', ylim = c(0,100), col = 'maroon', main = main_title,
           xlim = c(2000, yr_pred), ylab = 'Proportion PLHIV Ever Tested', xlab = 'Year', lwd = 1)
-        lines(I(out_m$value*100) ~ out_m$year, col = 'navy', lwd = 1)
-        points(I(dat_f$est*100) ~ I(dat_f$year-0.1), pch = 15, col = 'maroon')
-        points(I(dat_m$est*100) ~ I(dat_m$year+0.1), pch = 16, col = 'navy')
-        segments(x0 = dat_f$year-0.1, y0 = I(dat_f$ci_l*100), 
-                 x1 = dat_f$year-0.1, y1 = I(dat_f$ci_u*100), lwd = 1, col = 'maroon')
-        segments(x0 = dat_m$year+0.1, y0 = I(dat_m$ci_l*100), 
-                 x1 = dat_m$year+0.1, y1 = I(dat_m$ci_u*100), lwd = 1, col = 'navy')
+        lines(I(out_m$value * 100) ~ out_m$year, col = 'navy', lwd = 1)
+        points(I(dat_f$est * 100) ~ I(dat_f$year - 0.1), pch = 15, col = 'maroon')
+        points(I(dat_m$est * 100) ~ I(dat_m$year + 0.1), pch = 16, col = 'navy')
+        segments(x0 = dat_f$year - 0.1, y0 = I(dat_f$ci_l * 100), 
+                 x1 = dat_f$year - 0.1, y1 = I(dat_f$ci_u * 100), lwd = 1, col = 'maroon')
+        segments(x0 = dat_m$year + 0.1, y0 = I(dat_m$ci_l * 100), 
+                 x1 = dat_m$year + 0.1, y1 = I(dat_m$ci_u * 100), lwd = 1, col = 'navy')
         if (plot_legend) {  
           legend(x = 2000, y = 100,
-                 legend = c('Women (15-49 years)','Men (15-49 years)'), 
-                 col = c('maroon','navy'), bty = 'n', lwd = 2, pch = c(15,16)) }
+                 legend = c('Women (15-49 years)', 'Men (15-49 years)'), 
+                 col = c('maroon', 'navy'), bty = 'n', lwd = 2, pch = c(15, 16)) }
     }
 }
 
 #' @export
-plot_out_evertest <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, simul = NULL, plot_legend= TRUE, yr_pred = 2018) {
+plot_out_evertest <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, 
+                              simul = NULL, plot_legend = TRUE, yr_pred = 2019,
+                              plot_title = TRUE) {
 
   out_evertest <- subset(out_evertest, year <= yr_pred)
   out_evertest$year <- out_evertest$year + 0.5
@@ -616,6 +640,9 @@ plot_out_evertest <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, si
         plot.ci <- TRUE
     }
     if (is.null(simul)) plot.ci <- FALSE
+  
+    if (plot_title == TRUE) { main_title <- "Population Ever Tested"
+    } else {  main_title <- ""  }
 
     # Plots of Ever Test by Sex (overall)
     out_f <- subset(out_evertest, agegr == '15-49' & outcome == 'evertest' & sex =='female' & hivstatus == 'all')
@@ -629,18 +656,18 @@ plot_out_evertest <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, si
         ci_f <- subset(ci, agegr == '15-49' & outcome == 'evertest' & sex =='female' & hivstatus == 'all')
         ci_m <- subset(ci, agegr == '15-49' & outcome == 'evertest' & sex =='male' & hivstatus == 'all')
 
-        plot(I(out_f$value*100) ~ out_f$year, pch='', ylim=c(0,100), col='maroon', main='Population Ever Tested',
-          xlim=c(2000, yr_pred), ylab='Proportion Ever Tested', xlab='Year', lwd=1)
+        plot(I(out_f$value * 100) ~ out_f$year, pch='', ylim = c(0,100), col = 'maroon', main = main_title,
+          xlim=c(2000, yr_pred), ylab = 'Proportion Ever Tested', xlab = 'Year', lwd = 1)
         polygon(x = c(ci_f$year, rev(ci_f$year)),
-          y = c(I(ci_f$upper*100), rev(I(ci_f$lower*100))),
+          y = c(I(ci_f$upper * 100), rev(I(ci_f$lower*100))),
           col = col_ci, border = NA)
-        lines(I(out_f$value*100) ~ out_m$year, col='maroon', lwd=1)
+        lines(I(out_f$value * 100) ~ out_m$year, col='maroon', lwd=1)
         polygon(x = c(ci_m$year, rev(ci_m$year)),
-          y = c(I(ci_m$upper*100), rev(I(ci_m$lower*100))),
+          y = c(I(ci_m$upper * 100), rev(I(ci_m$lower*100))),
           col = col_ci, border = NA)
-        lines(I(out_m$value*100) ~ out_m$year, col = 'navy', lwd = 1)
-        points(I(dat_f$est*100) ~ I(dat_f$year + 0.1), pch = 15, col='maroon')
-        points(I(dat_m$est*100) ~ I(dat_m$year - 0.1), pch = 16, col = 'navy')
+        lines(I(out_m$value * 100) ~ out_m$year, col = 'navy', lwd = 1)
+        points(I(dat_f$est * 100) ~ I(dat_f$year + 0.1), pch = 15, col='maroon')
+        points(I(dat_m$est * 100) ~ I(dat_m$year - 0.1), pch = 16, col = 'navy')
         segments(x0 = dat_f$year + 0.1, y0 = I(dat_f$ci_l*100), 
                  x1 = dat_f$year + 0.1, y1 = I(dat_f$ci_u*100), lwd = 1, col = 'maroon')
         segments(x0 = dat_m$year - 0.1, y0 = I(dat_m$ci_l*100), 
@@ -650,8 +677,8 @@ plot_out_evertest <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, si
                      legend = c('Women (15-49 years)','Men (15-49 years)'), 
                      col = c('maroon','navy'), bty = 'n', lwd = 1, pch = c(15,16)) }
     } else {
-        plot(I(out_f$value*100) ~ out_f$year, type = 'l', ylim = c(0,100), 
-          col = 'maroon', main = 'Population Ever Tested',
+        plot(I(out_f$value * 100) ~ out_f$year, type = 'l', ylim = c(0, 100), 
+          col = 'maroon', main = main_title,
           xlim = c(2000, yr_pred), ylab = 'Proportion Ever Tested', 
           xlab = 'Year', lwd = 1)
         lines(I(out_m$value*100) ~ out_m$year, col = 'navy', lwd = 1)
@@ -669,7 +696,8 @@ plot_out_evertest <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, si
 }
 
 #' @export
-plot_out_90s <- function(mod, fp, likdat, cnt, out_evertest, survey_hts, simul = NULL, plot_legend = TRUE, yr_pred = 2018) {
+plot_out_90s <- function(mod, fp, likdat, cnt, out_evertest, survey_hts, 
+                         simul = NULL, plot_legend = TRUE, yr_pred = 2019) {
 
     phia_aware <- subset(survey_hts, country == cnt & agegr == '15-49' &
                   sex == 'both' & outcome == 'aware')
@@ -787,7 +815,7 @@ plot_out_90s <- function(mod, fp, likdat, cnt, out_evertest, survey_hts, simul =
 
 #' @export
 plot_out_evertest_fbyage <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, 
-                            simul = NULL, plot_legend = TRUE, yr_pred = 2018) {
+                            simul = NULL, plot_legend = TRUE, yr_pred = 2019) {
 
   out_evertest <- subset(out_evertest, year <= yr_pred)
   out_evertest$year <- out_evertest$year + 0.5
@@ -875,7 +903,9 @@ plot_out_evertest_fbyage <- function(mod, fp, likdat, cnt, survey_hts, out_evert
 }
 
 #' @export
-plot_out_evertest_mbyage <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, simul = NULL, plot_legend = TRUE, yr_pred = 2018) {
+plot_out_evertest_mbyage <- function(mod, fp, likdat, cnt, survey_hts, 
+                                     out_evertest, simul = NULL, 
+                                     plot_legend = TRUE, yr_pred = 2019) {
 
   out_evertest <- subset(out_evertest, year <= yr_pred)
   out_evertest$year <- out_evertest$year + 0.5
@@ -962,7 +992,8 @@ plot_out_evertest_mbyage <- function(mod, fp, likdat, cnt, survey_hts, out_evert
 
 
 # ---- Single Function for Plots ----
-plot_out <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, simul = NULL, plot_legend = TRUE, yr_pred = 2018) {
+plot_out <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, simul = NULL, 
+                     plot_legend = TRUE, yr_pred = 2019) {
 par(mfrow = c(3,2), mar = c(4,4,2,2))
   plot_out_nbtest(mod, fp, likdat, cnt, simul, yr_pred)
   plot_out_nbpostest(mod, fp, likdat, cnt, simul, yr_pred)  
@@ -973,7 +1004,8 @@ par(mfrow = c(3,2), mar = c(4,4,2,2))
 }
 
 #' @export
-plot_out_strat <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, simul = NULL, plot_legend = TRUE, yr_pred = 2018) {
+plot_out_strat <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, simul = NULL, 
+                           plot_legend = TRUE, yr_pred = 2019) {
   par(mfrow = c(1,2), mar = c(4,4,2,2))
   plot_out_evertest_mbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul, plot_legend, yr_pred) 
   plot_out_evertest_fbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul, plot_legend, yr_pred)    
@@ -990,7 +1022,9 @@ end_of_year <- function(year, value){
 
 
 #' @export
-tab_out_evertest <- function(mod, fp, age_grp = '15-49', gender = 'both', hiv = 'all', year_range = c(2010, 2018), simul = NULL, end_year = TRUE) {
+tab_out_evertest <- function(mod, fp, age_grp = '15-49', gender = 'both', 
+                             hiv = 'all', year_range = c(2010, 2019), 
+                             simul = NULL, end_year = TRUE) {
   if (length(year_range) == 1) { year_range <- c(year_range, year_range) }
   if (is.null(simul)) {
     out <- get_out_evertest(mod, fp, age_grp, gender, hiv)
@@ -1016,27 +1050,24 @@ tab_out_evertest <- function(mod, fp, age_grp = '15-49', gender = 'both', hiv = 
 }
 
 #' @export
-tab_out_aware <- function(mod, fp, age_grp = '15-49', gender = 'both', year_range = c(2010, 2018), simul = NULL, end_year = TRUE) {
+tab_out_aware <- function(mod, fp, age_grp = '15-49', gender = 'both', 
+                          year_range = c(2010, 2019), simul = NULL, 
+                          end_year = TRUE) {
+  if (age_grp == "15-99") { age_grp <- "15+" }
+  
   if (length(year_range) == 1) {
-    year_range <- c(year_range, year_range)
-  }
+    year_range <- c(year_range, year_range) }
 
   if (is.null(simul)) {
     out <- get_out_aware(mod, fp, age_grp, gender)
-
     if (end_year == TRUE) {
-      out$value <- end_of_year(out$year, out$value)
-    }
+      out$value <- end_of_year(out$year, out$value) }
     out$value <- round(out$value * 100, 1)
     tab_aware <- subset(out, year >= year_range[1] & year <= year_range[2])
-
   } else {
-
     out <- get_out_aware(mod, fp, age_grp, gender)
     if (end_year == TRUE) {
-      out$value <- end_of_year(out$year, out$value)
-    }
-    
+    out$value <- end_of_year(out$year, out$value) }
     out$value <- round(out$value * 100, 1)
     outci <- getCI(simul$diagnoses)
     outci <- subset(outci, agegr == age_grp & sex == gender) 
@@ -1058,7 +1089,9 @@ tab_out_aware <- function(mod, fp, age_grp = '15-49', gender = 'both', year_rang
 }
 
 #' @export
-tab_out_nbaware <- function(mod, fp, age_grp = '15-49', gender = 'both', year_range = c(2010, 2018), end_year = TRUE) {
+tab_out_nbaware <- function(mod, fp, age_grp = '15-49', 
+                            gender = 'both', year_range = c(2010, 2019), 
+                            end_year = TRUE) {
   if (length(year_range) == 1) { year_range <- c(year_range, year_range) }
     out <- get_out_nbaware(mod, fp, age_grp, gender)
     if (end_year == TRUE) { out$value <- end_of_year(out$year, out$value) }
@@ -1071,7 +1104,8 @@ tab_out_nbaware <- function(mod, fp, age_grp = '15-49', gender = 'both', year_ra
 
 
 #' @export
-tab_out_artcov <- function(mod, fp, gender = 'both', year_range = c(2010, 2018)) {
+tab_out_artcov <- function(mod, fp, gender = 'both', 
+                           year_range = c(2010, 2019)) {
   ## ART coverage is already end-of-year, no need to adjust
   
   if (length(year_range) == 1) {
@@ -1108,7 +1142,8 @@ tab_out_artcov <- function(mod, fp, gender = 'both', year_range = c(2010, 2018))
 }
 
 #' @export
-tab_out_pregprev <- function(mod, fp, year_range = c(2010, 2018), end_year = TRUE) {
+tab_out_pregprev <- function(mod, fp, year_range = c(2010, 2019), 
+                             end_year = TRUE) {
   if (length(year_range) == 1) { year_range <- c(year_range, year_range) }
     out <- get_out_pregprev(mod, fp)
   out$prev <- round(out$prev * 100, 1)
