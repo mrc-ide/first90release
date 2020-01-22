@@ -30,4 +30,14 @@ write.csv(spectrum_output_table(mod, fp),
           "~/Downloads/Malawi-shiny90-example-output.csv", 
            row.names = FALSE)
 }
+
+ If we use the numbers on ART in mod (that get capped) all is fine.
+ We do not have the situation where kos < art
+ The code below verifies this...
+If the numbers aware are lower than those on ART, we make them equal before
+importing back in Spectrum. This is necessary if countries overestimate their
+ART numbers... if that is the case, Spectrum will cap initiations if there are 
+not enough people to be initiated (based on sex, age, cd4 strata). Here, we are
+just making the numbers equal but countries should be strongly encouraged to 
+revisit their ART numbers.
 }

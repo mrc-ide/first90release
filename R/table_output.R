@@ -12,6 +12,8 @@
 #'
 #' PLHIV is mid-year estimate. All other outcomes are end of year estimate.
 #'
+#' @export
+#'
 #' @examples
 #'
 #' \dontrun{
@@ -19,7 +21,7 @@
 #'           "~/Downloads/Malawi-shiny90-example-output.csv", 
 #'            row.names = FALSE)
 #' }
-#' @export 
+#'
 spectrum_output_table <- function(mod, fp) {
 
   aware_m <- get_out_aware(mod, fp, "15+", "male")
