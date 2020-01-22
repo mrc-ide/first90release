@@ -30,4 +30,5 @@ write.csv(spectrum_output_table(mod, fp),
           "~/Downloads/Malawi-shiny90-example-output.csv", 
            row.names = FALSE)
 }
+
 }
