@@ -3,7 +3,7 @@
 
 #  Function to calculate outputs by age / sex / testing history stratifications
 #' @export
-prb_dx_one_yr <- function(fp, year = c(2000:2019), age = "15-24", sex = "male", test_ever = "never", dt = 0.1, version = "C") {
+prb_dx_one_yr <- function(fp, year = c(2000:2019), age = "15-24", sex = "male", test_ever = "never", dt = 0.1, version = "R") {
   
   if (version == "C") {
     val <- prb_dx_one_yr_cpp(fp, year = year, age = age, sex = sex, test_ever = test_ever, dt = dt)
