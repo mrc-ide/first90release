@@ -44,9 +44,9 @@ spectrum_output_table <- function(mod, fp) {
   onart <- t(fp$art15plus_num[, out_idx])
   colnames(onart) <- paste0("onart_", c("m", "f"))
   
-  #'  If we use the numbers on ART in mod (that get capped) all is fine.
-  #'  We do not have the situation where kos < art
-  #'  The code below verifies this...
+  ##  If we use the numbers on ART in mod (that get capped) all is fine.
+  ##  We do not have the situation where kos < art
+  ##  The code below verifies this...
       # onart_f <- colSums(attr(mod, "artpop")[, , 1:9, 2, out_idx, drop = FALSE], , 4)
       # onart_m <- colSums(attr(mod, "artpop")[, , 1:9, 1, out_idx, drop = FALSE], , 4)
       # onart <- cbind(onart_m, onart_f)
@@ -83,12 +83,12 @@ spectrum_output_table <- function(mod, fp) {
              onart,
              notdx_hiv_one_yr)
   
-  #' If the numbers aware are lower than those on ART, we make them equal before
-  #' importing back in Spectrum. This is necessary if countries overestimate their
-  #' ART numbers... if that is the case, Spectrum will cap initiations if there are 
-  #' not enough people to be initiated (based on sex, age, cd4 strata). Here, we are
-  #' just making the numbers equal but countries should be strongly encouraged to 
-  #' revisit their ART numbers.
+  ## If the numbers aware are lower than those on ART, we make them equal before
+  ## importing back in Spectrum. This is necessary if countries overestimate their
+  ## ART numbers... if that is the case, Spectrum will cap initiations if there are 
+  ## not enough people to be initiated (based on sex, age, cd4 strata). Here, we are
+  ## just making the numbers equal but countries should be strongly encouraged to 
+  ## revisit their ART numbers.
   val$aware_m <- ifelse(val$aware_m < val$onart_m, val$onart_m, val$aware_m)
   val$aware_f <- ifelse(val$aware_f < val$onart_f, val$onart_f, val$aware_f)
   val$evertest_m <- ifelse(val$evertest_m < val$onart_m, val$onart_m, val$evertest_m)
