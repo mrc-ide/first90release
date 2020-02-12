@@ -1,3 +1,7 @@
+# first90 1.3.5 
+
+* Remove function `prb_dx_one_yr_cpp()` (commented out). This is creating error with windows compilation.
+
 # first90 1.3.4
 
 * Add adjustment in Spectrum output CSV that the number aware of status is
