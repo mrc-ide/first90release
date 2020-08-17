@@ -71,6 +71,7 @@ number_retests <- function(mod, fp, df){
         sum(attr(mod, "late_diagnoses")[, haidx, sidx, df$yidx[i]])
       
       retests[i] <- retests[i] +
+        sum(testneg_ha_hm * c(fp$diagn_rate[ , haidx, sidx, 2, df$yidx[i]])) +
         sum(diagn_ha_hm * c(fp$diagn_rate[ , haidx, sidx, 3, df$yidx[i]])) +
         sum(artpop_ha_hm * c(fp$diagn_rate[ , haidx, sidx, 4, df$yidx[i]]))
       

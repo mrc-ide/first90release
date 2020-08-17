@@ -1,3 +1,14 @@
+# first90 1.3.5
+
+* Updated the calculation of 'retests' among HIV positive adults to include HIV positive
+  tests conducted amongst adults who had previously tested HIV negative. Previously new
+  HIV diagnoses were excluded from the count of retests and only HIV positive adults who 
+  were previously diagnosed or on ART were counted as 'retests'.  This should not change
+  any of the standard displayed outputs because by convention the 'retest' figures have
+  focused on retests among HIV negative adults while separate results have been reported
+  for retesting among HIV positive results.
+
+
 # first90 1.3.4
 
 * Add adjustment in Spectrum output CSV that the number aware of status is
