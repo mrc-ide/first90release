@@ -141,7 +141,7 @@ lprior_hts <- function(theta, mod, fp) {
 
   lprior <- 
     ## Prior for first baseline rate for females # exp(log(0.001) + 1.96*0.25)
-    dnorm(x = theta[1], mean = log(0.001), sd = 0.25, log = TRUE) +
+    dnorm(x = theta[1], mean = log(0.005), sd = 0.25, log = TRUE) +
     ## Relative testing among PLHIV diagnosed, untreated. 1.50 (95%CI: 0.14-6.00) # plogis(qlogis(1.5/8) - 1.96*1.31)*8
     dnorm(x = theta[n_k2], mean = qlogis(1.5/8), sd = 1.31, log = TRUE) +
     ## Prior for male RR 0.6 (95%CI: 0.07-1.05)# plogis(qlogis(0.6/1.1) + 1.96*1.46) * 1.1

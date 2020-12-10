@@ -57,8 +57,8 @@ create_hts_param <- function(theta, fp) {
   base_rate_m <- base_rate_f * rr_m
   
   # Retest with time 
-  knots_rr_test <- c(2010, 2015) - fp$ss$proj_start + 1L
-  rate_rr_test <- approx(knots_rr_test, rr_test, seq_len(fp$ss$PROJ_YEARS), rule = 2)$y
+  knots_rr_test <- c(2005, 2010, 2015) - fp$ss$proj_start + 1L
+  rate_rr_test <- exp(approx(knots_rr_test, log(c(1, rr_test)), seq_len(fp$ss$PROJ_YEARS), rule = 2)$y)
   
   ## Testing rate for HIV negative population:
   ## 1: never tested
