@@ -57,13 +57,19 @@ spectrum_output_table <- function(mod, fp) {
   aware <- cbind(aware_m = aware_m$value,
                  aware_f = aware_f$value) * plhiv
   
-  # Number adults 15+ undiagnosed and infected in the past year
-  prb_dx_1yr_m <- pool_prb_dx_one_yr(mod, fp, year = c(2000:2019),
+  ## Number adults 15+ undiagnosed and infected in the past year
+
+  ## -- UPDATE HERE --
+  ## * increment year range by one to current year
+
+  prb_dx_1yr_m <- pool_prb_dx_one_yr(mod, fp, year = c(2000:2020),
                    age = c("15-24","25-34", "35-49", "50-99"),
                    sex = c("male"))
-  prb_dx_1yr_f <- pool_prb_dx_one_yr(mod, fp, year = c(2000:2019),
+  prb_dx_1yr_f <- pool_prb_dx_one_yr(mod, fp, year = c(2000:2020),
                    age = c("15-24","25-34", "35-49", "50-99"),
                    sex = c("female"))
+  ## -- UPDATE ABOVE --
+  
   prb_dx_1yr <- cbind(prb_dx_1yr_m = c(prb_dx_1yr_m$prb1yr, 
                                        rep(NA, length(year_out) - nrow(prb_dx_1yr_m))),
                       prb_dx_1yr_f = c(prb_dx_1yr_f$prb1yr, 

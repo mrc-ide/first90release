@@ -22,15 +22,13 @@ create_hts_param <- function(theta, fp) {
   # theta_fx <- c(0.05, 0.12, 0.27, 0.27, rep(0.9, 3))
     theta_fx <- c(   0,    0, 0.27, 0.27, rep(0.9, 3)) 
     
-# We name the parameters to be fitted
-  # Every year new estimates are produced, we need to add one knot
-  # -- UPDATE HERE --
-  knots <- c(1995, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-                   2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 
-                   2020) - fp$ss$proj_start + 1L
-  knots_rr_dxunt <- c(2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019,
-                      2020) - fp$ss$proj_start + 1L
-  # -- UPDATE ABOVE --
+## We name the parameters to be fitted
+  ## Every year new estimates are produced, we need to add one knot
+  ## -- UPDATE HERE --
+  knots <- c(1995, 2000:2021) - fp$ss$proj_start + 1L
+  knots_rr_dxunt <- c(2010:2021) - fp$ss$proj_start + 1L
+  
+  ## -- UPDATE ABOVE --
   
   n_k1 <- length(knots) - 1 # we remove 1995
   n_k2 <- n_k1 + length(knots_rr_dxunt)
@@ -59,8 +57,8 @@ create_hts_param <- function(theta, fp) {
   base_rate_m <- base_rate_f * rr_m
   
   # Retest with time 
-  knots_rr_test <- c(2010, 2015) - fp$ss$proj_start + 1L
-  rate_rr_test <- approx(knots_rr_test, rr_test, seq_len(fp$ss$PROJ_YEARS), rule = 2)$y
+  knots_rr_test <- c(2005, 2010, 2015) - fp$ss$proj_start + 1L
+  rate_rr_test <- exp(approx(knots_rr_test, log(c(1, rr_test)), seq_len(fp$ss$PROJ_YEARS), rule = 2)$y)
   
   ## Testing rate for HIV negative population:
   ## 1: never tested

@@ -1,3 +1,16 @@
+# first90 1.4.0
+
+Updates for 2021 UNAIDS estimates:
+
+* Extended arrays to output 2020 results.
+
+* Changed prior for baseline testing rate to normal(log(0.005), sd = 0.25). (likelihood.R#138)
+  
+* Revise HIV retesting rate to increase log-linearly betwee 2005 and 2010. The 
+  implication of this is to reduce the retesting rate during the 2000s compared
+  to the 2010s, which reduces implausibly high predictions for number of HIV
+  tests conducted during the 2000s in the abscence of HTS programme data (Giguere et al 2020).
+
 # first90 1.3.5
 
 * Updated the calculation of 'retests' among HIV positive adults to include HIV positive

@@ -48,7 +48,10 @@ ll_prgdat <- function(mod, fp, dat) {
   return(llk)
 }
 
-art_constraint_penalty <- function(mod, fp, max_year = 2019) {
+## -- UPDATE HERE --
+## * max_year = <current_year> incremented each year
+
+art_constraint_penalty <- function(mod, fp, max_year = 2020) {
   ind_year <- c(2000:max_year) - fp$ss$proj_start + 1L
   tot_late <- apply(attr(mod, "late_diagnoses")[,,, ind_year], 4, sum)
   tot_untreated_pop <- apply(attr(mod, "hivpop")[,,, ind_year], 4, sum)
@@ -58,7 +61,7 @@ art_constraint_penalty <- function(mod, fp, max_year = 2019) {
   return(penalty)
 }
 # Include this in ll_hts if you want to incorporate the likelihood constraint on ART.
-  # val_art_penalty <- art_constraint_penalty(mod, fp, max_year = 2019)
+  # val_art_penalty <- art_constraint_penalty(mod, fp, max_year = 2020)
   # val <- val1 + val2 + val3 + val_prior + val_art_penalty
   
 # Function to prepare the data for input in the likelihood function.
@@ -121,11 +124,14 @@ prepare_hts_likdat <- function(dat_evertest, dat_prg, fp) {
 
 
 lprior_hts <- function(theta, mod, fp) {
-# Penalty to smooth testing rates among females aged 15-24 (reference group)
-# We calculate penalty for RR of males on the log(rate) scale (and use same SD as for females)
-  knots <- c(2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-             2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019,
-             2020) - fp$ss$proj_start + 1L
+## Penalty to smooth testing rates among females aged 15-24 (reference group)
+## We calculate penalty for RR of males on the log(rate) scale (and use same SD as for females)
+
+  ## -- UPDATE HERE --
+  ## * Extend knots by 1 year to current year
+  knots <- 2000:2021 - fp$ss$proj_start + 1L
+  ## -- UPDATE ABOVE --
+  
   n_k1 <- length(knots)
   n_k2 <- n_k1 * 2 - 10 
     penalty_f <- log(fp$hts_rate[1,2,1, knots[-1]]) - log(fp$hts_rate[1,2,1, knots[-n_k1]])
@@ -135,7 +141,7 @@ lprior_hts <- function(theta, mod, fp) {
 
   lprior <- 
     ## Prior for first baseline rate for females # exp(log(0.001) + 1.96*0.25)
-    dnorm(x = theta[1], mean = log(0.001), sd = 0.25, log = TRUE) +
+    dnorm(x = theta[1], mean = log(0.005), sd = 0.25, log = TRUE) +
     ## Relative testing among PLHIV diagnosed, untreated. 1.50 (95%CI: 0.14-6.00) # plogis(qlogis(1.5/8) - 1.96*1.31)*8
     dnorm(x = theta[n_k2], mean = qlogis(1.5/8), sd = 1.31, log = TRUE) +
     ## Prior for male RR 0.6 (95%CI: 0.07-1.05)# plogis(qlogis(0.6/1.1) + 1.96*1.46) * 1.1
