@@ -32,11 +32,16 @@ select_prgmdata <- function(prgm_dat, cnt, age_group) {
     }  } 
   
   if (!any(prgm_dat$country == cnt)) {
+
+    ## -- UPDATE HERE --
+    ## * year vecotr needs to be extended to output results to current year
+    
     prg_dat <- data.frame(country = cnt, 
-                          year = 2010:2019, 
+                          year = 2010:2020,
                           agegr = '15-99', sex = 'both',
                           tot = NA, totpos = NA,
                           vct = NA, vctpos = NA, anc = NA, ancpos = NA)
+    ## -- UPDATE ABOVE --
   }
   prg_dat <- prg_dat[order(prg_dat$year), ]
   return(prg_dat)

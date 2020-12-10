@@ -1,3 +1,9 @@
+# first90 1.4.0
+
+Updates for 2021 UNAIDS estimates:
+
+* Extended arrays to output 2020 results.
+
 # first90 1.3.5
 
 * Updated the calculation of 'retests' among HIV positive adults to include HIV positive

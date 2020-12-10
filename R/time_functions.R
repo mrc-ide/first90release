@@ -3,7 +3,10 @@
 
 #  Function to calculate outputs by age / sex / testing history stratifications
 #' @export
-prb_dx_one_yr <- function(fp, year = c(2000:2019), age = "15-24", sex = "male", test_ever = "never", dt = 0.1, version = "R") {
+
+## -- UPDATE HERE --
+## * Increment year by one to include current year
+prb_dx_one_yr <- function(fp, year = c(2000:2020), age = "15-24", sex = "male", test_ever = "never", dt = 0.1, version = "R") {
   
   if (version == "C") {
     val <- prb_dx_one_yr_cpp(fp, year = year, age = age, sex = sex, test_ever = test_ever, dt = dt)
@@ -133,7 +136,9 @@ prb_dx_one_yr <- function(fp, year = c(2000:2019), age = "15-24", sex = "male", 
 
 # Pooling the 16 stratifications together.
 #' @export
-pool_prb_dx_one_yr <- function(mod, fp, year = c(2000:2019), 
+## -- UPDATE HERE --
+## * Increment year by one to include current year
+pool_prb_dx_one_yr <- function(mod, fp, year = c(2000:2020), 
                             age = c("15-24", "25-34", "35-49", "50-99"),
                             sex = c("male", "female")) {
   
@@ -189,7 +194,9 @@ pool_prb_dx_one_yr <- function(mod, fp, year = c(2000:2019),
 
 
 #' @export
-simul_pool_prb_dx_one_yr <- function(samp, mod, fp, year = c(2010:2019),
+## -- UPDATE HERE --
+## * Increment year by one to include current year
+simul_pool_prb_dx_one_yr <- function(samp, mod, fp, year = c(2010:2020),
                                age = c("15-24", "25-34", "35-49", "50-99"),
                                sex = c("male", "female")) {
   

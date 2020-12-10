@@ -98,8 +98,11 @@ number_retests <- function(mod, fp, df){
 #---- Test retest ----
 # HIV-
 #' @export
+
+## -- UPDATE HERE --
+## * update yr_pred to current year
 plot_retest_test_neg <- function(mod, fp, likdat, cnt, relative = F, 
-                                 yr_pred = 2019,
+                                 yr_pred = 2020,
                                  plot_title = TRUE) {
   end_date <- fp$ss$proj_start + fp$ss$PROJ_YEARS - 1L
   out_retest <- expand.grid(year = 2000:end_date, 
@@ -158,8 +161,11 @@ plot_retest_test_neg <- function(mod, fp, likdat, cnt, relative = F,
 
 # HIV+
 #' @export
+
+## -- UPDATE HERE --
+## * update yr_pred to current year
 plot_retest_test_pos <- function(mod, fp, likdat, cnt, relative = F, 
-                                 yr_pred = 2019,
+                                 yr_pred = 2020,
                                  plot_legend = TRUE, plot_title = TRUE) {
   end_date <- fp$ss$proj_start + fp$ss$PROJ_YEARS - 1L
   out_retest <- expand.grid(year = 2000:end_date, 
@@ -223,7 +229,10 @@ plot_retest_test_pos <- function(mod, fp, likdat, cnt, relative = F,
 }
 
 #' @export
-plot_prv_pos_yld <- function(mod, fp, likdat, cnt, yr_pred = 2019, 
+
+## -- UPDATE HERE --
+## * update retest to current year
+plot_prv_pos_yld <- function(mod, fp, likdat, cnt, yr_pred = 2020, 
                              plot_legend = TRUE,
                              plot_title = TRUE) {
   
