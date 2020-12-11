@@ -157,8 +157,8 @@ plot_out_nbtest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2019,
   # redact <- c('Namibia','Uganda','Zambia','Zimbabwe')
     redact <- c('XXX')
   
-  cnt_to_plot <- ifelse(cnt == "Cote d'Ivoire", "Côte d'Ivoire",
-                        ifelse(cnt == "Swaziland", "eSwatini", cnt)) 
+  ## cnt_to_plot <- ifelse(cnt == "Cote d'Ivoire", "Côte d'Ivoire",
+  ##                       ifelse(cnt == "Swaziland", "eSwatini", cnt)) 
   start <- fp$ss$proj_start
   mod <- simmod(fp)
   plhiv <- apply(attr(mod, "hivpop")[,1:8,,], 4, FUN = sum) + 
