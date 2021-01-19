@@ -24,9 +24,32 @@ create_hts_param <- function(theta, fp) {
     
 ## We name the parameters to be fitted
   ## Every year new estimates are produced, we need to add one knot
+  ## 
+  ## # HOTFIX 14 Dec 2020:
+  ##   * Adding knots each year makes software incompatible with .shiny90.zip
+  ##     outputs saved with previous version.
+  ##   * There is not reliable information about which version saved easily
+  ##     accessible to what gets passed through here.
+  ##   * Hotfix: use the length of the parameter vector to determine which
+  ##     year and number of knots.
+  ##     * THIS WILL FAIL if other parameters are changed.
+  ##       * Added a pretty rigid check on length of parameter vector in the
+  ##         block below.
+  ##       * Added package test to ensure we know if something changes.
+  ##
   ## -- UPDATE HERE --
-  knots <- c(1995, 2000:2021) - fp$ss$proj_start + 1L
-  knots_rr_dxunt <- c(2010:2021) - fp$ss$proj_start + 1L
+  max_knot_year <- if (length(theta) == 41) {
+                     2019
+                   } else if (length(theta) == 43) {
+                     2020
+                   } else if (length(theta) == 45) {
+                     2021
+                   } else {
+                     stop("Unexpected length of parameter vector.")
+                   }
+  
+  knots <- c(1995, 2000:max_knot_year) - fp$ss$proj_start + 1L
+  knots_rr_dxunt <- c(2010:max_knot_year) - fp$ss$proj_start + 1L
   
   ## -- UPDATE ABOVE --
   

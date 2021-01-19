@@ -1,4 +1,13 @@
-# first90 1.4.0
+# first90 1.4.2
+
+* Implement backward compatibility for simulating previous .shiny90 outputs.
+  * The updates for each year add an additional knot, which changes the length
+    of the parameter vector. This update parses the knot definition based on 
+    the number of parameters.
+  * Function `create_hts_param()` will throw and error if an unexpected parameter
+    vector length is identified. 
+  
+# first90 1.4.1
 
 Updates for 2021 UNAIDS estimates:
 
