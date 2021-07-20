@@ -1,3 +1,11 @@
+# first90 1.4.3
+
+* Patch: in function `add_ss_indices()`, add argument `type.convert(..., as.is = TRUE)` 
+  to suppress R 4.0 warning.
+* Bugfix: remove duplicate declaration of `double incrate_g[NG];` in `EPP_DIRECTINCID` incidence
+  option. This did not affect any results because this option is not used in Shiny90 application; 
+  new infections by sex and age group were directly specified (option `EPP_DIRECTINFECTIONS`).
+
 # first90 1.4.2
 
 * Implement backward compatibility for simulating previous .shiny90 outputs.
