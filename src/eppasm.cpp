@@ -979,7 +979,6 @@ extern "C" {
 	// double prev_i = Xhivp / (Xhivn[MALE] + Xhivn[FEMALE] + Xhivp);
 	// double incrate15to49_i = (prev15to49[t] - prev_i)/(1.0 - prev_i);
 	double incrate_i = incidinput[t];
-	double incrate_g[NG];
 	incrate_g[MALE] = incrate_i * (Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex[t]*Xhivn[FEMALE]);
 	incrate_g[FEMALE] = incrate_i * incrr_sex[t]*(Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex[t]*Xhivn[FEMALE]);
       }

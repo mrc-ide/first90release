@@ -202,8 +202,8 @@ add_ss_indices <- function(dat, ss) {
   ## Convert 15+ to 15-99 for parsing below
   agegr_tmp <- sub("15\\+", "15-99", df$agegr)
   
-  df$agestart <- type.convert(sub("([0-9]+)-([0-9]+)", "\\1", agegr_tmp))
-  ageend <- type.convert(sub("([0-9]+)-([0-9]+)", "\\2", agegr_tmp))+1L
+  df$agestart <- type.convert(sub("([0-9]+)-([0-9]+)", "\\1", agegr_tmp), as.is = TRUE)
+  ageend <- type.convert(sub("([0-9]+)-([0-9]+)", "\\2", agegr_tmp), as.is = TRUE)+1L
 
   df$aidx <- df$agestart - ss$AGE_START + 1L
   df$agspan <- ageend - df$agestart
