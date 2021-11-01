@@ -62,10 +62,10 @@ spectrum_output_table <- function(mod, fp) {
   ## -- UPDATE HERE --
   ## * increment year range by one to current year
 
-  prb_dx_1yr_m <- pool_prb_dx_one_yr(mod, fp, year = c(2000:2020),
+  prb_dx_1yr_m <- pool_prb_dx_one_yr(mod, fp, year = c(2000:2021),
                    age = c("15-24","25-34", "35-49", "50-99"),
                    sex = c("male"))
-  prb_dx_1yr_f <- pool_prb_dx_one_yr(mod, fp, year = c(2000:2020),
+  prb_dx_1yr_f <- pool_prb_dx_one_yr(mod, fp, year = c(2000:2021),
                    age = c("15-24","25-34", "35-49", "50-99"),
                    sex = c("female"))
   ## -- UPDATE ABOVE --

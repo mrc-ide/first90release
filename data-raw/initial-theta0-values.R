@@ -1,7 +1,7 @@
 
 # Every year new estimates are produced, we need to add one knot
 # -- UPDATE HERE --
-n_k <- length(2000:2021)
+n_k <- length(2000:2022)
 # -- UPDATE ABOVE --
 
 # Starting parameters

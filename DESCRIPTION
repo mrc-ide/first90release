@@ -1,5 +1,5 @@
 Package: first90
-Version: 1.4.3
+Version: 1.5.0
 Title: The first90 model
 Description: Implements the Shiny90 model for estimating progress towards the UNAIDS "first 90" target for HIV awareness of status in sub-Saharan Africa.
 Authors@R:

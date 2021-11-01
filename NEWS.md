@@ -1,3 +1,10 @@
+# first90 1.5.0
+
+Updates for 2022 UNAIDS estimates:
+
+* Extend output arrays, plots, and tables to output 2021 results.
+* Extend theta0 initial values for additional year random-walk parameters.
+
 # first90 1.4.3
 
 * Patch: in function `add_ss_indices()`, add argument `type.convert(..., as.is = TRUE)` 
