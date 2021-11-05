@@ -11,6 +11,8 @@ Updates for 2022 UNAIDS estimates:
   from a previous model fit. Simulating from a previous fit requires manually specifying
   `fp$eppmod <- "directinfections"` after calling `prepare_inputs()`.
   
+* `extract_pjnz()` reads whether custom population adjustment was used in the Spectrum file from the tag `"<RegionalAdjustPopCBState MV>"`. This is used to set `popadjust = TRUE` automatically if a custom population was used in Spectrum.
+
 # first90 1.4.3
 
 * Patch: in function `add_ss_indices()`, add argument `type.convert(..., as.is = TRUE)` 

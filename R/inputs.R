@@ -254,6 +254,9 @@ prepare_inputs_from_extracts <- function(pjnz_in){
   dimnames(projp$fert_rat)[[1]] <- gsub("(.*)-.*", "\\1", dimnames(projp$fert_rat)[[1]])
   
   fp <- create_fp(projp, demp)
+
+  ## Set pop adjust
+  fp$popadjust <- pjnz_aggr$popadjust
   
   ## Calculate incidence input
   fp$infections <- pjnz_aggr$infections[fp$ss$AGE_START + fp$ss$p.age15plus.idx, , ]
