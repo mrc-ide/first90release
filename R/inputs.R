@@ -257,7 +257,7 @@ prepare_inputs_from_extracts <- function(pjnz_in){
   
   ## Calculate incidence input
   fp$infections <- pjnz_aggr$infections[fp$ss$AGE_START + fp$ss$p.age15plus.idx, , ]
-  fp$eppmod <- "directinfections"
+  fp$eppmod <- "directinfections_hts"
   
   ## initialise to no testing
   fp$hts_rate <- array(0.0, c(fp$ss$hAG, fp$ss$NG, fp$ss$pDS, fp$ss$PROJ_YEARS))
