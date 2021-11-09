@@ -37,7 +37,7 @@ select_prgmdata <- function(prgm_dat, cnt, age_group) {
     ## * year vecotr needs to be extended to output results to current year
     
     prg_dat <- data.frame(country = cnt, 
-                          year = 2010:2020,
+                          year = 2010:2021,
                           agegr = '15-99', sex = 'both',
                           tot = NA, totpos = NA,
                           vct = NA, vctpos = NA, anc = NA, ancpos = NA)
@@ -254,10 +254,13 @@ prepare_inputs_from_extracts <- function(pjnz_in){
   dimnames(projp$fert_rat)[[1]] <- gsub("(.*)-.*", "\\1", dimnames(projp$fert_rat)[[1]])
   
   fp <- create_fp(projp, demp)
+
+  ## Set pop adjust
+  fp$popadjust <- pjnz_aggr$popadjust
   
   ## Calculate incidence input
   fp$infections <- pjnz_aggr$infections[fp$ss$AGE_START + fp$ss$p.age15plus.idx, , ]
-  fp$eppmod <- "directinfections"
+  fp$eppmod <- "directinfections_hts"
   
   ## initialise to no testing
   fp$hts_rate <- array(0.0, c(fp$ss$hAG, fp$ss$NG, fp$ss$pDS, fp$ss$PROJ_YEARS))

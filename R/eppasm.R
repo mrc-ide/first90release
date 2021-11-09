@@ -5,7 +5,7 @@
 simmod <- function(fp, VERSION = "C"){
 
   if(VERSION != "R"){
-    fp$eppmodInt <- match(fp$eppmod, c("rtrend", "directincid", "directinfections"), nomatch = 0) # 0: r-spline;
+    fp$eppmodInt <- match(fp$eppmod, c("rtrend", "directincid", "directinfections", "directinfections_hts"), nomatch = 0) # 0: r-spline;
     mod <- .Call(eppasmC, fp)
     class(mod) <- "spec"
     return(mod)
@@ -206,6 +206,19 @@ simmod <- function(fp, VERSION = "C"){
       hivdeaths.ts <- cd4_mort_ts * hivpop[,,,i]
       hivdeaths_hAG.ts <- colSums(hivdeaths.ts)
 
+      ## ---- Distributing new infections in disease model ----
+      if(fp$eppmod == "directinfections_hts") {
+
+        ## Calculate annualised new infections by HIV age groups
+        infections_ha <- apply(fp$infections[,, i], 2, ctapply, ag.idx, sum)
+        grad <- grad + sweep(fp$cd4_initdist, 2:3, infections_ha, "*")
+
+        ## move new infections per DT from negative to positive compartment
+        pop[,, hivn.idx, i] <- pop[,, hivn.idx, i] - DT * fp$infections[,, i]
+        pop[,, hivp.idx, i] <- pop[,, hivp.idx, i] + DT * fp$infections[,, i]
+        infections[,,i] <- infections[,,i] + DT * fp$infections[,, i]
+      }      
+
       ## HIV testing and diagnosis
       if(i >= fp$t_hts_start) {
 
@@ -219,7 +232,19 @@ simmod <- function(fp, VERSION = "C"){
         hivtests[,,2,i] <- hivtests[,,2,i] + DT * fp$hts_rate[ , , 2, i] * testnegpop[ , , hivn.idx , i]
         grad_tn[ , , hivn.idx] <- grad_tn[ , , hivn.idx] + fp$hts_rate[ , , 1, i] * (hivn_pop_ha - testnegpop[ , , hivn.idx , i])
 
-        ## !!! TRANSFER INFECTIONS IF USING EPP INCIDENCE
+        ## Add new infections to testneg population
+        if (fp$eppmod == "directinfections_hts") {
+
+          infections_ha <- apply(fp$infections[,, i], 2, ctapply, ag.idx, sum)
+          
+          ## number of new infections among never tested (proportional to the HIV-neg pop)
+          hivn_pop_ha <- apply(pop[,,hivn.idx,i], 2, ctapply, ag.idx, sum)
+          testneg_infections_ha <- infections_ha * (testnegpop[,,hivn.idx,i] / hivn_pop_ha)
+
+          grad_tn[ , , hivn.idx] <- grad_tn[ , , hivn.idx] - testneg_infections_ha
+          grad_tn[ , , hivp.idx] <- grad_tn[ , , hivp.idx] - testneg_infections_ha
+        }
+
         ## Do new diagnoses
 
         ## Remove HIV deaths among tested negative pop
@@ -467,10 +492,11 @@ simmod <- function(fp, VERSION = "C"){
       } else if(fp$eppmod == "directinfections") {
          infections[,,i] <- fp$infections[,,i]
        }
-     
+
+       infections_ha <- apply(infections[,,i], 2, ctapply, ag.idx, sum)
+
        if(i >= fp$t_hts_start){
          hivn_pop_ha <- apply(pop[,,hivn.idx,i], 2, ctapply, ag.idx, sum)
-         infections_ha <- apply(infections[,,i], 2, ctapply, ag.idx, sum)
          testneg_infections_ha <- infections_ha * testnegpop[,,hivn.idx,i] / hivn_pop_ha
          testnegpop[ , , hivn.idx, i] <- testnegpop[ , , hivn.idx, i] - testneg_infections_ha
          testnegpop[ , , hivp.idx, i] <- testnegpop[ , , hivp.idx, i] + testneg_infections_ha
@@ -479,10 +505,9 @@ simmod <- function(fp, VERSION = "C"){
        pop[,,hivn.idx,i] <- pop[,,hivn.idx,i] - infections[,,i]
        pop[,,hivp.idx,i] <- pop[,,hivp.idx,i] + infections[,,i]
      
-       hivpop[,,,i] <- hivpop[,,,i] + sweep(fp$cd4_initdist, 2:3, apply(infections[,,i], 2, ctapply, ag.idx, sum), "*")
-       incid15to49[i] <- sum(infections[p.age15to49.idx,,i])
+       hivpop[,,,i] <- hivpop[,,,i] + sweep(fp$cd4_initdist, 2:3, infections_ha, "*")
      } # if(fp$eppmod %in% c("directincid", "directinfections"))
-
+    
     ## adjust HIV population to match target population size
     if(fp$popadjust) {
       
@@ -515,6 +540,7 @@ simmod <- function(fp, VERSION = "C"){
 
     ## prevalence and incidence 15 to 49
     prev15to49[i] <- sum(pop[p.age15to49.idx,,hivp.idx,i]) / sum(pop[p.age15to49.idx,,,i])
+    incid15to49[i] <- sum(infections[p.age15to49.idx,,i])
     incid15to49[i] <- sum(incid15to49[i]) / sum(pop[p.age15to49.idx, , hivn.idx, i - 1])
   }
 

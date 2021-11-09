@@ -45,6 +45,7 @@
 
 #define EPP_DIRECTINCID 2  // annual direct incidence inputs (as Spectrum)
 #define EPP_DIRECTINFECTIONS 3  // annual number of new infections by sex and age
+#define EPP_DIRECTINFECTIONS_HTS 4  // annual number of new infections by sex and age but intercalating infections by DT
 
 #define INCIDPOP_15TO49 0 // age range corresponding to incidence input
 #define INCIDPOP_15PLUS 1
@@ -156,7 +157,8 @@ extern "C" {
 	pAG_INCIDPOP = pAG_15TO49;
       else
 	pAG_INCIDPOP = pAG_15PLUS;
-    } else if(eppmod == EPP_DIRECTINFECTIONS){
+    } else if (eppmod == EPP_DIRECTINFECTIONS ||
+               eppmod == EPP_DIRECTINFECTIONS_HTS) {
       a_infections = REAL(getListElement(s_fp, "infections"));
     }
     multi_array_ref<double, 3> incrr_age(a_incrr_age, extents[PROJ_YEARS][NG][pAG]);
@@ -584,6 +586,32 @@ extern "C" {
             }
           }
 
+        // Add new infections per time step
+        if (eppmod == EPP_DIRECTINFECTIONS_HTS) {
+          for (int g = 0; g < NG; g++) {
+            int a = 0;
+            for (int ha = 0; ha < hAG; ha++) {
+              double infections_a, infections_ha = 0.0;
+              for (int i = 0; i < hAG_SPAN[ha]; i++) {
+                infections_a = input_infections[t][g][a];
+                infections_ha += input_infections[t][g][a];
+                infections[t][g][a] += DT * infections_a;
+                pop[t][HIVN][g][a] -= DT * infections_a;
+                pop[t][HIVP][g][a] += DT * infections_a;
+                a++;
+              }
+
+              if (ha < (hIDX_15TO49 + hAG_15TO49)) {
+                incid15to49[t] += DT * infections_ha;
+              }
+
+              for (int hm = 0; hm < hDS; hm++) {
+                grad[g][ha][hm] += infections_ha * cd4_initdist[g][ha][hm];
+              }
+            }
+          } 
+        } // if (eppmod == EPP_DIRECTINFECTIONS_HTS)
+
         // HIV testing and diagnosis
         if(t >= t_hts_start) {
 
@@ -591,22 +619,31 @@ extern "C" {
             int a = 0;
             for(int ha = 0; ha < hAG; ha++){
 
-              // New diagnoses among HIV negative population
-              // !!! NOTE: For use with EPP, need to substract incidence per time step from this
-              // !!!   This happens below for the direct incidence input option.
-              double hivn_pop_ha = 0.0;
+              double hivn_pop_ha = 0.0, infections_ha = 0.0;
               for(int i = 0; i < hAG_SPAN[ha]; i++){
                 hivn_pop_ha += pop[t][HIVN][g][a];
+                infections_ha += input_infections[t][g][a];
                 a++;
               }
+
+              // number of new infections among never tested (proportional to the HIV-neg pop)
+              double testneg_infections_ha = infections_ha * (testnegpop[t][0][g][ha] / hivn_pop_ha);              
+              
+              // Tests among HIV negative population
               hivtests[t][0][g][ha] += DT * hts_rate[t][0][g][ha] * (hivn_pop_ha - testnegpop[t][0][g][ha]);
               hivtests[t][1][g][ha] += DT * hts_rate[t][1][g][ha] * testnegpop[t][0][g][ha];
               testnegpop[t][HIVN][g][ha] += DT * hts_rate[t][HIVN][g][ha] * (hivn_pop_ha - testnegpop[t][HIVN][g][ha]);
+
+              // Remove infections from HIV- testnegpop
+              testnegpop[t][HIVN][g][ha] -= DT * testneg_infections_ha ;
 
 
               // New diagnoses among HIV positive population
 
               double grad_diagn[hDS], grad_testneg_hivp = 0.0;
+
+              // Add infections among testnegpop
+              grad_testneg_hivp += testneg_infections_ha;
 
               double hivpop_ha = 0.0, undiagnosed_ha = 0.0;
               for(int hm = 0; hm < hDS; hm++) {

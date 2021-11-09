@@ -19,7 +19,7 @@ get_pjnz_summary_data <- function(fp) {
 #'
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
-plot_pjnz_prv <- function(pjnz_summary, yr_pred = 2020) {
+plot_pjnz_prv <- function(pjnz_summary, yr_pred = 2021) {
   pjnz_summary <- na.omit(data.frame(year = pjnz_summary[["year"]], prv = pjnz_summary[["prevalence"]]*100))
   pjnz_summary$year <- pjnz_summary$year + 0.5
   plot(pjnz_summary$prv ~ pjnz_summary$year, 
@@ -34,7 +34,7 @@ plot_pjnz_prv <- function(pjnz_summary, yr_pred = 2020) {
 #' @export
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
-plot_pjnz_inc <- function(pjnz_summary, yr_pred = 2020) {
+plot_pjnz_inc <- function(pjnz_summary, yr_pred = 2021) {
   pjnz_summary <- na.omit(data.frame(year = pjnz_summary[["year"]], inc = pjnz_summary[["incidence"]]*1000))
   pjnz_summary$year <- pjnz_summary$year + 0.5
   pjnz_summary <- subset(pjnz_summary, year >= 2000)
@@ -50,7 +50,7 @@ plot_pjnz_inc <- function(pjnz_summary, yr_pred = 2020) {
 #' @export
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
-plot_pjnz_pop <- function(pjnz_summary, yr_pred = 2020) {
+plot_pjnz_pop <- function(pjnz_summary, yr_pred = 2021) {
   pjnz_summary <- na.omit(data.frame(year = pjnz_summary[["year"]], pop = pjnz_summary[["pop"]]/1000))
   pjnz_summary$year <- pjnz_summary$year + 0.5
   plot(pjnz_summary$pop ~ pjnz_summary$year, 
@@ -65,7 +65,7 @@ plot_pjnz_pop <- function(pjnz_summary, yr_pred = 2020) {
 #' @export
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
-plot_pjnz_plhiv <- function(pjnz_summary, yr_pred = 2020) {
+plot_pjnz_plhiv <- function(pjnz_summary, yr_pred = 2021) {
   pjnz_summary <- na.omit(data.frame(year = pjnz_summary[["year"]], plhiv = pjnz_summary[["plhiv"]]/1000))
   pjnz_summary$year <- pjnz_summary$year + 0.5
   plot(pjnz_summary$plhiv ~ pjnz_summary$year, 
@@ -82,7 +82,7 @@ plot_pjnz_plhiv <- function(pjnz_summary, yr_pred = 2020) {
 
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
-plot_pjnz <- function(fp, yr_pred = 2020) {
+plot_pjnz <- function(fp, yr_pred = 2021) {
   summary <- get_pjnz_summary_data(fp)
   par(mfrow=c(2,2))
   plot_pjnz_prv(summary, yr_pred)
@@ -125,7 +125,7 @@ combine_rows <- function(prgdat) {
 #' @export
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
-plot_input_tot <- function(prgdat, fp, yr_pred = 2020) {
+plot_input_tot <- function(prgdat, fp, yr_pred = 2021) {
     start <- fp$ss$proj_start
     mod <- simmod(fp)
     pop <- apply(mod[1:35,,,], 4, FUN=sum)
@@ -156,7 +156,7 @@ plot_input_tot <- function(prgdat, fp, yr_pred = 2020) {
 #' @export
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
-plot_input_totpos <- function(prgdat, fp, yr_pred = 2020) {
+plot_input_totpos <- function(prgdat, fp, yr_pred = 2021) {
     start <- fp$ss$proj_start
     mod <- simmod(fp)
     plhiv <- apply(attr(mod, "hivpop")[,1:8,,], 4, FUN = sum) +
@@ -200,7 +200,7 @@ plot_input_totpos <- function(prgdat, fp, yr_pred = 2020) {
 #' @export
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
-plot_input_anctot <- function(prgdat, fp, yr_pred = 2020) {
+plot_input_anctot <- function(prgdat, fp, yr_pred = 2021) {
 
   if (sum(prgdat$anc, na.rm = TRUE) > 0) {
     prgdat <- subset(prgdat, sex != 'male')
@@ -216,7 +216,7 @@ plot_input_anctot <- function(prgdat, fp, yr_pred = 2020) {
 #' @export
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
-plot_input_ancpos <- function(prgdat, fp, yr_pred = 2020) {
+plot_input_ancpos <- function(prgdat, fp, yr_pred = 2021) {
 
   if (sum(prgdat$ancpos, na.rm = TRUE) > 0) {
     prgdat <- subset(prgdat, sex != 'male')
@@ -232,7 +232,7 @@ plot_input_ancpos <- function(prgdat, fp, yr_pred = 2020) {
 # ---- Single Function Inputs Data ----
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
-plot_inputdata <- function(prgm_dat, fp, yr_pred = 2020) {
+plot_inputdata <- function(prgm_dat, fp, yr_pred = 2021) {
   par(mfrow = c(2,2))
   plot_input_tot(prgm_dat, fp, yr_pred)
   plot_input_totpos(prgm_dat, fp, yr_pred)
@@ -328,7 +328,7 @@ optimized_par <- function(opt, param = NULL) {
                    'RR re-testing: PLHIV aware (not ART) 2010',
 ## -- UPDATE HERE --
 ## * update label to current year
-                   'RR re-testing: PLHIV aware (not ART) 2020', 
+                   'RR re-testing: PLHIV aware (not ART) 2021', 
                    'RR re-testing: PLHIV on ART (*RR not ART)', 
                    'RR among 25-34 men',
                    'RR among 35+ men',

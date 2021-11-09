@@ -39,6 +39,15 @@ extract_pjnz <- function(pjnz = NULL, dp_file= NULL, pjn_file = NULL){
 
   v$valid_date <- dpsub(dp, "<ValidDate MV>", 2, 3)
 
+  ## Spectrum custom population used
+  if (exists_dptag(dp, "<RegionalAdjustPopCBState MV>")) {
+    v$popadjust <- dpsub(dp, "<RegionalAdjustPopCBState MV>", 2, 4)
+    v$popadjust <- as.integer(v$popadjust) == 1
+  } else {
+    v$popadjust <- FALSE
+  }
+    
+  
   ## Projection inputs
   v$yr_start <- year_start
   v$yr_end <- year_end
@@ -163,6 +172,9 @@ combine_inputs <- function(lst){
   vv <- lapply(vv, Reduce, f="+")
   v[names(vv)] <- vv
 
+
+  ## # Popadjust: use if any region used
+  v$popadjust <- any(vapply(lst, "[[", logical(1), "popadjust"))
 
   ## # Demographic inputs
 

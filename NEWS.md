@@ -1,3 +1,18 @@
+# first90 1.5.0
+
+Updates for 2022 UNAIDS estimates:
+
+* Extend output arrays, plots, and tables to output 2021 results.
+* Extend theta0 initial values for additional year random-walk parameters.
+
+* Intercalate new infections in each HIV time step. Equal number of infections are added in each time step. This is controlled by the option `eppmod = "directinfections_hts"`.
+* Option `eppmod = "directinfections_hts"` is specified as the default option in 
+  `prepare_inputs(pjnz)`. Therefore, new package version will not reproduce simulations
+  from a previous model fit. Simulating from a previous fit requires manually specifying
+  `fp$eppmod <- "directinfections"` after calling `prepare_inputs()`.
+  
+* `extract_pjnz()` reads whether custom population adjustment was used in the Spectrum file from the tag `"<RegionalAdjustPopCBState MV>"`. This is used to set `popadjust = TRUE` automatically if a custom population was used in Spectrum.
+
 # first90 1.4.3
 
 * Patch: in function `add_ss_indices()`, add argument `type.convert(..., as.is = TRUE)` 

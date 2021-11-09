@@ -44,6 +44,8 @@ create_hts_param <- function(theta, fp) {
                      2020
                    } else if (length(theta) == 45) {
                      2021
+                   } else if (length(theta) == 47) {
+                     2022
                    } else {
                      stop("Unexpected length of parameter vector.")
                    }
