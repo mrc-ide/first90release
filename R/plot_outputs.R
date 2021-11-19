@@ -146,7 +146,7 @@ get_out_pregprev <- function(mod, fp) {
 ## 
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
-plot_out_nbtest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2020,
+plot_out_nbtest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2021,
                             plot_title = TRUE) {
     require(data.table)
   
@@ -234,7 +234,7 @@ plot_out_nbtest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2020,
 ## 
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
-plot_out_nbtest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2020) {
+plot_out_nbtest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2021) {
   require(data.table)
   
   # redact <- c('Namibia','Uganda','Zambia','Zimbabwe')
@@ -317,7 +317,7 @@ plot_out_nbtest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 20
 ## 
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
-plot_out_nbpostest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2020,
+plot_out_nbpostest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2021,
                                plot_title = TRUE) {
   require(data.table)
   
@@ -413,7 +413,7 @@ plot_out_nbpostest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 202
 ## 
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
-plot_out_nbpostest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2020) {
+plot_out_nbpostest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2021) {
   require(data.table)
   
   # redact <- c('Namibia','Uganda','Zambia','Zimbabwe')
@@ -492,7 +492,7 @@ plot_out_nbpostest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred =
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
 plot_out_evertestneg <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, 
-                                 simul = NULL, plot_legend = TRUE, yr_pred = 2020) {
+                                 simul = NULL, plot_legend = TRUE, yr_pred = 2021) {
     
     out_evertest <- subset(out_evertest, year <= yr_pred)
     out_evertest$year <- out_evertest$year + 0.5
@@ -571,7 +571,7 @@ plot_out_evertestneg <- function(mod, fp, likdat, cnt, survey_hts, out_evertest,
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
 plot_out_evertestpos <- function(mod, fp, likdat, cnt, survey_hts, out_evertest,
-                                 simul = NULL, plot_legend = TRUE, yr_pred = 2020,
+                                 simul = NULL, plot_legend = TRUE, yr_pred = 2021,
                                  plot_title = TRUE) {
 
   out_evertest <- subset(out_evertest, year <= yr_pred)
@@ -645,7 +645,7 @@ plot_out_evertestpos <- function(mod, fp, likdat, cnt, survey_hts, out_evertest,
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
 plot_out_evertest <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, 
-                              simul = NULL, plot_legend = TRUE, yr_pred = 2020,
+                              simul = NULL, plot_legend = TRUE, yr_pred = 2021,
                               plot_title = TRUE) {
 
   out_evertest <- subset(out_evertest, year <= yr_pred)
@@ -721,7 +721,7 @@ plot_out_evertest <- function(mod, fp, likdat, cnt, survey_hts, out_evertest,
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
 plot_out_90s <- function(mod, fp, likdat, cnt, out_evertest, survey_hts, 
-                         simul = NULL, plot_legend = TRUE, yr_pred = 2020) {
+                         simul = NULL, plot_legend = TRUE, yr_pred = 2021) {
 
     phia_aware <- subset(survey_hts, country == cnt & agegr == '15-49' &
                   sex == 'both' & outcome == 'aware')
@@ -842,7 +842,7 @@ plot_out_90s <- function(mod, fp, likdat, cnt, out_evertest, survey_hts,
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
 plot_out_evertest_fbyage <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, 
-                            simul = NULL, plot_legend = TRUE, yr_pred = 2020) {
+                            simul = NULL, plot_legend = TRUE, yr_pred = 2021) {
 
   out_evertest <- subset(out_evertest, year <= yr_pred)
   out_evertest$year <- out_evertest$year + 0.5
@@ -935,7 +935,7 @@ plot_out_evertest_fbyage <- function(mod, fp, likdat, cnt, survey_hts, out_evert
 ## * update yr_pred to current year
 plot_out_evertest_mbyage <- function(mod, fp, likdat, cnt, survey_hts, 
                                      out_evertest, simul = NULL, 
-                                     plot_legend = TRUE, yr_pred = 2020) {
+                                     plot_legend = TRUE, yr_pred = 2021) {
 
   out_evertest <- subset(out_evertest, year <= yr_pred)
   out_evertest$year <- out_evertest$year + 0.5
@@ -1026,7 +1026,7 @@ plot_out_evertest_mbyage <- function(mod, fp, likdat, cnt, survey_hts,
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
 plot_out <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, simul = NULL, 
-                     plot_legend = TRUE, yr_pred = 2020) {
+                     plot_legend = TRUE, yr_pred = 2021) {
 par(mfrow = c(3,2), mar = c(4,4,2,2))
   plot_out_nbtest(mod, fp, likdat, cnt, simul, yr_pred)
   plot_out_nbpostest(mod, fp, likdat, cnt, simul, yr_pred)  
@@ -1041,7 +1041,7 @@ par(mfrow = c(3,2), mar = c(4,4,2,2))
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
 plot_out_strat <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, simul = NULL, 
-                           plot_legend = TRUE, yr_pred = 2020) {
+                           plot_legend = TRUE, yr_pred = 2021) {
   par(mfrow = c(1,2), mar = c(4,4,2,2))
   plot_out_evertest_mbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul, plot_legend, yr_pred) 
   plot_out_evertest_fbyage(mod, fp, likdat, cnt, survey_hts, out_evertest, simul, plot_legend, yr_pred)    
@@ -1062,7 +1062,7 @@ end_of_year <- function(year, value){
 ## -- UPDATE HERE --
 ## * update year_range to include current year
 tab_out_evertest <- function(mod, fp, age_grp = '15-49', gender = 'both', 
-                             hiv = 'all', year_range = c(2010, 2020), 
+                             hiv = 'all', year_range = c(2010, 2021), 
                              simul = NULL, end_year = TRUE) {
   if (length(year_range) == 1) { year_range <- c(year_range, year_range) }
   if (is.null(simul)) {
@@ -1093,7 +1093,7 @@ tab_out_evertest <- function(mod, fp, age_grp = '15-49', gender = 'both',
 ## -- UPDATE HERE --
 ## * update year_range to include current year
 tab_out_aware <- function(mod, fp, age_grp = '15-49', gender = 'both', 
-                          year_range = c(2010, 2020), simul = NULL, 
+                          year_range = c(2010, 2021), simul = NULL, 
                           end_year = TRUE) {
   if (age_grp == "15-99") { age_grp <- "15+" }
   
@@ -1135,7 +1135,7 @@ tab_out_aware <- function(mod, fp, age_grp = '15-49', gender = 'both',
 ## -- UPDATE HERE --
 ## * update year_range to include current year
 tab_out_nbaware <- function(mod, fp, age_grp = '15-49', 
-                            gender = 'both', year_range = c(2010, 2020), 
+                            gender = 'both', year_range = c(2010, 2021), 
                             end_year = TRUE) {
   if (length(year_range) == 1) { year_range <- c(year_range, year_range) }
     out <- get_out_nbaware(mod, fp, age_grp, gender)
@@ -1153,7 +1153,7 @@ tab_out_nbaware <- function(mod, fp, age_grp = '15-49',
 ## -- UPDATE HERE --
 ## * update year_range to include current year
 tab_out_artcov <- function(mod, fp, gender = 'both', 
-                           year_range = c(2010, 2020)) {
+                           year_range = c(2010, 2021)) {
   ## ART coverage is already end-of-year, no need to adjust
   
   if (length(year_range) == 1) {
@@ -1193,7 +1193,7 @@ tab_out_artcov <- function(mod, fp, gender = 'both',
 ## 
 ## -- UPDATE HERE --
 ## * update year_range to include current year
-tab_out_pregprev <- function(mod, fp, year_range = c(2010, 2020), 
+tab_out_pregprev <- function(mod, fp, year_range = c(2010, 2021), 
                              end_year = TRUE) {
   if (length(year_range) == 1) { year_range <- c(year_range, year_range) }
     out <- get_out_pregprev(mod, fp)
