@@ -1,3 +1,7 @@
+# first90 1.5.2
+
+* Update initial values to median of 2021 .shiny90 file final parameter estiamtes.
+
 # first90 1.5.1
 
 * Update output tables and plots show results through 2021 (missed in v1.5.0 update)
