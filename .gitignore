@@ -9,3 +9,5 @@
 tests/testthat/sample_files
 *.tar.gz
 *.Rcheck
+
+README.html

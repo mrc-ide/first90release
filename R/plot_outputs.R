@@ -1022,7 +1022,8 @@ plot_out_evertest_mbyage <- function(mod, fp, likdat, cnt, survey_hts,
 
 
 # ---- Single Function for Plots ----
-## 
+
+#' @export
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
 plot_out <- function(mod, fp, likdat, cnt, survey_hts, out_evertest, simul = NULL, 

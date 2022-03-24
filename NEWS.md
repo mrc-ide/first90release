@@ -1,3 +1,7 @@
+# first90 1.5.3
+
+* Add missing @export tags to ensure README.Rmd runs
+
 # first90 1.5.2
 
 * Update initial values to median of 2021 .shiny90 file final parameter estiamtes.

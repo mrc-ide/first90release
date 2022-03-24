@@ -80,6 +80,7 @@ plot_pjnz_plhiv <- function(pjnz_summary, yr_pred = 2021) {
 
 # ---- Single function ----
 
+#' @export
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
 plot_pjnz <- function(fp, yr_pred = 2021) {
@@ -230,6 +231,8 @@ plot_input_ancpos <- function(prgdat, fp, yr_pred = 2021) {
 }
 
 # ---- Single Function Inputs Data ----
+
+#' @export
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
 plot_inputdata <- function(prgm_dat, fp, yr_pred = 2021) {
