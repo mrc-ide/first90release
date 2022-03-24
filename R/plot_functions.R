@@ -82,9 +82,10 @@ plot_pjnz_plhiv <- function(pjnz_summary, yr_pred = 2021) {
 
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
+#' @export
 plot_pjnz <- function(fp, yr_pred = 2021) {
   summary <- get_pjnz_summary_data(fp)
-  par(mfrow=c(2,2))
+  par(mfrow = c(2, 2))
   plot_pjnz_prv(summary, yr_pred)
   plot_pjnz_inc(summary, yr_pred)
   plot_pjnz_pop(summary, yr_pred)
@@ -217,7 +218,6 @@ plot_input_anctot <- function(prgdat, fp, yr_pred = 2021) {
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
 plot_input_ancpos <- function(prgdat, fp, yr_pred = 2021) {
-
   if (sum(prgdat$ancpos, na.rm = TRUE) > 0) {
     prgdat <- subset(prgdat, sex != 'male')
     plot(I(prgdat$ancpos/1000) ~ prgdat$year, 
@@ -232,8 +232,9 @@ plot_input_ancpos <- function(prgdat, fp, yr_pred = 2021) {
 # ---- Single Function Inputs Data ----
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
+#' @export
 plot_inputdata <- function(prgm_dat, fp, yr_pred = 2021) {
-  par(mfrow = c(2,2))
+  par(mfrow = c(2, 2))
   plot_input_tot(prgm_dat, fp, yr_pred)
   plot_input_totpos(prgm_dat, fp, yr_pred)
   plot_input_anctot(prgm_dat, fp, yr_pred)
