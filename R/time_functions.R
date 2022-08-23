@@ -195,7 +195,7 @@ pool_prb_dx_one_yr <- function(mod, fp, year = c(2000:2021),
 #' @export
 ## -- UPDATE HERE --
 ## * Increment year by one to include current year
-simul_pool_prb_dx_one_yr <- function(samp, mod, fp, year = c(2010:2020),
+simul_pool_prb_dx_one_yr <- function(samp, mod, fp, year = c(2010:2021),
                                age = c("15-24", "25-34", "35-49", "50-99"),
                                sex = c("male", "female")) {
   
