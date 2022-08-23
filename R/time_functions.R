@@ -109,8 +109,7 @@ prb_dx_one_yr <- function(fp, year = c(2000:2021), age = "15-24", sex = "male", 
       N <- 1000
       X <- array(data = 0, dim = c(vec_l_prb_one_year, 7))
       nb_dx <- array(data = 0, dim = c(vec_l_prb_one_year, 7))
-      X[1, 1] <- N * fp$cd4_initdist[1, ind_age, ind_sex]
-      X[1, 2] <- N * fp$cd4_initdist[2, ind_age, ind_sex]
+      X[1, ] <- N * fp$cd4_initdist[ , ind_age, ind_sex]
       Xt <- X[1, ]
       # For mean or median time between infection and diagnosis or HIV-death
       for (i in 2:vec_l_prb_one_year) {
@@ -196,7 +195,7 @@ pool_prb_dx_one_yr <- function(mod, fp, year = c(2000:2021),
 #' @export
 ## -- UPDATE HERE --
 ## * Increment year by one to include current year
-simul_pool_prb_dx_one_yr <- function(samp, mod, fp, year = c(2010:2021),
+simul_pool_prb_dx_one_yr <- function(samp, mod, fp, year = c(2010:2020),
                                age = c("15-24", "25-34", "35-49", "50-99"),
                                sex = c("male", "female")) {
   

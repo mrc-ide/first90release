@@ -1,6 +1,4 @@
 
-#' Probability of diagnosis in one year
-#' 
 #' @export
 Rcpp::cppFunction('List prb_dx_one_yr_cpp(List s_fp,
                   IntegerVector year,
@@ -93,7 +91,11 @@ Rcpp::cppFunction('List prb_dx_one_yr_cpp(List s_fp,
                   // initial cd4 cell count distribution
                   double cd4_init_1 = cd4_init[(7 * 9 * ind_sex) + (7 * ind_age) + 0];
                   double cd4_init_2 = cd4_init[(7 * 9 * ind_sex) + (7 * ind_age) + 1];
-                  
+                  double cd4_init_3 = cd4_init[(7 * 9 * ind_sex) + (7 * ind_age) + 2];
+                  double cd4_init_4 = cd4_init[(7 * 9 * ind_sex) + (7 * ind_age) + 3];
+                  double cd4_init_5 = cd4_init[(7 * 9 * ind_sex) + (7 * ind_age) + 4];
+                  double cd4_init_6 = cd4_init[(7 * 9 * ind_sex) + (7 * ind_age) + 5];
+                  double cd4_init_7 = cd4_init[(7 * 9 * ind_sex) + (7 * ind_age) + 6];
                   // for probability of being Dx or dead before certain time (expressed in dt)
                   int tind1yr = nearbyint(1 / dt);
 
@@ -168,9 +170,15 @@ Rcpp::cppFunction('List prb_dx_one_yr_cpp(List s_fp,
                   NumericVector mort_rate_t(vec_l * 7);
                   
                   if (age == "15-24") {
-                  int ind15 = std::round((25 - avg_inf15) / dt);
-                  int ind25 = std::round(ind15 + 10 / dt);
-                  int ind35 = std::round(ind25 + 15 / dt);
+                    // int ind15 = std::round((25 - avg_inf15) / dt);
+                    // int ind25 = std::round(ind15 + 10 / dt);
+                    // int ind35 = std::round(ind25 + 15 / dt);
+
+                    // JE replace 1 June 2020
+                    int ind15 = floor((25 - avg_inf15) / dt + 0.5);
+                    int ind25 = floor(ind15 + 10 / dt + 0.5);
+                    int ind35 = floor(ind25 + 15 / dt + 0.5);
+
                   for (int j = 0; j < vec_l; ++j) {
                   IntegerVector ind_j = seq(j * 7 + 0, j * 7 + 6);
                   if (j < ind15) {
@@ -187,8 +195,15 @@ Rcpp::cppFunction('List prb_dx_one_yr_cpp(List s_fp,
                   mort_rate_t[ind_j] = cd4_mort50;
                   }}
                   } else if (age == "25-34") {
-                  int ind25 = std::round((35 - avg_inf25) / dt);
-                  int ind35 = std::round(ind25 + 15 / dt);
+
+
+                    // int ind25 = std::round((35 - avg_inf25) / dt);
+                    // int ind35 = std::round(ind25 + 15 / dt);
+
+                    // JE replace 1 June 2020
+                    int ind25 = floor((35 - avg_inf25) / dt + 0.5);
+                    int ind35 = floor(ind25 + 15 / dt + 0.5);
+
                   for (int j = 0; j < vec_l; ++j) {
                   IntegerVector ind_j = seq(j * 7 + 0, j * 7 + 6);
                   if (j < ind25) {
@@ -202,7 +217,11 @@ Rcpp::cppFunction('List prb_dx_one_yr_cpp(List s_fp,
                   mort_rate_t[ind_j] = cd4_mort50;
                   }}
                   } else if (age == "35-49") {
-                  int ind35 = std::round((50 - avg_inf35) / dt);
+
+                    // JE replace 1 June 2020
+                    // int ind35 = std::round((50 - avg_inf35) / dt);
+                    int ind35 = floor((50 - avg_inf35) / dt + 0.5);
+
                   for (int j = 0; j < vec_l; ++j) {
                   IntegerVector ind_j = seq(j * 7 + 0, j * 7 + 6);
                   if (j < ind35) {
@@ -229,6 +248,12 @@ Rcpp::cppFunction('List prb_dx_one_yr_cpp(List s_fp,
                   NumericVector nb_dx_tot(vec_l_prb_one_year);
                   X[0] = cd4_init_1;
                   X[1] = cd4_init_2;
+                  X[2] = cd4_init_3;
+                  X[3] = cd4_init_4;
+                  X[4] = cd4_init_5;
+                  X[5] = cd4_init_6;
+                  X[6] = cd4_init_7;
+                  
                   // loop for competing risk of cd4 progression, HIV-death, and diagnosis
                   for (int i = 1; i < vec_l_prb_one_year; ++i) {
                   int t_i = i - 1;
