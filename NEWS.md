@@ -1,3 +1,7 @@
+# first90 1.5.4
+
+* Update time to diagnosis functions to account for CD4 at seroconversion in categories below 350.
+
 # first90 1.5.3
 
 * Add missing @export tags to ensure README.Rmd runs
