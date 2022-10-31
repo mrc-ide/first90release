@@ -60,7 +60,8 @@ extract_pjnz <- function(pjnz = NULL, dp_file= NULL, pjn_file = NULL){
   v$srb <- get_dp_srb(dp, proj_years)
   v$births <- get_dp_births(dp, proj_years)
   v$netmigr <- calc_netmigr(get_dp_totnetmig(dp, proj_years),
-                            get_dp_netmigagedist(dp, proj_years))
+                            get_dp_netmigagedist(dp, proj_years),
+                            v$Sx)
 
   ## Epidemic results
   v$hivpop <- get_dp_hivpop(dp, proj_years)
@@ -650,21 +651,41 @@ get_dp_artmx_timerr <- function(dp, proj_years){
 #'
 #' @return array of age-specific fertility rate by single-year of age 15-49.
 calc_asfr <- function(tfr, asfd){
+
+  ## Normalise the ASFD to sum exactly to 1.0
+  asfd <- sweep(asfd, 2, colSums(asfd), "/")
   
-  asfr <- apply(asfd / 5, 2, rep, each=5)  
+  asfr <- apply(asfd / 5, 2, rep, each=5)
   asfr <- sweep(asfr, 2, tfr, "*")
   dimnames(asfr) <- list(age = 15:49, year = dimnames(asfd)[[2]])
 
   asfr
 }
 
-calc_netmigr <- function(totnetmig, netmigagedist){
+calc_netmigr <- function(totnetmig, netmigagedist, Sx){
+
+  ## Normalise netmigagedist to sum to exactly 1.0
+  netmigagedist <- sweep(netmigagedist, 2:3, colSums(netmigagedist), "/")
   
-  netmigr <- sweep(netmigagedist, 2:3, totnetmig, "*")
+  netmigr5 <- sweep(netmigagedist, 2:3, totnetmig, "*")
   A <- create_beers(17)
-  netmigr <- apply(netmigr, 2:3, function(x) A %*% x)
+  netmigr <- apply(netmigr5, 2:3, function(x) A %*% x)
   dimnames(netmigr) <- specpop_dimnames(colnames(totnetmig))
 
+  ## For age <5 years, Spectrum disaggregates netmigration proportional to survival in
+  ## the **base year**.
+  u5prop <- array(dim = c(5, 2))
+  u5prop[1, ] <- Sx[1, , 1] * 2
+  u5prop[2, ] <- Sx[2, , 1] * u5prop[1, ]
+  u5prop[3, ] <- Sx[3, , 1] * u5prop[2, ]
+  u5prop[4, ] <- Sx[4, , 1] * u5prop[3, ]
+  u5prop[5, ] <- Sx[5, , 1] * u5prop[4, ]
+  
+  u5prop <- sweep(u5prop, 2, colSums(u5prop), "/")
+  
+  netmigr[1:5 , 1, ] <- u5prop[ , 1, drop = FALSE] %*% netmigr5[1, 1, ]
+  netmigr[1:5 , 2, ] <- u5prop[ , 2, drop = FALSE] %*% netmigr5[1, 2, ]
+  
   netmigr
 }
 

@@ -1,3 +1,14 @@
+# first90 1.6.0
+
+Updates for Spectrum transition from mid-year projection period to calendar year
+projection period. Implemented in Spectrum 6.2 in November 2022.
+
+* Normalise `asfd` and `netmigagedist` to sum to exactly 1.0 before distributing
+  to age groups.
+* Disaggregate under-5 net migration proportional to paediatric survival probabilities
+  in the base year.
+
+
 # first90 1.5.4
 
 * Update time to diagnosis functions to account for CD4 at seroconversion in categories below 350.
