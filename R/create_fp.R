@@ -6,7 +6,8 @@ create_fp <- function(projp,
                       AGE_START = 15L,
                       popadjust = TRUE,
                       artelig200adj=TRUE,
-                      who34percelig=0){
+                      who34percelig=0,
+                      projection_period = NULL){
 
 
   ## ########################## ##
@@ -58,6 +59,18 @@ create_fp <- function(projp,
   fp$SIM_YEARS <- ss$PROJ_YEARS
   fp$proj.steps <- proj_start + 0.5 + 0:(ss$hiv_steps_per_year * (fp$SIM_YEARS-1)) / ss$hiv_steps_per_year
 
+  if (!grepl("^[4-6]\\.[0-9]", projp$spectrum_version)) {
+    stop(paste0("Spectrum version not recognized: ", projp$spectrum_version))
+  }
+
+  if (is.null(projection_period)) {
+    fp$projection_period <- if (projp$spectrum_version >= "6.2") {"calendar"} else {"midyear"}
+  } else {
+    stopifnot(projection_period %in% c("calendar", "midyear"))
+    fp$projection_period <- projection_period
+  }
+  
+  
   ## ######################## ##
   ##  Demographic parameters  ##
   ## ######################## ##
@@ -73,12 +86,18 @@ create_fp <- function(projp,
 
   fp$srb <- sapply(demp$srb[as.character(proj_start:proj_end)], function(x) c(x,100)/(x+100))
 
-  ## Spectrum adjusts net-migration to occur half in current age group and half in next age group
   netmigr.adj <- demp$netmigr
-  netmigr.adj[-1,,] <- (demp$netmigr[-1,,] + demp$netmigr[-81,,])/2
-  netmigr.adj[1,,] <- demp$netmigr[1,,]/2
-  netmigr.adj[81,,] <- netmigr.adj[81,,] + demp$netmigr[81,,]/2
 
+  if (fp$projection_period == "midyear") {
+    
+    ## Spectrum mid-year projection (v5.19 and earlier) adjusts net-migration to occur
+    ## half in current age group and half in next age group
+    
+    netmigr.adj[-1,,] <- (demp$netmigr[-1,,] + demp$netmigr[-81,,])/2
+    netmigr.adj[1,,] <- demp$netmigr[1,,]/2
+    netmigr.adj[81,,] <- netmigr.adj[81,,] + demp$netmigr[81,,]/2
+  }
+    
   fp$netmigr <- netmigr.adj[(AGE_START+1):81,,as.character(proj_start:proj_end)]
 
   fp$entrantpop <- projp$totpop[AGE_START,,as.character(proj_start:proj_end)]

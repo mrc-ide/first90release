@@ -8,6 +8,10 @@ projection period. Implemented in Spectrum 6.2 in November 2022.
 * Disaggregate under-5 net migration proportional to paediatric survival probabilities
   in the base year.
 
+* Net-migrations added at end of projection step, consistent with WPP 2022. No longer 
+  (1) adjust net migration for half-period survival, nor (2) adjust net migration to 
+  be half in current age group and half in next age group.
+
 # first90 1.5.5
 
 * Patch to `eppmod = "directinfections_hts"` option (v1.5.0) to avoid referencing 
