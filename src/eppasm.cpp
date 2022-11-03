@@ -87,7 +87,6 @@ extern "C" {
       hAG_START[ha] = hAG_START[ha-1] + hAG_SPAN[ha-1];
 
     int SIM_YEARS = *INTEGER(getListElement(s_fp, "SIM_YEARS"));
-    double *projsteps = REAL(getListElement(s_fp, "proj.steps"));
 
     // demographic projection
     multi_array_ref<double, 2> basepop(REAL(getListElement(s_fp, "basepop")), extents[NG][pAG]);
@@ -143,20 +142,21 @@ extern "C" {
 
     // incidence model
     int eppmod = *INTEGER(getListElement(s_fp, "eppmodInt"));
-    double *incrr_sex;
-    double *a_incrr_age;
-    double *incidinput;
+    double *incrr_sex = nullptr;
+    double *a_incrr_age = nullptr;
+    double *incidinput = nullptr;
     int pIDX_INCIDPOP, pAG_INCIDPOP;
-    double *a_infections;
+    double *a_infections = nullptr;
     if(eppmod == EPP_DIRECTINCID){
       incrr_sex = REAL(getListElement(s_fp, "incrr_sex"));
       a_incrr_age = REAL(getListElement(s_fp, "incrr_age"));
       incidinput = REAL(getListElement(s_fp, "incidinput"));
       pIDX_INCIDPOP = 0;
-      if(*INTEGER(getListElement(s_fp, "incidpopage")) == INCIDPOP_15TO49)
+      if(*INTEGER(getListElement(s_fp, "incidpopage")) == INCIDPOP_15TO49) {
         pAG_INCIDPOP = pAG_15TO49;
-      else
+      } else {
         pAG_INCIDPOP = pAG_15PLUS;
+      }
     } else if (eppmod == EPP_DIRECTINFECTIONS ||
                eppmod == EPP_DIRECTINFECTIONS_HTS) {
       a_infections = REAL(getListElement(s_fp, "infections"));
@@ -530,7 +530,7 @@ extern "C" {
       } // loop over g
 
       // fertility
-      double births = 0.0, births_by_ha[hAG_FERT];
+      double births_by_ha[hAG_FERT];
       memset(births_by_ha, 0, hAG_FERT*sizeof(double));
       for(int m = 0; m < pDS; m++){
         int a = pIDX_FERT;
@@ -541,8 +541,6 @@ extern "C" {
           }
         }
       }
-      for(int ha = hIDX_FERT; ha < hAG_FERT; ha++)
-        births += births_by_ha[ha-hIDX_FERT];
 
       ////////////////////////////////
       ////  HIV model simulation  ////
@@ -553,8 +551,6 @@ extern "C" {
       everARTelig_idx = anyelig_idx < everARTelig_idx ? anyelig_idx : everARTelig_idx;
 
       for(int hts = 0; hts < HIVSTEPS_PER_YEAR; hts++){
-
-        int ts = (t-1)*HIVSTEPS_PER_YEAR + hts;
 
         double hivdeaths_ha[NG][hAG];
         memset(hivdeaths_ha, 0, sizeof(double)*NG*hAG);
@@ -1001,7 +997,7 @@ extern "C" {
       if (eppmod == EPP_DIRECTINCID || eppmod == EPP_DIRECTINFECTIONS) {
         // Calculating new infections once per year (like Spectrum)
 
-        double Xhivp = 0.0, Xhivn[NG], Xhivn_incagerr[NG];
+        double Xhivn[NG], Xhivn_incagerr[NG];
         double incrate_g[NG];
         if(eppmod == EPP_DIRECTINCID) {
 
@@ -1009,13 +1005,10 @@ extern "C" {
             Xhivn[g] = 0.0;
             Xhivn_incagerr[g] = 0.0;
             for(int a = pIDX_INCIDPOP; a < pIDX_INCIDPOP+pAG_INCIDPOP; a++){
-              Xhivp += pop[t-1][HIVP][g][a];
               Xhivn[g] += pop[t-1][HIVN][g][a];
               Xhivn_incagerr[g] += incrr_age[t][g][a] * pop[t-1][HIVN][g][a];
             }
           }
-          // double prev_i = Xhivp / (Xhivn[MALE] + Xhivn[FEMALE] + Xhivp);
-          // double incrate15to49_i = (prev15to49[t] - prev_i)/(1.0 - prev_i);
           double incrate_i = incidinput[t];
           incrate_g[MALE] = incrate_i * (Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex[t]*Xhivn[FEMALE]);
           incrate_g[FEMALE] = incrate_i * incrr_sex[t]*(Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex[t]*Xhivn[FEMALE]);
