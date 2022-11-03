@@ -96,7 +96,7 @@ extern "C" {
     multi_array_ref<double, 2> asfr(REAL(getListElement(s_fp, "asfr")), extents[PROJ_YEARS][pAG_FERT]);
 
     multi_array_ref<double, 2> entrantpop(REAL(getListElement(s_fp, "entrantpop")), extents[PROJ_YEARS][NG]);
-	
+
     int bin_popadjust = *INTEGER(getListElement(s_fp, "popadjust"));
     multi_array_ref<double, 3> target_hivn_pop(REAL(getListElement(s_fp, "target_hivn_pop")), extents[PROJ_YEARS][NG][pAG]);
     multi_array_ref<double, 3> target_hivp_pop(REAL(getListElement(s_fp, "target_hivp_pop")), extents[PROJ_YEARS][NG][pAG]);
@@ -154,9 +154,9 @@ extern "C" {
       incidinput = REAL(getListElement(s_fp, "incidinput"));
       pIDX_INCIDPOP = 0;
       if(*INTEGER(getListElement(s_fp, "incidpopage")) == INCIDPOP_15TO49)
-	pAG_INCIDPOP = pAG_15TO49;
+        pAG_INCIDPOP = pAG_15TO49;
       else
-	pAG_INCIDPOP = pAG_15PLUS;
+        pAG_INCIDPOP = pAG_15PLUS;
     } else if (eppmod == EPP_DIRECTINFECTIONS ||
                eppmod == EPP_DIRECTINFECTIONS_HTS) {
       a_infections = REAL(getListElement(s_fp, "infections"));
@@ -381,7 +381,7 @@ extern "C" {
           hivpop[0][g][ha][hm] = 0.0;
 
     int everARTelig_idx = hDS;
-    
+
     ////////////////////////////////////
     ////  do population projection  ////
     ////////////////////////////////////
@@ -568,7 +568,7 @@ extern "C" {
             for(int hm = 0; hm < hDS; hm++){
 
               double cd4mx_scale = 1.0;
-	      if(scale_cd4_mort & t >= t_ART_start & hm >= everARTelig_idx){
+              if(scale_cd4_mort & t >= t_ART_start & hm >= everARTelig_idx){
                 double artpop_hahm = 0.0;
                 for(int hu = 0; hu < hTS; hu++)
                   artpop_hahm += artpop[t][g][ha][hm][hu];
@@ -609,7 +609,7 @@ extern "C" {
                 grad[g][ha][hm] += infections_ha * cd4_initdist[g][ha][hm];
               }
             }
-          } 
+          }
         } // if (eppmod == EPP_DIRECTINFECTIONS_HTS)
 
         // HIV testing and diagnosis
@@ -627,8 +627,8 @@ extern "C" {
               }
 
               // number of new infections among never tested (proportional to the HIV-neg pop)
-              double testneg_infections_ha = infections_ha * (testnegpop[t][0][g][ha] / hivn_pop_ha);              
-              
+              double testneg_infections_ha = infections_ha * (testnegpop[t][0][g][ha] / hivn_pop_ha);
+
               // Tests among HIV negative population
               hivtests[t][0][g][ha] += DT * hts_rate[t][0][g][ha] * (hivn_pop_ha - testnegpop[t][0][g][ha]);
               hivtests[t][1][g][ha] += DT * hts_rate[t][1][g][ha] * testnegpop[t][0][g][ha];
@@ -697,11 +697,11 @@ extern "C" {
           // progression and mortality
           for(int g = 0; g < NG; g++)
             for(int ha = 0; ha < hAG; ha++)
-	      for(int hm = everARTelig_idx; hm < hDS; hm++){
+              for(int hm = everARTelig_idx; hm < hDS; hm++){
                 double gradART[hTS];
 
                 for(int hu = 0; hu < hTS; hu++){
-		  double deaths = art_mort[g][ha][hm][hu] * artmx_timerr[t][hu] * artpop[t][g][ha][hm][hu];
+                  double deaths = art_mort[g][ha][hm][hu] * artmx_timerr[t][hu] * artpop[t][g][ha][hm][hu];
                   hivdeaths_ha[g][ha] += DT*deaths;
                   artpopdeaths[t][g][ha][hm][hu] += DT*deaths;
                   gradART[hu] = -deaths;
@@ -719,7 +719,7 @@ extern "C" {
           if(art_dropout[t] > 0){
             for(int g = 0; g < NG; g++)
               for(int ha = 0; ha < hAG; ha++)
-		for(int hm = everARTelig_idx; hm < hDS; hm++)
+                for(int hm = everARTelig_idx; hm < hDS; hm++)
                   for(int hu = 0; hu < hTS; hu++){
                     double dropout_ts = DT * art_dropout[t] * artpop[t][g][ha][hm][hu];
                     hivpop[t][g][ha][hm] += dropout_ts;
@@ -734,16 +734,16 @@ extern "C" {
 
             double artelig_hahm[hAG_15PLUS][hDS], Xart_15plus = 0.0, Xartelig_15plus = 0.0, expect_mort_artelig15plus = 0.0;
             for(int ha = hIDX_15PLUS; ha < hAG; ha++){
-	      for(int hm = everARTelig_idx; hm < hDS; hm++){
-		if(hm >= anyelig_idx){
-		  double prop_elig = (hm >= cd4elig_idx) ? 1.0 : (hm >= hIDX_CD4_350) ? 1.0 - (1.0-specpop_percelig[t])*(1.0-who34percelig) : specpop_percelig[t];
-		  Xartelig_15plus += artelig_hahm[ha-hIDX_15PLUS][hm] = prop_elig * hivpop[t][g][ha][hm] ;
-		  expect_mort_artelig15plus += cd4_mort[g][ha][hm] * artelig_hahm[ha-hIDX_15PLUS][hm];
-		}
+              for(int hm = everARTelig_idx; hm < hDS; hm++){
+                if(hm >= anyelig_idx){
+                  double prop_elig = (hm >= cd4elig_idx) ? 1.0 : (hm >= hIDX_CD4_350) ? 1.0 - (1.0-specpop_percelig[t])*(1.0-who34percelig) : specpop_percelig[t];
+                  Xartelig_15plus += artelig_hahm[ha-hIDX_15PLUS][hm] = prop_elig * hivpop[t][g][ha][hm] ;
+                  expect_mort_artelig15plus += cd4_mort[g][ha][hm] * artelig_hahm[ha-hIDX_15PLUS][hm];
+                }
                 for(int hu = 0; hu < hTS; hu++)
                   Xart_15plus += artpop[t][g][ha][hm][hu];
               }
-	      
+
               // if pw_artelig, add pregnant women to artelig_hahm population
               if(g == FEMALE & pw_artelig[t] > 0 & ha < hAG_FERT){
                 double frr_pop_ha = 0;
@@ -913,8 +913,8 @@ extern "C" {
                 for(int hm = anyelig_idx; hm < hDS; hm++){
 
                   double artinit_hahm = artinit_hts * artelig_hahm[ha-hIDX_15PLUS][hm] * ((1.0 - art_alloc_mxweight)/Xartelig_15plus + art_alloc_mxweight * cd4_mort[g][ha][hm] / expect_mort_artelig15plus);
-		  if(Xartelig_15plus == 0)
-		    artinit_hahm =  0;
+                  if(Xartelig_15plus == 0)
+                    artinit_hahm =  0;
                   if(artinit_hahm > artelig_hahm[ha-hIDX_15PLUS][hm])
                     artinit_hahm = artelig_hahm[ha-hIDX_15PLUS][hm];
 
@@ -998,58 +998,60 @@ extern "C" {
       } // loop HIVSTEPS_PER_YEAR
 
 
-      // Calculating new infections once per year (like Spectrum)
+      if (eppmod == EPP_DIRECTINCID || eppmod == EPP_DIRECTINFECTIONS) {
+        // Calculating new infections once per year (like Spectrum)
 
-      double Xhivp = 0.0, Xhivn[NG], Xhivn_incagerr[NG];
-      double incrate_g[NG];
-      if(eppmod == EPP_DIRECTINCID) {
-	
-	for(int g = 0; g < NG; g++){
-	  Xhivn[g] = 0.0;
-	  Xhivn_incagerr[g] = 0.0;
-	  for(int a = pIDX_INCIDPOP; a < pIDX_INCIDPOP+pAG_INCIDPOP; a++){
-	    Xhivp += pop[t-1][HIVP][g][a];
-	    Xhivn[g] += pop[t-1][HIVN][g][a];
-	    Xhivn_incagerr[g] += incrr_age[t][g][a] * pop[t-1][HIVN][g][a];
-	  }
-	}
-	// double prev_i = Xhivp / (Xhivn[MALE] + Xhivn[FEMALE] + Xhivp);
-	// double incrate15to49_i = (prev15to49[t] - prev_i)/(1.0 - prev_i);
-	double incrate_i = incidinput[t];
-	incrate_g[MALE] = incrate_i * (Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex[t]*Xhivn[FEMALE]);
-	incrate_g[FEMALE] = incrate_i * incrr_sex[t]*(Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex[t]*Xhivn[FEMALE]);
-      }
-	
-      for(int g = 0; g < NG; g++){
-	int a = 0;
-	for(int ha = 0; ha < hAG; ha++){
-	  double infections_a, infections_ha = 0.0;
-	  double hivn_pop_ha = 0.0;
-	  for(int i = 0; i < hAG_SPAN[ha]; i++){
-	    if(eppmod == EPP_DIRECTINCID)
-	      infections_ha += infections_a = pop[t-1][HIVN][g][a] * incrate_g[g] * incrr_age[t][g][a] * Xhivn[g] / Xhivn_incagerr[g];
-	    else if(eppmod == EPP_DIRECTINFECTIONS)
-	      infections_ha += infections_a = input_infections[t][g][a];
-	    hivn_pop_ha += pop[t][HIVN][g][a];
-	    infections[t][g][a] += infections_a;
-	    pop[t][HIVN][g][a] -= infections_a;
-	    pop[t][HIVP][g][a] += infections_a;
-	    a++;
-	  }
-	  if(ha < hIDX_15TO49+hAG_15TO49)
-	    incid15to49[t] += infections_ha;
-	  
-	  if(t >= t_hts_start) {
-	    double testneg_infections_ha = infections_ha * testnegpop[t][HIVN][g][ha] / hivn_pop_ha;
-            testnegpop[t][HIVN][g][ha] -= testneg_infections_ha;
-            testnegpop[t][HIVP][g][ha] += testneg_infections_ha;
+        double Xhivp = 0.0, Xhivn[NG], Xhivn_incagerr[NG];
+        double incrate_g[NG];
+        if(eppmod == EPP_DIRECTINCID) {
+
+          for(int g = 0; g < NG; g++){
+            Xhivn[g] = 0.0;
+            Xhivn_incagerr[g] = 0.0;
+            for(int a = pIDX_INCIDPOP; a < pIDX_INCIDPOP+pAG_INCIDPOP; a++){
+              Xhivp += pop[t-1][HIVP][g][a];
+              Xhivn[g] += pop[t-1][HIVN][g][a];
+              Xhivn_incagerr[g] += incrr_age[t][g][a] * pop[t-1][HIVN][g][a];
+            }
           }
-
-          // add infections to hivpop
-          for(int hm = 0; hm < hDS; hm++)
-            hivpop[t][g][ha][hm] += infections_ha * cd4_initdist[g][ha][hm];
+          // double prev_i = Xhivp / (Xhivn[MALE] + Xhivn[FEMALE] + Xhivp);
+          // double incrate15to49_i = (prev15to49[t] - prev_i)/(1.0 - prev_i);
+          double incrate_i = incidinput[t];
+          incrate_g[MALE] = incrate_i * (Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex[t]*Xhivn[FEMALE]);
+          incrate_g[FEMALE] = incrate_i * incrr_sex[t]*(Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex[t]*Xhivn[FEMALE]);
         }
-      }
+
+        for(int g = 0; g < NG; g++){
+          int a = 0;
+          for(int ha = 0; ha < hAG; ha++){
+            double infections_a, infections_ha = 0.0;
+            double hivn_pop_ha = 0.0;
+            for(int i = 0; i < hAG_SPAN[ha]; i++){
+              if(eppmod == EPP_DIRECTINCID)
+                infections_ha += infections_a = pop[t-1][HIVN][g][a] * incrate_g[g] * incrr_age[t][g][a] * Xhivn[g] / Xhivn_incagerr[g];
+              else if(eppmod == EPP_DIRECTINFECTIONS)
+                infections_ha += infections_a = input_infections[t][g][a];
+              hivn_pop_ha += pop[t][HIVN][g][a];
+              infections[t][g][a] += infections_a;
+              pop[t][HIVN][g][a] -= infections_a;
+              pop[t][HIVP][g][a] += infections_a;
+              a++;
+            }
+            if(ha < hIDX_15TO49+hAG_15TO49)
+              incid15to49[t] += infections_ha;
+
+            if(t >= t_hts_start) {
+              double testneg_infections_ha = infections_ha * testnegpop[t][HIVN][g][ha] / hivn_pop_ha;
+              testnegpop[t][HIVN][g][ha] -= testneg_infections_ha;
+              testnegpop[t][HIVP][g][ha] += testneg_infections_ha;
+            }
+
+            // add infections to hivpop
+            for(int hm = 0; hm < hDS; hm++)
+              hivpop[t][g][ha][hm] += infections_ha * cd4_initdist[g][ha][hm];
+          }
+        }
+      } // if (eppmod == EPP_DIRECTINCID || eppmod == EPP_DIRECTINFECTIONS)
 
       // adjust population to match target population
       if(bin_popadjust){
@@ -1061,18 +1063,18 @@ extern "C" {
 
               hivnpop_ha += pop[t][HIVN][g][a];
 
-	      pop[t][HIVN][g][a] = target_hivn_pop[t][g][a];
+              pop[t][HIVN][g][a] = target_hivn_pop[t][g][a];
               pop[t][HIVP][g][a] = target_hivp_pop[t][g][a];
 
               a++;
             }
 
-	    double hivpop_ha = 0.0;
-	    for(int hm = 0; hm < hDS; hm++)
-	      hivpop_ha += hivpop[t][g][ha][hm];
-	  
-	    double hivpop_adj_ha = hivpop_ha > 0 ? target_hivpop_ha[t][g][ha] / hivpop_ha : 1.0;
-	    
+            double hivpop_ha = 0.0;
+            for(int hm = 0; hm < hDS; hm++)
+              hivpop_ha += hivpop[t][g][ha][hm];
+
+            double hivpop_adj_ha = hivpop_ha > 0 ? target_hivpop_ha[t][g][ha] / hivpop_ha : 1.0;
+
             if(t >= t_hts_start) {
               double hivn_adj_ha = hivnpop_ha > 0 ? target_hivn_ha[t][g][ha] / hivnpop_ha : 1.0;
               testnegpop[t][HIVN][g][ha] *= hivn_adj_ha;
@@ -1083,20 +1085,20 @@ extern "C" {
               hivpop[t][g][ha][hm] *= hivpop_adj_ha;
               if(t >= t_hts_start)
                 diagnpop[t][g][ha][hm] *= hivpop_adj_ha;
-	    }
-	    
-	    if(t >= t_ART_start){
-	      double artpop_ha = 0.0;
-	      for(int hm = 0; hm < hDS; hm++)
-		for(int hu = 0; hu < hTS; hu++)
-		  artpop_ha += artpop[t][g][ha][hm][hu];
+            }
 
-	      double artpop_adj_ha = artpop_ha > 0 ? target_artpop_ha[t][g][ha] / artpop_ha : 1.0;
+            if(t >= t_ART_start){
+              double artpop_ha = 0.0;
+              for(int hm = 0; hm < hDS; hm++)
+                for(int hu = 0; hu < hTS; hu++)
+                  artpop_ha += artpop[t][g][ha][hm][hu];
 
-	      for(int hm = 0; hm < hDS; hm++)
-		for(int hu = 0; hu < hTS; hu++)
-		  artpop[t][g][ha][hm][hu] *= artpop_adj_ha;
-	    }
+              double artpop_adj_ha = artpop_ha > 0 ? target_artpop_ha[t][g][ha] / artpop_ha : 1.0;
+
+              for(int hm = 0; hm < hDS; hm++)
+                for(int hu = 0; hu < hTS; hu++)
+                  artpop[t][g][ha][hm][hu] *= artpop_adj_ha;
+            }
           } // loop over ha
         } // loop over g
       } // if(bin_popadjust)

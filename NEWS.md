@@ -1,3 +1,8 @@
+# first90 1.5.5
+
+* Patch to `eppmod = "directinfections_hts"` option (v1.5.0) to avoid referencing 
+  uninitialised memory.
+
 # first90 1.5.4
 
 * Update time to diagnosis functions to account for CD4 at seroconversion in categories below 350.
