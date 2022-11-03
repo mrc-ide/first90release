@@ -369,7 +369,7 @@ extern "C" {
       for(int a = 0; a < pAG; a++){
         pop[0][HIVN][g][a] = basepop[g][a];
         pop[0][HIVP][g][a] = 0.0;
-        if(a >= pIDX_15TO49 & a < pIDX_15TO49+pAG_15TO49)
+        if(a >= pIDX_15TO49 && a < pIDX_15TO49+pAG_15TO49)
           hivn15to49[0] += basepop[g][a];
       }
 
@@ -549,7 +549,7 @@ extern "C" {
       ////////////////////////////////
 
       int cd4elig_idx = artcd4elig_idx[t] - 1; // -1 for 0-based indexing vs. 1-based in R
-      int anyelig_idx = (specpop_percelig[t] > 0 | pw_artelig[t] > 0) ? 0 : (who34percelig > 0) ? hIDX_CD4_350 : cd4elig_idx;
+      int anyelig_idx = (specpop_percelig[t] > 0 || pw_artelig[t] > 0) ? 0 : (who34percelig > 0) ? hIDX_CD4_350 : cd4elig_idx;
       everARTelig_idx = anyelig_idx < everARTelig_idx ? anyelig_idx : everARTelig_idx;
 
       for(int hts = 0; hts < HIVSTEPS_PER_YEAR; hts++){
@@ -568,7 +568,7 @@ extern "C" {
             for(int hm = 0; hm < hDS; hm++){
 
               double cd4mx_scale = 1.0;
-              if(scale_cd4_mort & t >= t_ART_start & hm >= everARTelig_idx){
+              if(scale_cd4_mort && t >= t_ART_start && hm >= everARTelig_idx){
                 double artpop_hahm = 0.0;
                 for(int hu = 0; hu < hTS; hu++)
                   artpop_hahm += artpop[t][g][ha][hm][hu];
@@ -745,7 +745,7 @@ extern "C" {
               }
 
               // if pw_artelig, add pregnant women to artelig_hahm population
-              if(g == FEMALE & pw_artelig[t] > 0 & ha < hAG_FERT){
+              if(g == FEMALE && pw_artelig[t] > 0 && ha < hAG_FERT){
                 double frr_pop_ha = 0;
                 for(int a =  hAG_START[ha]; a < hAG_START[ha]+hAG_SPAN[ha]; a++)
                   frr_pop_ha += pop[t][HIVN][g][a]; // add HIV- population
@@ -766,23 +766,23 @@ extern "C" {
             // calculate number on ART at end of ts, based on number or percent
             double artnum_hts = 0.0;
             if(DT*(hts+1) < 0.5){
-              if(!art15plus_isperc[t-2][g] & !art15plus_isperc[t-1][g]){ // both numbers
+              if(!art15plus_isperc[t-2][g] && !art15plus_isperc[t-1][g]){ // both numbers
                 artnum_hts = (0.5-DT*(hts+1))*artnum15plus[t-2][g] + (DT*(hts+1)+0.5)*artnum15plus[t-1][g];
-              } else if(art15plus_isperc[t-2][g] & art15plus_isperc[t-1][g]){ // both percentages
+              } else if(art15plus_isperc[t-2][g] && art15plus_isperc[t-1][g]){ // both percentages
                 double artcov_hts = (0.5-DT*(hts+1))*artnum15plus[t-2][g] + (DT*(hts+1)+0.5)*artnum15plus[t-1][g];
                 artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
-              } else if(!art15plus_isperc[t-2][g] & art15plus_isperc[t-1][g]){ // transition from number to percentage
+              } else if(!art15plus_isperc[t-2][g] && art15plus_isperc[t-1][g]){ // transition from number to percentage
                 double curr_coverage = Xart_15plus / (Xart_15plus + Xartelig_15plus);
                 double artcov_hts = curr_coverage + (artnum15plus[t-1][g] - curr_coverage) * DT / (0.5-DT*hts);
                 artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
               }
             } else {
-              if(!art15plus_isperc[t-1][g] & !art15plus_isperc[t][g]){ // both numbers
+              if(!art15plus_isperc[t-1][g] && !art15plus_isperc[t][g]){ // both numbers
                 artnum_hts = (1.5-DT*(hts+1))*artnum15plus[t-1][g] + (DT*(hts+1)-0.5)*artnum15plus[t][g];
-              } else if(art15plus_isperc[t-1][g] & art15plus_isperc[t][g]){ // both percentages
+              } else if(art15plus_isperc[t-1][g] && art15plus_isperc[t][g]){ // both percentages
                 double artcov_hts = (1.5-DT*(hts+1))*artnum15plus[t-1][g] + (DT*(hts+1)-0.5)*artnum15plus[t][g];
                 artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
-              } else if(!art15plus_isperc[t-1][g] & art15plus_isperc[t][g]){ // transition from number to percentage
+              } else if(!art15plus_isperc[t-1][g] && art15plus_isperc[t][g]){ // transition from number to percentage
                 double curr_coverage = Xart_15plus / (Xart_15plus + Xartelig_15plus);
                 double artcov_hts = curr_coverage + (artnum15plus[t][g] - curr_coverage) * DT / (1.5-DT*hts);
                 artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
@@ -849,7 +849,7 @@ extern "C" {
                 }
 
                 // Remove share of excess ART initiations from either diagnpop or testnegpop
-                if(t >= t_hts_start & new_diagn_ha > 0){
+                if(t >= t_hts_start && new_diagn_ha > 0){
 
                   double diagn_surplus_ha = 0.0;
                   for(int hm = 0; hm < hDS; hm++)
@@ -881,7 +881,7 @@ extern "C" {
                 double artelig_hm = 0;
                 for(int ha = hIDX_15PLUS; ha < hAG; ha++)
                   artelig_hm += artelig_hahm[ha-hIDX_15PLUS][hm];
-                double init_prop = (artelig_hm == 0 | artinit_hts > artelig_hm) ? 1.0 : artinit_hts / artelig_hm;
+                double init_prop = (artelig_hm == 0 || artinit_hts > artelig_hm) ? 1.0 : artinit_hts / artelig_hm;
 
                 for(int ha = hIDX_15PLUS; ha < hAG; ha++){
                   double artinit_hahm = init_prop * artelig_hahm[ha-hIDX_15PLUS][hm];
@@ -934,7 +934,7 @@ extern "C" {
                 }
 
                 // Remove share of excess ART initiations from either diagnpop or testnegpop
-                if(t >= t_hts_start & new_diagn_ha > 0){
+                if(t >= t_hts_start && new_diagn_ha > 0){
 
                   double diagn_surplus_ha = 0.0;
                   for(int hm = 0; hm < hDS; hm++)
