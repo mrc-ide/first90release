@@ -2,6 +2,8 @@
 
 * Patch to `eppmod = "directinfections_hts"` option (v1.5.0) to avoid referencing 
   uninitialised memory.
+* Fix error in ART deaths calculation in R version of simulation code. ART mortality time trend
+  was omitted from deaths removed from total HIV population.
 
 # first90 1.5.4
 
