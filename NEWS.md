@@ -1,3 +1,7 @@
+# first90 1.6.1
+
+* Remove `data.table` dependency.
+
 # first90 1.6.0
 
 Updates for Spectrum transition from mid-year projection period to calendar year
