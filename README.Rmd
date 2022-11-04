@@ -178,7 +178,7 @@ To use them, create a directory with `mkdir tests/testhat/sample_files` and copy
 Or if you access to the private repo, you can clone it:
 
 ```
-git clone https://github.com/mrc-ide/shiny90_sample_files tests/testthat/sample_files
+git clone git@github.com:mrc-ide/shiny90_sample_files tests/testthat/sample_files
 ```
 
 Then run
