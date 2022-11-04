@@ -26,6 +26,10 @@ Spectrum inputs version number. For versions 6.19 and earlier,
   be scaled by the net migration proportions. Therefore the model output for number on
   ART will not exactly match the ART inputs.
   
+* In likelihood calculations for household survey proportion ever tested, interopolate
+  model outputs to mid-year. This affects `ll_evertest()`. Likelihood for annual 
+  HIV tests and diagnoses (`ll_prgdat()`) is unaffected.
+  
   
 # first90 1.5.5
 
