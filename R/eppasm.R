@@ -338,7 +338,7 @@ simmod <- function(fp, VERSION = "C"){
         ## calculate number to initiate ART based on number or percentage
 
         artnum.ii <- c(0,0) # number on ART this ts
-        if(DT*ii < 0.5){
+        if (fp$projection_period == "midyear" && DT*ii < 0.5) {
           for(g in 1:2){
             if(!any(fp$art15plus_isperc[g,i-2:1])){  # both number
               artnum.ii[g] <- c(fp$art15plus_num[g,i-2:1] %*% c(1-(DT*ii+0.5), DT*ii+0.5))
@@ -353,14 +353,20 @@ simmod <- function(fp, VERSION = "C"){
           }
         } else {
           for(g in 1:2){
+
+            art_interp_w <- DT*ii
+             if (fp$projection_period == "midyear") {
+               art_interp_w <- art_interp_w - 0.5
+             }
+            
             if(!any(fp$art15plus_isperc[g,i-1:0])){  # both number
-              artnum.ii[g] <- c(fp$art15plus_num[g,i-1:0] %*% c(1-(DT*ii-0.5), DT*ii-0.5))
+              artnum.ii[g] <- c(fp$art15plus_num[g,i-1:0] %*% c(1-art_interp_w, art_interp_w))
             } else if(all(fp$art15plus_isperc[g,i-1:0])) {  # both percentage
-              artcov.ii <- c(fp$art15plus_num[g,i-1:0] %*% c(1-(DT*ii-0.5), DT*ii-0.5))
+              artcov.ii <- c(fp$art15plus_num[g,i-1:0] %*% c(1-art_interp_w, art_interp_w))                
               artnum.ii[g] <- artcov.ii * (sum(art15plus.elig[,,g]) + sum(artpop[,,h.age15plus.idx,g,i]))
             } else if(!fp$art15plus_isperc[g,i-1] & fp$art15plus_isperc[g,i]){  # transition number to percentage
               curr_coverage <- sum(artpop[,,h.age15plus.idx,g,i]) / (sum(art15plus.elig[,,g]) + sum(artpop[,,h.age15plus.idx,g,i]))
-              artcov.ii <- curr_coverage + (fp$art15plus_num[g,i] - curr_coverage) * DT/(1.5-DT*(ii-1))
+              artcov.ii <- curr_coverage + (fp$art15plus_num[g,i] - curr_coverage) * DT/(1.0 - art_interp_w)
               artnum.ii[g] <- artcov.ii * (sum(art15plus.elig[,,g]) + sum(artpop[,,h.age15plus.idx,g,i]))
             }
           }

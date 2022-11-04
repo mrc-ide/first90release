@@ -3,6 +3,14 @@
 Updates for Spectrum transition from mid-year projection period to calendar year
 projection period. Implemented in Spectrum 6.2 in November 2022.
 
+Previous mid-year interpolation is still available in code by using argument
+`create_fp(..., projection_period = "midyear")`. The default argument 
+`projection_period = NULL` will choose the projection period based on the 
+Spectrum inputs version number. For versions 6.19 and earlier,
+`projection_period = "midyear"`. For versions 6.2 and later, `projection_period =
+"calendar"`.
+
+
 * Normalise `asfd` and `netmigagedist` to sum to exactly 1.0 before distributing
   to age groups.
 * Disaggregate under-5 net migration proportional to paediatric survival probabilities
@@ -11,7 +19,14 @@ projection period. Implemented in Spectrum 6.2 in November 2022.
 * Net-migrations added at end of projection step, consistent with WPP 2022. No longer 
   (1) adjust net migration for half-period survival, nor (2) adjust net migration to 
   be half in current age group and half in next age group.
-
+  
+* End-year ART input interpolation adjusted to reflect calendar year projection period,
+  such that ART input aligns to end of projection year. 
+  _Note:_ since net migration is applied _after_ ART initiations, the number on ART will
+  be scaled by the net migration proportions. Therefore the model output for number on
+  ART will not exactly match the ART inputs.
+  
+  
 # first90 1.5.5
 
 * Patch to `eppmod = "directinfections_hts"` option (v1.5.0) to avoid referencing 
