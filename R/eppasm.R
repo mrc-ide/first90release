@@ -295,9 +295,9 @@ simmod <- function(fp, VERSION = "C"){
         gradART[1:2,,,] <- gradART[1:2,,,] - 2.0 * artpop[1:2,,,, i]      # remove ART duration progression (HARD CODED 6 months duration)
         gradART[2:3,,,] <- gradART[2:3,,,] + 2.0 * artpop[1:2,,,, i]      # add ART duration progression (HARD CODED 6 months duration)
 
-        gradART <- gradART - fp$art_mort * fp$artmx_timerr[ , i] * artpop[,,,,i]                  # ART mortality
+        artdeaths.ts <- fp$art_mort * fp$artmx_timerr[ , i] * artpop[,,,,i]
+        gradART <- gradART - artdeaths.ts                  # ART mortality
 
-        artdeaths.ts <- fp$art_mort * artpop[,,,,i]
         hivdeaths_hAG.ts <- hivdeaths_hAG.ts + colSums(artdeaths.ts,,2)
 
         artpop[,,,, i] <- artpop[,,,, i] + DT * gradART
