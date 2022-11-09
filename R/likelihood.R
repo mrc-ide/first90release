@@ -23,9 +23,21 @@ ll_hts <- function(theta, fp, likdat) {
 #' @export
 ll_evertest <- function(mod, fp, dat) {
   mu <- evertest(mod, fp, dat)
-  if (any(is.na(mu)) | any(mu < 0) | any(mu > 1)) { llk <- log(0) 
+
+  ## If projection_period = "calendar", interpolate proportion
+  ## ever tested predictions to mid-year.
+  if (fp$projection_period == "calendar") {
+    dat_last <- dat
+    dat_last$yidx <- dat_last$yidx - 1L
+    mu_last <- evertest(mod, fp, dat_last)
+    mu <- 0.5 * (mu + mu_last)
+  }
+
+  if (any(is.na(mu)) || any(mu < 0) || any(mu > 1)) {
+    llk <- log(0) 
   } else {
-    llk <- sum(dbinom(x = dat$nsuccess, size = dat$neff, prob = mu, log = TRUE)) }
+    llk <- sum(dbinom(x = dat$nsuccess, size = dat$neff, prob = mu, log = TRUE))
+  }
   
   return(llk)
 }
