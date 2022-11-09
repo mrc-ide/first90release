@@ -1,5 +1,12 @@
 # first90 1.6.1
 
+Updates for 2023 UNAIDS estimates:
+
+* Extend output arrays, plots, and tables to output 2022 results.
+* Extend theta0 initial values for additional year random-walk parameters.
+
+Other:
+
 * Remove `data.table` dependency.
 
 # first90 1.6.0
@@ -52,7 +59,7 @@ Spectrum inputs version number. For versions 6.19 and earlier,
 
 # first90 1.5.2
 
-* Update initial values to median of 2021 .shiny90 file final parameter estiamtes.
+* Update initial values to median of 2021 .shiny90 file final parameter estimates.
 
 # first90 1.5.1
 
