@@ -182,14 +182,17 @@ plot_retest_test_pos <- function(mod, fp, likdat, cnt, relative = F,
   out_retest$newdiag <- out_retest$tests - out_retest$retests
   out_retest$newuna <- out_retest$tests - out_retest$art
   
-  ylim <- c(0, max(out_retest$tests/1000) * 1.3)
+  ylim <- c(0, max(out_retest$tests/1000, na.rm = TRUE) * 1.3)
   
   col1 <- rgb(230, 180, 205, 200, max=255)
   col2 <- rgb(150, 0, 50, 200, max=255)
   col3 <- rgb(100, 0, 100, 200, max=255)
     
-  if (plot_title == TRUE) { main_title <- "Distribution of HIV+ Tests by \n Awareness and ART Status"
-  } else {  main_title <- ""  }
+  if (plot_title == TRUE) {
+    main_title <- "Distribution of HIV+ Tests by \n Awareness and ART Status"
+  } else {
+    main_title <- ""
+  }
   
   if(relative == F){
     plot(out_retest$tests/1000 ~ out_retest$year, type = 'n', ylim = ylim,
@@ -278,8 +281,11 @@ plot_prv_pos_yld <- function(mod, fp, likdat, cnt, yr_pred = 2021,
   col2 <- rgb(255, 0, 130, 250, max = 255)
   col3 <- rgb(100, 0, 100, 250, max = 255)
   
-  if (plot_title == TRUE) { main_title <- "HIV Prevalence (15+), Positivity, and \n Yield of New HIV Diagnoses"
-  } else {  main_title <- ""  }
+  if (plot_title == TRUE) {
+    main_title <- "HIV Prevalence (15+), Positivity, and \n Yield of New HIV Diagnoses"
+  } else {
+    main_title <- ""
+  }
   
     plot(I(prv * 100) ~ yr, type = 'l', ylim = ylim, 
          main = main_title,

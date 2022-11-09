@@ -148,8 +148,6 @@ get_out_pregprev <- function(mod, fp) {
 ## * update yr_pred to current year
 plot_out_nbtest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2021,
                             plot_title = TRUE) {
-    require(data.table)
-  
   # if fitting with HTS program data stratified by sex, we add both sex back
   ld <- likdat$hts
   if (!is.null(ld)) {
@@ -177,21 +175,26 @@ plot_out_nbtest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2021,
   }
 
   
-    # Decide if we plot CI or not
-    if (!is.null(simul)) {
-        ci <- getCI(simul$number.test)
-        ci <- subset(ci, sex == 'both' & year <= yr_pred)
-        ci[is.na(ci)] <- 0
-        ci$year <- ci$year + 0.5
-        plot.ci <- TRUE
-    }
-    if (is.null(simul)) plot.ci <- FALSE
+  # Decide if we plot CI or not
+  if (!is.null(simul)) {
+    ci <- getCI(simul$number.test)
+    ci <- subset(ci, sex == 'both' & year <= yr_pred)
+    ci$lower[is.na(ci$lower)] <- 0
+    ci$upper[is.na(ci$upper)] <- 0
+    ci$year <- ci$year + 0.5
+    plot.ci <- TRUE
+  } else {
+    plot.ci <- FALSE
+  }
   
-    if (plot_title == TRUE) { main_title <- expression(bold(paste("Total ", N^o, " of Tests")))
-    } else {  main_title <- ""  }
-
-    col_ci <- rgb(150, 150, 150, 125, max = 255)
-    
+  if (plot_title == TRUE) {
+    main_title <- expression(bold(paste("Total ", N^o, " of Tests")))
+  } else {
+    main_title <- ""
+  }
+  
+  col_ci <- rgb(150, 150, 150, 125, max = 255)
+  
     # Total tested
     if (plot.ci == T){
         plot(I(out_nbtest$value / 1000) ~ out_nbtest$year, pch = '',
@@ -235,7 +238,6 @@ plot_out_nbtest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2021,
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
 plot_out_nbtest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2021) {
-  require(data.table)
   
   # redact <- c('Namibia','Uganda','Zambia','Zimbabwe')
   redact <- c('XXX')
@@ -263,13 +265,15 @@ plot_out_nbtest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 20
   if (!is.null(simul)){
     ci <- getCI(simul$number.test)
     ci <- subset(ci, sex != 'both' & year <= yr_pred)
-    ci[is.na(ci)] <- 0
+    ci$lower[is.na(ci$lower)] <- 0
+    ci$upper[is.na(ci$upper)] <- 0
     ci$year <- ci$year + 0.5
     plot.ci <- TRUE
     ci_f <- subset(ci, sex == 'female')
     ci_m <- subset(ci, sex == 'male')
+  } else {
+    plot.ci <- FALSE
   }
-  if (is.null(simul)) plot.ci <- FALSE
   
   col_ci <- rgb(150, 150, 150, 125, max = 255)
   
@@ -319,8 +323,6 @@ plot_out_nbtest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 20
 ## * update yr_pred to current year
 plot_out_nbpostest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2021,
                                plot_title = TRUE) {
-  require(data.table)
-  
   # if fitting with HTS program data stratified by sex, we add both sex back
   ld <- likdat$hts
   if (!is.null(ld)) {
@@ -351,14 +353,19 @@ plot_out_nbpostest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 202
     if (!is.null(simul)){
         ci <- getCI(simul$number.test.pos)
         ci <- subset(ci, sex == 'both' & year <= yr_pred)
-        ci[is.na(ci)] <- 0
+        ci$lower[is.na(ci$lower)] <- 0
+        ci$upper[is.na(ci$upper)] <- 0
         ci$year <- ci$year + 0.5
         plot.ci <- TRUE
+    } else {
+      plot.ci <- FALSE
     }
-    if (is.null(simul)) plot.ci <- FALSE
 
-    if (plot_title == TRUE) { main_title <- expression(bold(paste("Total ", N^o, " of Positive Tests")))
-    } else {  main_title <- ""  }
+  if (plot_title == TRUE) {
+    main_title <- expression(bold(paste("Total ", N^o, " of Positive Tests")))
+  } else {
+    main_title <- ""
+  }
     
     col_ci <- rgb(150, 150, 150, 125, max = 255)
     
@@ -414,7 +421,6 @@ plot_out_nbpostest <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 202
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
 plot_out_nbpostest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred = 2021) {
-  require(data.table)
   
   # redact <- c('Namibia','Uganda','Zambia','Zimbabwe')
   redact <- c('XXX')
@@ -440,13 +446,15 @@ plot_out_nbpostest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred =
   if (!is.null(simul)){
     ci <- getCI(simul$number.test.pos)
     ci <- subset(ci, sex != 'both' & year <= yr_pred)
-    ci[is.na(ci)] <- 0
+    ci$lower[is.na(ci$lower)] <- 0
+    ci$upper[is.na(ci$upper)] <- 0
     ci$year <- ci$year + 0.5
     plot.ci <- TRUE
     ci_f <- subset(ci, sex == 'female')
     ci_m <- subset(ci, sex == 'male')
+  } else {
+    plot.ci <- FALSE
   }
-  if (is.null(simul)) plot.ci <- FALSE
   
   col_ci <- rgb(150, 150, 150, 125, max = 255)
   
@@ -466,7 +474,7 @@ plot_out_nbpostest_sex <- function(mod, fp, likdat, cnt, simul = NULL, yr_pred =
     lines(I(out_nbtest_pos_f$value / 1000) ~ out_nbtest_pos_f$year, lwd = 1, col = 'orangered2')
     lines(I(out_nbtest_pos_m$value / 1000) ~ out_nbtest_pos_m$year, lwd = 1, col = 'orangered2')
     
-    if (length(lik_f) > 0 | length(lik_m) > 0) {
+    if (length(lik_f) > 0 || length(lik_m) > 0) {
       if (cnt %in% redact) { pchpt <- '' } else { pchpt <- 16 }
       points(I(lik_f$totpos / 1000) ~ I(lik_f$year + 0.5), pch = pchpt) 
       points(I(lik_m$totpos / 1000) ~ I(lik_m$year + 0.5), pch = pchpt + 1) 
@@ -502,7 +510,8 @@ plot_out_evertestneg <- function(mod, fp, likdat, cnt, survey_hts, out_evertest,
     if (!is.null(simul)){
       ci <- getCI(simul$ever.test)
       ci <- subset(ci, year <= yr_pred)
-      ci[is.na(ci)] <- 0
+      ci$lower[is.na(ci$lower)] <- 0
+      ci$upper[is.na(ci$upper)] <- 0
       ci$year <- ci$year + 0.5
       plot.ci <- TRUE
     }
@@ -582,7 +591,8 @@ plot_out_evertestpos <- function(mod, fp, likdat, cnt, survey_hts, out_evertest,
     if (!is.null(simul)){
         ci <- getCI(simul$ever.test)
         ci <- subset(ci, year <= yr_pred)
-        ci[is.na(ci)] <- 0
+        ci$lower[is.na(ci$lower)] <- 0
+        ci$upper[is.na(ci$upper)] <- 0
         ci$year <- ci$year + 0.5
         plot.ci <- TRUE
     }
@@ -656,7 +666,8 @@ plot_out_evertest <- function(mod, fp, likdat, cnt, survey_hts, out_evertest,
     if (!is.null(simul)){
         ci <- getCI(simul$ever.test)
         ci <- subset(ci, year <= yr_pred)
-        ci[is.na(ci)] <- 0
+        ci$lower[is.na(ci$lower)] <- 0
+        ci$upper[is.na(ci$upper)] <- 0
         ci$year <- ci$year + 0.5
         plot.ci <- TRUE
     }
@@ -852,7 +863,8 @@ plot_out_evertest_fbyage <- function(mod, fp, likdat, cnt, survey_hts, out_evert
     if (!is.null(simul)){
         ci <- getCI(simul$ever.test)
         ci <- subset(ci, year <= yr_pred)
-        ci[is.na(ci)] <- 0
+        ci$lower[is.na(ci$lower)] <- 0
+        ci$upper[is.na(ci$upper)] <- 0
         ci$year <- ci$year + 0.5
         plot.ci <- TRUE
     }
@@ -945,7 +957,8 @@ plot_out_evertest_mbyage <- function(mod, fp, likdat, cnt, survey_hts,
     if (!is.null(simul)){
       ci <- getCI(simul$ever.test)
       ci <- subset(ci, year <= yr_pred)
-      ci[is.na(ci)] <- 0
+      ci$lower[is.na(ci$lower)] <- 0
+      ci$upper[is.na(ci$upper)] <- 0
       ci$year <- ci$year + 0.5
       plot.ci <- TRUE
     }

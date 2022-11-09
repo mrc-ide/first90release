@@ -210,14 +210,14 @@ simul_pool_prb_dx_one_yr <- function(samp, mod, fp, year = c(2010:2021),
                         year = year, age = age, sex = sex)
   }
   
-  val_ <- data.table::rbindlist(val_lst)
+  val_df <- do.call(rbind, val_lst)
   
   val <- data.frame(year = year, age = rep(paste(age, collapse = "+"), n_year),
                     sex = rep(paste(sex, collapse = "+"), n_year),
                     prb1yr = NA, prb1yr_lci = NA, prb1yr_uci = NA)
   
   for (n in 1:n_year) {
-    uncertainty <- quantile(val_$prb1yr[val_$year == year[n]], probs = c(0.5, 0.025, 0.975))
+    uncertainty <- quantile(val_df$prb1yr[val_df$year == year[n]], probs = c(0.5, 0.025, 0.975))
     val$prb1yr[val$year == year[n]] <- uncertainty[1]
     val$prb1yr_lci[val$year == year[n]] <- uncertainty[2]
     val$prb1yr_uci[val$year == year[n]] <- uncertainty[3]
