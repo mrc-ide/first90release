@@ -44,6 +44,11 @@ extract_pjnz <- function(pjnz = NULL, dp_file= NULL, pjn_file = NULL){
   v$projection_name <- pjn[which(pjn[,1] == "<Projection Name>")+2, 4]
   v$spectrum_version <- pjn[which(pjn[,1] == "<Projection General>")+4, 4]
 
+  ## Replace comma decimal separator save on Francophone locale computers
+  ## (e.g. replace 6,14 by 6.14
+  v$spectrum_version <- sub("^([0-9]+),(.*)$", "\\1.\\2", v$spectrum_version)
+
+
   v$valid_date <- dpsub(dp, "<ValidDate MV>", 2, 3)
 
   ## Spectrum custom population used

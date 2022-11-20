@@ -1,6 +1,7 @@
 # first90 1.6.2
 
 * Use `vroom::vroom()` to read PJNZ files; much faster for reading `.DP` file.
+* Handle Spectrum version numbers saved on Francophone locale devices: e.g. 6,13 instead of 6.13.
 # first90 1.6.1
 
 Updates for 2023 UNAIDS estimates:
