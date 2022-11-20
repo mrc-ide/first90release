@@ -2,7 +2,7 @@
 first90_read_csv_character <- function(file) {
   v <- vroom::vroom(file, delim = ",",
                     col_types = vroom::cols(.default = vroom::col_character()),
-                    .name_repair = "minimal")
+                    .name_repair = "minimal", progress = FALSE)
   v <- as.data.frame(v)
   v
 }
