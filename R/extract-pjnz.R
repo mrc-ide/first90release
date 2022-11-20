@@ -665,7 +665,9 @@ get_dp_artmx_timerr <- function(dp, proj_years){
 calc_asfr <- function(tfr, asfd){
 
   ## Normalise the ASFD to sum exactly to 1.0
-  asfd <- sweep(asfd, 2, colSums(asfd), "/")
+  asfd_sum <- colSums(asfd)
+  asfd_sum[asfd_sum == 0.0] <- 1.0
+  asfd <- sweep(asfd, 2, asfd_sum, "/")
   
   asfr <- apply(asfd / 5, 2, rep, each=5)
   asfr <- sweep(asfr, 2, tfr, "*")
@@ -677,7 +679,9 @@ calc_asfr <- function(tfr, asfd){
 calc_netmigr <- function(totnetmig, netmigagedist, Sx){
 
   ## Normalise netmigagedist to sum to exactly 1.0
-  netmigagedist <- sweep(netmigagedist, 2:3, colSums(netmigagedist), "/")
+  netmigagedist_sum <- colSums(netmigagedist)
+  netmigagedist_sum[netmigagedist_sum == 0.0] <- 1.0
+  netmigagedist <- sweep(netmigagedist, 2:3, netmigagedist_sum, "/")
   
   netmigr5 <- sweep(netmigagedist, 2:3, totnetmig, "*")
   A <- create_beers(17)
