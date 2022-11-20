@@ -1,1 +1,1 @@
-pjn_data <- read.csv("testdata/sao_tome_test.pjn.csv", as.is = TRUE)
+pjn_data <- first90_read_csv_character("testdata/sao_tome_test.pjn.csv")

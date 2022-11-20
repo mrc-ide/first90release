@@ -1,3 +1,6 @@
+# first90 1.6.2
+
+* Use `vroom::vroom()` to read PJNZ files; much faster for reading `.DP` file.
 # first90 1.6.1
 
 Updates for 2023 UNAIDS estimates:

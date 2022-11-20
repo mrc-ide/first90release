@@ -1,4 +1,11 @@
 
+first90_read_csv_character <- function(file) {
+  v <- vroom::vroom(file, delim = ",",
+                    col_types = vroom::cols(.default = vroom::col_character()),
+                    .name_repair = "minimal")
+  v <- as.data.frame(v)
+  v
+}
 
 #' Extract outputs from PJNZ needed for first90 model
 #'
@@ -19,8 +26,8 @@ extract_pjnz <- function(pjnz = NULL, dp_file= NULL, pjn_file = NULL){
   else if(is.null(pjnz) && (is.null(dp_file) || is.null(pjn_file)))
     stop("Must provide either a Spectrum .PJNZ file or both a .DP and .PJN file")
 
-  dp <- read.csv(dp_file, as.is = TRUE)
-  pjn <- read.csv(pjn_file, as.is = TRUE)
+  dp <- first90_read_csv_character(dp_file)
+  pjn <- first90_read_csv_character(pjn_file)
 
 
   year_start <- as.integer(dpsub(dp, "<FirstYear MV2>",2,4))
@@ -692,7 +699,7 @@ calc_netmigr <- function(totnetmig, netmigagedist, Sx){
 #' Get country name from parsed PJN
 #' @param pjn parsed PJN file
 #' @details
-#' `pjn` should be via `read.csv(pjn_file, as.is = TRUE)`
+#' `pjn` should be via `first90_read_csv_character(pjn_file)`
 #' @export
 get_pjn_country <- function(pjn){
   cc <- as.integer(pjn[which(pjn[, 1] == "<Projection Parameters>") + 2, 4])
@@ -703,11 +710,11 @@ get_pjn_country <- function(pjn){
 #' Get subnational region from parsed PJN
 #' @param pjn parsed PJN file
 #' @details
-#' `pjn` should be via `read.csv(pjn_file, as.is = TRUE)`
+#' `pjn` should be via `first90_read_csv_character(pjn_file)`
 #' @export
 get_pjn_region <- function(pjn){
   region <- pjn[which(pjn[, 1] == "<Projection Parameters - Subnational Region Name2>") + 2, 4]
-  if (region == "") 
+  if (is.na(region) || region == "") 
     return(NULL)
   else
     return(region)
@@ -733,7 +740,7 @@ read_country <- function(pjnz = NULL, pjn_file = NULL){
   else if(!is.null(pjnz) && !is.null(pjn_file))
     stop("Must provide either a Spectrum .PJNZ file or a .PJN file. Do not provide both.")
 
-  pjn <- read.csv(pjn_file, as.is = TRUE)
+  pjn <- first90_read_csv_character(pjn_file)
   get_pjn_country(pjn)
 }
 
@@ -745,6 +752,6 @@ read_region <- function(pjnz = NULL, pjn_file = NULL){
   else if(!is.null(pjnz) && !is.null(pjn_file))
     stop("Must provide either a Spectrum .PJNZ file or a .PJN file. Do not provide both.")
 
-  pjn <- read.csv(pjn_file, as.is = TRUE)
+  pjn <- first90_read_csv_character(pjn_file)
   get_pjn_region(pjn)
 }
