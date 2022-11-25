@@ -366,7 +366,7 @@ simmod <- function(fp, VERSION = "C"){
               artnum.ii[g] <- artcov.ii * (sum(art15plus.elig[,,g]) + sum(artpop[,,h.age15plus.idx,g,i]))
             } else if(!fp$art15plus_isperc[g,i-1] & fp$art15plus_isperc[g,i]){  # transition number to percentage
               curr_coverage <- sum(artpop[,,h.age15plus.idx,g,i]) / (sum(art15plus.elig[,,g]) + sum(artpop[,,h.age15plus.idx,g,i]))
-              artcov.ii <- curr_coverage + (fp$art15plus_num[g,i] - curr_coverage) * DT/(1.0 - art_interp_w)
+              artcov.ii <- curr_coverage + (fp$art15plus_num[g,i] - curr_coverage) * DT/(1.0 - art_interp_w + DT)
               artnum.ii[g] <- artcov.ii * (sum(art15plus.elig[,,g]) + sum(artpop[,,h.age15plus.idx,g,i]))
             }
           }

@@ -59,6 +59,9 @@ create_fp <- function(projp,
   fp$SIM_YEARS <- ss$PROJ_YEARS
   fp$proj.steps <- proj_start + 0.5 + 0:(ss$hiv_steps_per_year * (fp$SIM_YEARS-1)) / ss$hiv_steps_per_year
 
+  ## Replace 6,14 with 6.14 for files saved with french locale
+  projp$spectrum_version <- sub("^([0-9]+),(.*)$", "\\1.\\2", projp$spectrum_version)
+  
   if (!grepl("^[4-6]\\.[0-9]", projp$spectrum_version)) {
     stop(paste0("Spectrum version not recognized: ", projp$spectrum_version))
   }

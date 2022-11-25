@@ -1,4 +1,11 @@
 
+first90_read_csv_character <- function(file) {
+  v <- vroom::vroom(file, delim = ",",
+                    col_types = vroom::cols(.default = vroom::col_character()),
+                    .name_repair = "minimal", progress = FALSE)
+  v <- as.data.frame(v)
+  v
+}
 
 #' Extract outputs from PJNZ needed for first90 model
 #'
@@ -19,8 +26,8 @@ extract_pjnz <- function(pjnz = NULL, dp_file= NULL, pjn_file = NULL){
   else if(is.null(pjnz) && (is.null(dp_file) || is.null(pjn_file)))
     stop("Must provide either a Spectrum .PJNZ file or both a .DP and .PJN file")
 
-  dp <- read.csv(dp_file, as.is = TRUE)
-  pjn <- read.csv(pjn_file, as.is = TRUE)
+  dp <- first90_read_csv_character(dp_file)
+  pjn <- first90_read_csv_character(pjn_file)
 
 
   year_start <- as.integer(dpsub(dp, "<FirstYear MV2>",2,4))
@@ -36,6 +43,11 @@ extract_pjnz <- function(pjnz = NULL, dp_file= NULL, pjn_file = NULL){
 
   v$projection_name <- pjn[which(pjn[,1] == "<Projection Name>")+2, 4]
   v$spectrum_version <- pjn[which(pjn[,1] == "<Projection General>")+4, 4]
+
+  ## Replace comma decimal separator save on Francophone locale computers
+  ## (e.g. replace 6,14 by 6.14
+  v$spectrum_version <- sub("^([0-9]+),(.*)$", "\\1.\\2", v$spectrum_version)
+
 
   v$valid_date <- dpsub(dp, "<ValidDate MV>", 2, 3)
 
@@ -653,7 +665,9 @@ get_dp_artmx_timerr <- function(dp, proj_years){
 calc_asfr <- function(tfr, asfd){
 
   ## Normalise the ASFD to sum exactly to 1.0
-  asfd <- sweep(asfd, 2, colSums(asfd), "/")
+  asfd_sum <- colSums(asfd)
+  asfd_sum[asfd_sum == 0.0] <- 1.0
+  asfd <- sweep(asfd, 2, asfd_sum, "/")
   
   asfr <- apply(asfd / 5, 2, rep, each=5)
   asfr <- sweep(asfr, 2, tfr, "*")
@@ -665,7 +679,9 @@ calc_asfr <- function(tfr, asfd){
 calc_netmigr <- function(totnetmig, netmigagedist, Sx){
 
   ## Normalise netmigagedist to sum to exactly 1.0
-  netmigagedist <- sweep(netmigagedist, 2:3, colSums(netmigagedist), "/")
+  netmigagedist_sum <- colSums(netmigagedist)
+  netmigagedist_sum[netmigagedist_sum == 0.0] <- 1.0
+  netmigagedist <- sweep(netmigagedist, 2:3, netmigagedist_sum, "/")
   
   netmigr5 <- sweep(netmigagedist, 2:3, totnetmig, "*")
   A <- create_beers(17)
@@ -692,7 +708,7 @@ calc_netmigr <- function(totnetmig, netmigagedist, Sx){
 #' Get country name from parsed PJN
 #' @param pjn parsed PJN file
 #' @details
-#' `pjn` should be via `read.csv(pjn_file, as.is = TRUE)`
+#' `pjn` should be via `first90_read_csv_character(pjn_file)`
 #' @export
 get_pjn_country <- function(pjn){
   cc <- as.integer(pjn[which(pjn[, 1] == "<Projection Parameters>") + 2, 4])
@@ -703,11 +719,11 @@ get_pjn_country <- function(pjn){
 #' Get subnational region from parsed PJN
 #' @param pjn parsed PJN file
 #' @details
-#' `pjn` should be via `read.csv(pjn_file, as.is = TRUE)`
+#' `pjn` should be via `first90_read_csv_character(pjn_file)`
 #' @export
 get_pjn_region <- function(pjn){
   region <- pjn[which(pjn[, 1] == "<Projection Parameters - Subnational Region Name2>") + 2, 4]
-  if (region == "") 
+  if (is.na(region) || region == "") 
     return(NULL)
   else
     return(region)
@@ -733,7 +749,7 @@ read_country <- function(pjnz = NULL, pjn_file = NULL){
   else if(!is.null(pjnz) && !is.null(pjn_file))
     stop("Must provide either a Spectrum .PJNZ file or a .PJN file. Do not provide both.")
 
-  pjn <- read.csv(pjn_file, as.is = TRUE)
+  pjn <- first90_read_csv_character(pjn_file)
   get_pjn_country(pjn)
 }
 
@@ -745,6 +761,6 @@ read_region <- function(pjnz = NULL, pjn_file = NULL){
   else if(!is.null(pjnz) && !is.null(pjn_file))
     stop("Must provide either a Spectrum .PJNZ file or a .PJN file. Do not provide both.")
 
-  pjn <- read.csv(pjn_file, as.is = TRUE)
+  pjn <- first90_read_csv_character(pjn_file)
   get_pjn_region(pjn)
 }
