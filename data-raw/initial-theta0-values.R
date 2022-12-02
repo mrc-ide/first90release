@@ -40,3 +40,4 @@ stopifnot(length(theta0) == n_k + n_k-10 + 11)
 stopifnot(length(theta1) == n_k + n_k-10 + 11)
 
 usethis::use_data(theta0, overwrite = TRUE)
+write.table(theta0, "theta0-2023.csv", row.names = FALSE, col.names = FALSE)
