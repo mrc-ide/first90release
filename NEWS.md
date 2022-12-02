@@ -1,3 +1,7 @@
+# first90 1.6.3 
+
+* Correct initial theta0 value for 2023 extended parameters.
+
 # first90 1.6.2
 
 * Use `vroom::vroom()` to read PJNZ files; much faster for reading `.DP` file.
