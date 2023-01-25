@@ -1,3 +1,7 @@
+# first90 1.6.5
+
+* Exclude NA values to set max `ylim` in `plot_prv_pos_yld()`. This addresses issue with this plot not showing in interface and preventing plot downloads when data NA values are simulated.
+
 # first90 1.6.4
 
 * Extend output plots and tables through 2022.

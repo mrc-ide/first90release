@@ -275,7 +275,7 @@ plot_prv_pos_yld <- function(mod, fp, likdat, cnt, yr_pred = 2022,
   yld <- out_postest$tot / out_test$tot
   ndx <- out_postest$newdiag / out_test$tot
     
-  ylim <- c(0, ifelse(max(c(prv, yld, ndx) * 1.3) > 1, 1, max(c(prv, yld, ndx) * 1.3))) * 100
+  ylim <- c(0, ifelse(max(c(prv, yld, ndx) * 1.3, na.rm = TRUE) > 1, 1, max(c(prv, yld, ndx) * 1.3, na.rm = TRUE))) * 100
   
   col1 <- rgb(255, 155, 50, 250, max = 255)
   col2 <- rgb(255, 0, 130, 250, max = 255)
