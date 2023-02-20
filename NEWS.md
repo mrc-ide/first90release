@@ -1,3 +1,9 @@
+# first90 1.6.6
+
+* Implement Spectrum Adult ART scalar adjustment. This is a user input that 
+  allows the input number on ART to be adjusted by a scalar to account for 
+  over/under-reporting of treatment numbers.
+
 # first90 1.6.5
 
 * Exclude NA values to set max `ylim` in `plot_prv_pos_yld()`. This addresses issue with this plot not showing in interface and preventing plot downloads when data NA values are simulated.

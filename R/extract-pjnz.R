@@ -107,7 +107,26 @@ extract_pjnz <- function(pjnz = NULL, dp_file= NULL, pjn_file = NULL){
   v$art15plus_numperc <- array(as.numeric(unlist(dpsub(dp, "<HAARTBySexPerNum MV>", 4:5, col_idx))), lengths(dn), dn)
   v$art15plus_num <- array(as.numeric(unlist(dpsub(dp, "<HAARTBySex MV>", 4:5, col_idx))), lengths(dn), dn)
   v$art15plus_needart <- array(as.numeric(unlist(dpsub(dp, "<NeedARTDec31 MV>", 3:4, col_idx))), lengths(dn), dn)
-  
+
+  ## # Adult on ART adjustment factor
+  ## 
+  ## * Implemented from around Spectrum 6.2 (a few versions before)
+  ## * Allows user to specify scalar to reduce number on ART in each year ("<AdultARTAdjFactor>")
+  ## * Enabled / disabled by checkbox flag ("<AdultARTAdjFactorFlag>")
+  ## * Scaling factor only applies to number inputs, not percentages (John Stover email, 20 Feb 2023)
+  ##   -> Even if scaling factor specified in a year with percentage input, ignore it.
+
+  if (exists_dptag(dp, "<AdultARTAdjFactorFlag>") &&
+        dpsub(dp, "<AdultARTAdjFactorFlag>", 2, 4) == 1) {
+
+    adult_artadj_factor <- array(as.numeric(unlist(dpsub(dp, "<AdultARTAdjFactor>", 3:4, col_idx))), lengths(dn), dn)
+
+    ## Only apply if is number (! is percentage)
+    adult_artadj_factor <- adult_artadj_factor ^ as.numeric(!v$art15plus_numperc)
+
+    v$art15plus_num <- v$art15plus_num * adult_artadj_factor
+  }
+
   v$art15plus_eligthresh <- setNames(as.numeric(dpsub(dp, "<CD4ThreshHoldAdults MV>", 2, col_idx)), proj_years)
 
   artelig_specpop <- setNames(dpsub(dp, "<PopsEligTreat MV>", 3:9, 2:6),
