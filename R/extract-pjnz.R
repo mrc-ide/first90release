@@ -103,10 +103,17 @@ extract_pjnz <- function(pjnz = NULL, dp_file= NULL, pjn_file = NULL){
   v$artmx_timerr <- get_dp_artmx_timerr(dp, proj_years)
   
   ## # ART programme data
-
   v$art15plus_numperc <- array(as.numeric(unlist(dpsub(dp, "<HAARTBySexPerNum MV>", 4:5, col_idx))), lengths(dn), dn)
   v$art15plus_num <- array(as.numeric(unlist(dpsub(dp, "<HAARTBySex MV>", 4:5, col_idx))), lengths(dn), dn)
-  v$art15plus_needart <- array(as.numeric(unlist(dpsub(dp, "<NeedARTDec31 MV>", 3:4, col_idx))), lengths(dn), dn)
+
+  male_15plus_needart <- dpsub(dp, "<NeedARTDec31 MV>", 4:17*3 + 3, col_idx)
+  male_15plus_needart <- vapply(lapply(male_15plus_needart, as.numeric), sum, numeric(1))
+
+  female_15plus_needart <- dpsub(dp, "<NeedARTDec31 MV>", 4:17*3 + 4, col_idx)
+  female_15plus_needart <- vapply(lapply(female_15plus_needart, as.numeric), sum, numeric(1))
+
+  v$art15plus_needart <- rbind(male_15plus_needart, female_15plus_needart)
+  dimnames(v$art15plus_needart) <- dn
 
   ## # Adult on ART adjustment factor
   ## 
