@@ -1,3 +1,9 @@
+# first90 1.6.7
+
+* Update PJNZ extraction for adult ART need Dec 31 for 2023 PJNZ files. Previously child ART was
+  note recorded in the .DP file tag `<NeedARTDec31 MV>`, and so it was fine to extract the total
+  value. Now child ART is recorded, and so need to sum the adult age groups only.
+  
 # first90 1.6.6
 
 * Implement Spectrum Adult ART scalar adjustment. This is a user input that 
