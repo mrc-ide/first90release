@@ -1078,21 +1078,30 @@ end_of_year <- function(year, value){
 tab_out_evertest <- function(mod, fp, age_grp = '15-49', gender = 'both', 
                              hiv = 'all', year_range = c(2010, 2022), 
                              simul = NULL, end_year = TRUE) {
+
+  interpolate_output <- end_year && fp$projection_period == "midyear" ||
+    !end_year && fp$projection_period == "calendar"
+  
   if (length(year_range) == 1) { year_range <- c(year_range, year_range) }
   if (is.null(simul)) {
     out <- get_out_evertest(mod, fp, age_grp, gender, hiv)
-    if (end_year == TRUE) { out$value <- end_of_year(out$year, out$value) }
+    if (interpolate_output) {
+      out$value <- end_of_year(out$year, out$value)
+    }
     out$value <- round(out$value * 100, 1)
     tab_evertest <- subset(out, year >= year_range[1] & year <= year_range[2])
   } else {
     out <- get_out_evertest(mod, fp, age_grp, gender, hiv)
-    if (end_year == TRUE) { out$value <- end_of_year(out$year, out$value) }
+    if (interpolate_output) {
+      out$value <- end_of_year(out$year, out$value)
+    }
     out$value <- round(out$value * 100, 1)
     outci <- getCI(simul$ever.test)
     outci <- subset(outci, agegr == age_grp & sex == gender & hivstatus == hiv)
-    if (end_year == TRUE) {
+    if (interpolate_output) {
       outci$lower <- end_of_year(outci$year, outci$lower)
-      outci$upper <- end_of_year(outci$year, outci$upper) }
+      outci$upper <- end_of_year(outci$year, outci$upper)
+    }
     outci$lower <- round(outci$lower * 100, 1)
     outci$upper <- round(outci$upper * 100, 1)
     outci <- subset(outci, year >= year_range[1] & year <= year_range[2]) 
@@ -1109,26 +1118,35 @@ tab_out_evertest <- function(mod, fp, age_grp = '15-49', gender = 'both',
 tab_out_aware <- function(mod, fp, age_grp = '15-49', gender = 'both', 
                           year_range = c(2010, 2022), simul = NULL, 
                           end_year = TRUE) {
-  if (age_grp == "15-99") { age_grp <- "15+" }
+
+  interpolate_output <- end_year && fp$projection_period == "midyear" ||
+    !end_year && fp$projection_period == "calendar"
+
+  if (age_grp == "15-99") {
+    age_grp <- "15+"
+  }
   
   if (length(year_range) == 1) {
-    year_range <- c(year_range, year_range) }
+    year_range <- c(year_range, year_range)
+  }
 
   if (is.null(simul)) {
     out <- get_out_aware(mod, fp, age_grp, gender)
-    if (end_year == TRUE) {
-      out$value <- end_of_year(out$year, out$value) }
+    if (interpolate_output) {
+      out$value <- end_of_year(out$year, out$value)
+    }
     out$value <- round(out$value * 100, 1)
     tab_aware <- subset(out, year >= year_range[1] & year <= year_range[2])
   } else {
     out <- get_out_aware(mod, fp, age_grp, gender)
-    if (end_year == TRUE) {
-    out$value <- end_of_year(out$year, out$value) }
+    if (interpolate_output) {
+      out$value <- end_of_year(out$year, out$value)
+    }
     out$value <- round(out$value * 100, 1)
     outci <- getCI(simul$diagnoses)
     outci <- subset(outci, agegr == age_grp & sex == gender) 
 
-    if (end_year == TRUE) { 
+    if (interpolate_output) { 
       outci$lower <- end_of_year(outci$year, outci$lower)
       outci$upper <- end_of_year(outci$year, outci$upper)
     }
@@ -1151,11 +1169,21 @@ tab_out_aware <- function(mod, fp, age_grp = '15-49', gender = 'both',
 tab_out_nbaware <- function(mod, fp, age_grp = '15-49', 
                             gender = 'both', year_range = c(2010, 2022), 
                             end_year = TRUE) {
-  if (length(year_range) == 1) { year_range <- c(year_range, year_range) }
-    out <- get_out_nbaware(mod, fp, age_grp, gender)
-    if (end_year == TRUE) { out$value <- end_of_year(out$year, out$value) }
-    out$value <- round(out$value, 0)
-    tab_nbaware <- subset(out, year >= year_range[1] & year <= year_range[2])
+
+  interpolate_output <- end_year && fp$projection_period == "midyear" ||
+    !end_year && fp$projection_period == "calendar"
+
+  if (length(year_range) == 1) {
+    year_range <- c(year_range, year_range)
+  }
+
+  out <- get_out_nbaware(mod, fp, age_grp, gender)
+
+  if (interpolate_output) {
+    out$value <- end_of_year(out$year, out$value)
+  }
+  out$value <- round(out$value, 0)
+  tab_nbaware <- subset(out, year >= year_range[1] & year <= year_range[2])
 
   row.names(tab_nbaware) <- NULL
   tab_nbaware
@@ -1209,8 +1237,12 @@ tab_out_artcov <- function(mod, fp, gender = 'both',
 ## * update year_range to include current year
 tab_out_pregprev <- function(mod, fp, year_range = c(2010, 2022), 
                              end_year = TRUE) {
-  if (length(year_range) == 1) { year_range <- c(year_range, year_range) }
-    out <- get_out_pregprev(mod, fp)
+
+  if (length(year_range) == 1) {
+    year_range <- c(year_range, year_range)
+  }
+
+  out <- get_out_pregprev(mod, fp)
   out$prev <- round(out$prev * 100, 1)
   out$aware <- round(out$aware * 100, 1)
   out$artcov <- round(out$artcov * 100, 1)
