@@ -1,4 +1,8 @@
-# first90 1.6.7
+# first90 1.6.9
+
+* Bug fix: account for end-year net migration in the ART population in the first year of ART start (implemented in v1.6.0).
+
+# first90 1.6.8
 
 * Don't interpolate number aware outputs in Spectrum output table when using calendar year interpolation.
 

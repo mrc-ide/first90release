@@ -1096,7 +1096,7 @@ extern "C" {
 	      pop[t][HIVP][g][a] += hmig_a;
 	      
 	      mig_ha += hmig_a;
-	      if (t > t_hts_start) {
+	      if (t >= t_hts_start) {
 		mig_hivn_ha += nmig_a;
 	      }
 	      a++;
@@ -1105,7 +1105,7 @@ extern "C" {
 	    // migration for hivpop
 	    double migrate_ha = hivpop_ha > 0 ? mig_ha / hivpop_ha : 0.0;
 	    
-	    if(t > t_hts_start) {
+	    if(t >= t_hts_start) {
 	      double migrate_hivn_ha = hivnpop_ha > 0 ? mig_hivn_ha / hivnpop_ha : 0.0;
 	      testnegpop[t][HIVN][g][ha] *= 1+migrate_hivn_ha;
 	      testnegpop[t][HIVP][g][ha] *= 1+migrate_ha;
@@ -1113,9 +1113,9 @@ extern "C" {
 
 	    for(int hm = 0; hm < hDS; hm++){
 	      hivpop[t][g][ha][hm] *= 1+migrate_ha;
-	      if(t > t_hts_start)
+	      if(t >= t_hts_start)
 		diagnpop[t][g][ha][hm] *= 1+migrate_ha;
-	      if(t > t_ART_start)
+	      if(t >= t_ART_start)
 		for(int hu = 0; hu < hTS; hu++)
 		  artpop[t][g][ha][hm][hu] *= 1+migrate_ha;
 	    } // loop over hm
