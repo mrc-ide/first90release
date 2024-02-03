@@ -313,11 +313,24 @@ simmod <- function(fp, VERSION = "C") {
 
         ## ART dropout
         ## remove proportion from all adult ART groups back to untreated pop
-        hivpop[,,,i] <- hivpop[,,,i] + DT*fp$art_dropout[i]*colSums(artpop[,,,,i])
-        if(i >= fp$t_hts_start)
-          diagnpop[,,,i] <- diagnpop[,,,i] + DT*fp$art_dropout[i]*colSums(artpop[,,,,i])
 
-        artpop[,,,,i] <- artpop[,,,,i] - DT*fp$art_dropout[i]*artpop[,,,,i]
+        art_dropout_ii <- fp$art_dropout[i]*colSums(artpop[1:2,,,,i])
+        if (fp$art_dropout_recover_cd4) {
+          art_dropout_ii[1,,] <- art_dropout_ii[1,,] +
+            fp$art_dropout[i] * artpop[3:fp$ss$hTS,1,,,i]
+          art_dropout_ii[-fp$ss$hDS,,] <- art_dropout_ii[-fp$ss$hDS,,] +
+            fp$art_dropout[i] * artpop[3:fp$ss$hTS,-1,,,i]
+        } else {
+          art_dropout_ii <- art_dropout_ii +
+            fp$art_dropout[i] * artpop[3:fp$ss$hTS,,,,i]
+        }
+
+        hivpop[,,,i] <- hivpop[,,,i] + DT * art_dropout_ii
+        if(i >= fp$t_hts_start) { 
+          diagnpop[,,,i] <- diagnpop[,,,i] + DT * art_dropout_ii
+        }
+
+        artpop[,,,,i] <- artpop[,,,,i] - DT * fp$art_dropout[i]*artpop[,,,,i]
 
         ## calculate number eligible for ART
         artcd4_percelig <- 1 - (1-rep(0:1, times=c(fp$artcd4elig_idx[i]-1, hDS - fp$artcd4elig_idx[i]+1))) *

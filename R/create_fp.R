@@ -7,7 +7,8 @@ create_fp <- function(projp,
                       popadjust = TRUE,
                       artelig200adj=TRUE,
                       who34percelig=0,
-                      projection_period = NULL) {
+                      projection_period = NULL,
+                      art_dropout_recover_cd4 = NULL) {
 
 
   ## ########################## ##
@@ -165,6 +166,14 @@ create_fp <- function(projp,
   ## percentage of those with CD4 <350 who are based on WHO Stage III/IV infection
   fp$who34percelig <- who34percelig
 
+  if (is.null(art_dropout_recover_cd4)) {
+    fp$art_dropout_recover_cd4 <- projp$spectrum_version >= "6.14"
+  } else {
+    stopifnot(is.logical(art_dropout_recover_cd4))
+    fp$art_dropout_recover_cd4 <- art_dropout_recover_cd4
+  }
+
+  
   fp$art_dropout <- projp$art_dropout[as.character(proj_start:proj_end)]/100
   fp$median_cd4init <- projp$median_cd4init[as.character(proj_start:proj_end)]
   fp$med_cd4init_input <- as.integer(fp$median_cd4init > 0)

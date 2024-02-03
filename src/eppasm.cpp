@@ -129,6 +129,7 @@ extern "C" {
     double *pw_artelig = REAL(getListElement(s_fp, "pw_artelig"));
     double who34percelig = *REAL(getListElement(s_fp, "who34percelig"));
 
+    int bin_art_dropout_recover_cd4 = *INTEGER(getListElement(s_fp, "art_dropout_recover_cd4"));
     double *art_dropout = REAL(getListElement(s_fp, "art_dropout"));
     double *median_cd4init = REAL(getListElement(s_fp, "median_cd4init"));
 
@@ -732,10 +733,22 @@ extern "C" {
               for(int ha = 0; ha < hAG; ha++)
                 for(int hm = everARTelig_idx; hm < hDS; hm++)
                   for(int hu = 0; hu < hTS; hu++){
-                    double dropout_ts = DT * art_dropout[t] * artpop[t][g][ha][hm][hu];
-                    hivpop[t][g][ha][hm] += dropout_ts;
-                    if(t >= t_hts_start)
-                      diagnpop[t][g][ha][hm] += dropout_ts;
+
+		    double dropout_ts = DT * art_dropout[t] * artpop[t][g][ha][hm][hu];
+		    
+		    if (bin_art_dropout_recover_cd4 && hu >= 2 && hm >= 1) {
+		      // recover people on ART >1 year to one higher CD4 category
+		      hivpop[t][g][ha][hm-1] += dropout_ts;
+		      if(t >= t_hts_start) {
+			diagnpop[t][g][ha][hm-1] += dropout_ts;
+		      }
+		    } else {
+		      hivpop[t][g][ha][hm] += dropout_ts;
+		      if(t >= t_hts_start) {
+			diagnpop[t][g][ha][hm] += dropout_ts;
+		      }
+		    }
+		    
                     artpop[t][g][ha][hm][hu] -= dropout_ts;
                   }
           }
