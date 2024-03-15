@@ -120,8 +120,8 @@ plot_retest_test_neg <- function(mod, fp, likdat, cnt, relative = F,
                                      add_ss_indices(out_retest, fp$ss))$tests
   out_retest$first_test <- out_retest$tests - out_retest$retests
   
-  col1 <- rgb(230, 200, 0, 200, max=255)
-  col2 <- rgb(50, 100, 155, 200, max=255)
+  col1 <- grDevices::rgb(230, 200, 0, 200, max=255)
+  col2 <- grDevices::rgb(50, 100, 155, 200, max=255)
   
   if(relative == F) {
     if (plot_title == TRUE) { main_title <- expression(bold(paste("Total ", N^o, " of HIV- Tests (in 1,000)")))
@@ -131,13 +131,13 @@ plot_retest_test_neg <- function(mod, fp, likdat, cnt, relative = F,
          main = main_title,
          xlim = c(2000, yr_pred),  ylim = c(0, max(out_retest$tests/1000)*1.2),
          ylab=expression(paste(N^o, " of HIV- Tests (in 1,000)")), xlab = 'Year', lty = 1, lwd = 1)
-    polygon(x = c(out_retest$year, rev(out_retest$year)),
+    graphics::polygon(x = c(out_retest$year, rev(out_retest$year)),
             y = c(rep(0, length = length(out_retest$tests)), rev(out_retest$first_test/1000)),
             col = col1, border = NA)
-    polygon(x = c(out_retest$year, rev(out_retest$year)),
+    graphics::polygon(x = c(out_retest$year, rev(out_retest$year)),
             y = c(out_retest$tests/1000, rev(out_retest$first_test/1000)),
             col = col2, border = NA)
-    legend('topleft', inset = 0.02, legend = c('Repeat Testers','First-Time Testers'), 
+    graphics::legend('topleft', inset = 0.02, legend = c('Repeat Testers','First-Time Testers'),
            col = c(col2, col1), bty = 'n', pch = c(15,15), pt.cex = 2, cex = 0.9)
   } else if(relative == T) {
     if (plot_title == TRUE) { main_title <- "Proportion of HIV- Tests \n Among Never and Ever Tested"
@@ -146,13 +146,13 @@ plot_retest_test_neg <- function(mod, fp, likdat, cnt, relative = F,
     plot((out_retest$tests/out_retest$tests)*100 ~ out_retest$year, type='l', ylim=c(0,100), col=col1, 
          main = main_title,
          xlim = c(2000, yr_pred), ylab='Proportion of Total HIV- Tests (%)', xlab='Year', lty=1, lwd=1)
-    polygon(x = c(out_retest$year, rev(out_retest$year)),
+    graphics::polygon(x = c(out_retest$year, rev(out_retest$year)),
             y = c((out_retest$retest/out_retest$tests)*100, rep(100, length = length(out_retest$tests))),
             col = col1, border = NA)
-    polygon(x = c(out_retest$year, rev(out_retest$year)),
+    graphics::polygon(x = c(out_retest$year, rev(out_retest$year)),
             y = c(rep(0, length = length(out_retest$tests)), rev((out_retest$retest/out_retest$tests)*100)),
             col = col2, border = NA)
-    legend('topleft', inset = 0.02, legend = c('% Repeat Testers','% First-Time Testers'), 
+    graphics::legend('topleft', inset = 0.02, legend = c('% Repeat Testers','% First-Time Testers'),
            col = c(col2, col1), bg = 'grey90', box.col = 'grey90', pch = c(15,15), pt.cex = 2, cex = 0.8)
     } else {
     print('True for relative scale, False for absolute scale')
@@ -184,9 +184,9 @@ plot_retest_test_pos <- function(mod, fp, likdat, cnt, relative = F,
   
   ylim <- c(0, max(out_retest$tests/1000, na.rm = TRUE) * 1.3)
   
-  col1 <- rgb(230, 180, 205, 200, max=255)
-  col2 <- rgb(150, 0, 50, 200, max=255)
-  col3 <- rgb(100, 0, 100, 200, max=255)
+  col1 <- grDevices::rgb(230, 180, 205, 200, max=255)
+  col2 <- grDevices::rgb(150, 0, 50, 200, max=255)
+  col3 <- grDevices::rgb(100, 0, 100, 200, max=255)
     
   if (plot_title == TRUE) {
     main_title <- "Distribution of HIV+ Tests by \n Awareness and ART Status"
@@ -199,32 +199,32 @@ plot_retest_test_pos <- function(mod, fp, likdat, cnt, relative = F,
          main = main_title,
          xlim = c(2000, yr_pred),
          ylab = expression(paste(N^o, " of HIV+ Tests (in 1,000)")), xlab = 'Year')
-    polygon(x = c(out_retest$year, rev(out_retest$year)),
+    graphics::polygon(x = c(out_retest$year, rev(out_retest$year)),
             y = c(out_retest$newuna/1000, rev(out_retest$tests/1000)),
             col = col1, border = NA)
-    polygon(x = c(out_retest$year, rev(out_retest$year)),
+    graphics::polygon(x = c(out_retest$year, rev(out_retest$year)),
             y = c(out_retest$newdiag/1000, rev(out_retest$newuna/1000)),
             col = col2, border = NA)
-    polygon(x = c(out_retest$year, rev(out_retest$year)),
+    graphics::polygon(x = c(out_retest$year, rev(out_retest$year)),
             y = c(rep(0, length = length(out_retest$tests)), rev(out_retest$newdiag/1000)),
             col = col3, border = NA)
     if (plot_legend) { 
-    legend('topleft', inset = 0.02, legend = c('Retests - PLHIV on ART','Retests - Aware Not on ART','New Diagnoses'), 
+    graphics::legend('topleft', inset = 0.02, legend = c('Retests - PLHIV on ART','Retests - Aware Not on ART','New Diagnoses'),
            col=c(col1, col2, col3), bty = 'n', pch = c(15,15, 15), pt.cex = 2, cex = 0.9) }
   } else if(relative == T) {
     plot((out_retest$tests/out_retest$tests)*100 ~ out_retest$year, type='n', ylim = c(0,100), 
          main = "Distribution of HIV+ Tests by \n Awareness and ART Status",
          xlim = c(2000, yr_pred), ylab = "Proportion of Total HIV+ Tests (%)", xlab = 'Year', lty=1, lwd=1)
-    polygon(x = c(out_retest$year, rev(out_retest$year)),
+    graphics::polygon(x = c(out_retest$year, rev(out_retest$year)),
             y = c((out_retest$newuna/out_retest$tests)*100, rev((out_retest$tests/out_retest$tests)*100)),
             col = col1, border = NA)
-    polygon(x = c(out_retest$year, rev(out_retest$year)),
+    graphics::polygon(x = c(out_retest$year, rev(out_retest$year)),
             y = c((out_retest$newdiag/out_retest$tests)*100, rev((out_retest$newuna/out_retest$tests)*100)),
             col = col2, border = NA)
-    polygon(x = c(out_retest$year, rev(out_retest$year)),
+    graphics::polygon(x = c(out_retest$year, rev(out_retest$year)),
             y = c(rep(0, length = length(out_retest$tests)), rev((out_retest$newdiag/out_retest$tests)*100)),
             col = col3, border = NA)
-    legend('bottomleft', inset = 0.02, legend = c('% Retests - PLHIV on ART','% Retests - Aware Not on ART','% New Diagnoses'), 
+    graphics::legend('bottomleft', inset = 0.02, legend = c('% Retests - PLHIV on ART','% Retests - Aware Not on ART','% New Diagnoses'),
            col = c(col1, col2, col3), bg = 'grey90', box.col = 'grey90', pch = c(15,15, 15), pt.cex = 2, cex = 0.8)
   } else {
     print('TRUE for relative scale; FALSE for absolute scale')
@@ -277,9 +277,9 @@ plot_prv_pos_yld <- function(mod, fp, likdat, cnt, yr_pred = 2022,
     
   ylim <- c(0, ifelse(max(c(prv, yld, ndx) * 1.3, na.rm = TRUE) > 1, 1, max(c(prv, yld, ndx) * 1.3, na.rm = TRUE))) * 100
   
-  col1 <- rgb(255, 155, 50, 250, max = 255)
-  col2 <- rgb(255, 0, 130, 250, max = 255)
-  col3 <- rgb(100, 0, 100, 250, max = 255)
+  col1 <- grDevices::rgb(255, 155, 50, 250, max = 255)
+  col2 <- grDevices::rgb(255, 0, 130, 250, max = 255)
+  col3 <- grDevices::rgb(100, 0, 100, 250, max = 255)
   
   if (plot_title == TRUE) {
     main_title <- "HIV Prevalence (15+), Positivity, and \n Yield of New HIV Diagnoses"
@@ -291,12 +291,10 @@ plot_prv_pos_yld <- function(mod, fp, likdat, cnt, yr_pred = 2022,
          main = main_title,
          xlim = c(2000, yr_pred), col = col1, lty = 2, lwd = 1.5, 
          ylab = "Proportion (%)", xlab = 'Year')
-    lines(I(yld * 100) ~ out_test$year, col = col2, lwd = 1.5)
-    lines(I(ndx * 100) ~ out_postest$year, col = col3, lwd = 1.5)
+    graphics::lines(I(yld * 100) ~ out_test$year, col = col2, lwd = 1.5)
+    graphics::lines(I(ndx * 100) ~ out_postest$year, col = col3, lwd = 1.5)
     if (plot_legend) { 
-    legend('topright', inset = 0.01, legend = c('HIV Prevalence (15+)','Positivity','Yield of New Diagnoses'), 
+    graphics::legend('topright', inset = 0.01, legend = c('HIV Prevalence (15+)','Positivity','Yield of New Diagnoses'),
            col=c(col1, col2, col3), bty = 'n', lty = c(2, 1, 1), lwd = 1.5, cex = 0.7) }
  
 }
-  
-  

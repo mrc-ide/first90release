@@ -134,9 +134,9 @@ extract_pjnz <- function(pjnz = NULL, dp_file= NULL, pjn_file = NULL){
     v$art15plus_num <- v$art15plus_num * adult_artadj_factor
   }
 
-  v$art15plus_eligthresh <- setNames(as.numeric(dpsub(dp, "<CD4ThreshHoldAdults MV>", 2, col_idx)), proj_years)
+  v$art15plus_eligthresh <- stats::setNames(as.numeric(dpsub(dp, "<CD4ThreshHoldAdults MV>", 2, col_idx)), proj_years)
 
-  artelig_specpop <- setNames(dpsub(dp, "<PopsEligTreat MV>", 3:9, 2:6),
+  artelig_specpop <- stats::setNames(dpsub(dp, "<PopsEligTreat MV>", 3:9, 2:6),
                               c("description", "pop", "elig", "percent", "year"))
   artelig_specpop$pop <- c("PW", "TBHIV", "DC", "FSW", "MSM", "IDU", "OTHER")
   artelig_specpop$elig <- as.logical(as.integer(artelig_specpop$elig))
@@ -146,8 +146,8 @@ extract_pjnz <- function(pjnz = NULL, dp_file= NULL, pjn_file = NULL){
   rownames(artelig_specpop) <- artelig_specpop$pop
   v$artelig_specpop <- artelig_specpop
 
-  v$median_cd4init <- setNames(as.numeric(dpsub(dp, "<MedCD4CountInit MV>", 2, col_idx)), proj_years)
-  v$art_dropout <- setNames(as.numeric(dpsub(dp, "<PercLostFollowup MV>", 2, col_idx)), proj_years)
+  v$median_cd4init <- stats::setNames(as.numeric(dpsub(dp, "<MedCD4CountInit MV>", 2, col_idx)), proj_years)
+  v$art_dropout <- stats::setNames(as.numeric(dpsub(dp, "<PercLostFollowup MV>", 2, col_idx)), proj_years)
 
   v$art_alloc_method <- get_dp_art_alloc_method(dp)
   v$art_prop_alloc <- get_dp_art_prop_alloc(dp)
@@ -763,7 +763,7 @@ get_pjn_iso3 <- function(pjn){
 
 #' @export
 file_in_zip <- function(zfile, ext){
-  ff <- grep(ext, unzip(zfile, list = TRUE)$Name, value = TRUE)
+  ff <- grep(ext, utils::unzip(zfile, list = TRUE)$Name, value = TRUE)
   unz(zfile, ff)
 }
 
