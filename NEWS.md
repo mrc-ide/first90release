@@ -1,3 +1,7 @@
+# first90 1.6.10
+
+* Qualify package names, fix some R CMD warnings and notes
+
 # first90 1.6.9
 
 * Bug fix: account for end-year net migration in the ART population in the first year of ART start (implemented in v1.6.0).
@@ -122,7 +126,7 @@ Updates for 2022 UNAIDS estimates:
 
 # first90 1.4.3
 
-* Patch: in function `add_ss_indices()`, add argument `utils::type.convert(..., as.is = TRUE)` 
+* Patch: in function `add_ss_indices()`, add argument `type.convert(..., as.is = TRUE)` 
   to suppress R 4.0 warning.
 * Bugfix: remove duplicate declaration of `double incrate_g[NG];` in `EPP_DIRECTINCID` incidence
   option. This did not affect any results because this option is not used in Shiny90 application; 

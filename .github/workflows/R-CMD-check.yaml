@@ -46,7 +46,7 @@ jobs:
 
       - uses: actions/checkout@master
         with:
-          name: mrc-ide/shiny90_sample_files
+          repository: mrc-ide/shiny90_sample_files
           ## ${{ github.token }} is scoped to the current repository, so we
           ## need to provide our own PAT
           token: ${{ secrets.SAMPLE_FILES_GH_PAT }}
