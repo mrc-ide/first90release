@@ -1,3 +1,7 @@
+# first90 1.6.10
+
+* Qualify package names, fix some R CMD warnings and notes
+
 # first90 1.6.9
 
 * Bug fix: account for end-year net migration in the ART population in the first year of ART start (implemented in v1.6.0).

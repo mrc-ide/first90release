@@ -7,6 +7,7 @@
 .DS_Store
 .idea
 tests/testthat/sample_files
+tests/testthat/Rplots.pdf
 *.tar.gz
 *.Rcheck
 

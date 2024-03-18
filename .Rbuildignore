@@ -1,5 +1,11 @@
 ^README\.Rmd$
+^README\.md$
+^\.idea$
 ^data-raw$
 ^LICENSE\.md$
 ^dev$
-^.travis.yml$
+^.*\.Rproj$
+^\.Rproj\.user$
+^.github$
+^.ProgramDataGuidance\.md$
+^.SurveyDataGuidance\.md$

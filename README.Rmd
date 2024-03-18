@@ -18,7 +18,7 @@ library(data.table)
 ```
 # first90
 
-[![Travis-CI Build Status](https://travis-ci.com/mrc-ide/first90release.svg?branch=master)](https://travis-ci.com/mrc-ide/first90release)
+![R CMD check](https://github.com/mrc-ide/first90release/actions/workflows/R-CMD-check.yml/badge.svg)
 
 UNAIDS put forward the ambitious 90-90-90 target to end the AIDS epidemic by 2030. This target aims for 90% of people living with HIV (PLHIV) to be aware of their HIV-positive status, 90% of those diagnosed to receive antiretroviral therapy, and 90% of those on treatment to have a suppressed viral load by 2020 (each reaching 95% by 2030). HIV testing remains an important bottleneck in this cascade, however, and obtaining reliable epidemiological data on the proportion of PLHIV aware of their status is difficult. Such information is nevertheless crucial to effectively monitor HIV prevention efforts. Tracking progress towards achievement of this “first 90” target could be improved by combining population-based surveys and programmatic data on the number of HIV tests performed (and yield) in a coherent deterministic/statistical model. This type of integrative systems modelling is especially useful to fully consider HIV incidence, mortality, testing behaviours, as well as to coherently combine different sources of data. 
 
@@ -146,18 +146,18 @@ first90::plot_out_evertest_mbyage(mod, fp, likdat, cnt, survey_hts, out_evertest
 We can compare HIV tests' positivity through time, the estimated *true* yield of new HIV diagnoses, and compare those to population-level HIV prevalence.
 
 ```{r, fig.height = 5, fig.width = 5, warning = FALSE}
-par(mfrow = c(1,1))
+graphics::par(mfrow = c(1,1))
 first90::plot_prv_pos_yld(mod, fp, likdat, cnt, yr_pred = 2018)
 ```
 
 We can also examine some ouptuts related to the distribution of HIV tests performed in those susceptibles to HIV and PLHIV by different awareness and treatment status. (First sets of graphs is on the absolute scale, second one on the relative scale.)
 
 ```{r, fig.height = 5, fig.width = 8.5, warning = FALSE}
-par(mfrow = c(1,2))
+graphics::par(mfrow = c(1,2))
 first90::plot_retest_test_neg(mod, fp, likdat, cnt)
 first90::plot_retest_test_pos(mod, fp, likdat, cnt)
 
-par(mfrow = c(1,2))
+graphics::par(mfrow = c(1,2))
 first90::plot_retest_test_neg(mod, fp, likdat, cnt, relative = TRUE)
 first90::plot_retest_test_pos(mod, fp, likdat, cnt, relative = TRUE)
 ```

@@ -13,5 +13,5 @@ get_pjn_country(pjn)
 Get country name from parsed PJN
 }
 \details{
-\code{pjn} should be via \code{read.csv(pjn_file, as.is = TRUE)}
+\code{pjn} should be via \code{first90_read_csv_character(pjn_file)}
 }
