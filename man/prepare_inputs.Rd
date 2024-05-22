@@ -21,7 +21,8 @@ The aggregation makes a number of assumptions:
 }
 \examples{
 
-pjnzlist <- list.files("~/Documents/Data/Spectrum files/2018 final/SSA/", "CotedIvoire.*PJNZ$", full.names=TRUE, ignore.case=TRUE)
+pjnzlist <- list.files("~/Documents/Data/Spectrum files/2018 final/SSA/",
+  "CotedIvoire.*PJNZ$", full.names=TRUE, ignore.case=TRUE)
 pjnzlist <- "~/Documents/Data/Spectrum files/2018 final/SSA/Malawi_2018_version_8.PJNZ"
 
 }

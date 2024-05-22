@@ -19,8 +19,8 @@ simul.sample <- function(hessian, par, fp, sim = 3000, likdat = NULL, SIR = FALS
     ev <- eS$values
     if (!all(ev >= -1e-06 * abs(ev[1L]))) {
         vcova <- Matrix::nearPD(vcova, corr = FALSE)$mat
-        vcova <- matrix(vcova@x, 
-                        nrow = vcova@Dim[1], 
+        vcova <- matrix(vcova@x,
+                        nrow = vcova@Dim[1],
                         ncol = vcova@Dim[2] )
         }
 
@@ -33,7 +33,10 @@ simul.sample <- function(hessian, par, fp, sim = 3000, likdat = NULL, SIR = FALS
     # Sampling Importance Resampling
     # http://www.sumsar.net/blog/2013/12/shaping_up_laplace_approximation/
     if (SIR == TRUE) {
-        if (is.null(likdat)) { print('SIR needs to include <likdat>'); break }
+        if (is.null(likdat)) {
+          print('SIR needs to include <likdat>')
+          return()
+        }
         # Sample parameters from multivariate t-distribution to get thicker tails
         par_sir <- mvtnorm::rmvt(n = nsir, delta = par, sigma = as.matrix(vcova), df = 2)
         # We had the mode to the resampled values (to be sure that it is included in the CI)
@@ -99,7 +102,7 @@ simul.run <- function(samp, fp, progress = NULL){
     nbtestpos_ss <- add_ss_indices(out_nbtest_pos, fp$ss)
     nbtest_ss$hivstatus <- as.character(nbtest_ss$hivstatus)
     nbtestpos_ss$hivstatus <- as.character(nbtestpos_ss$hivstatus)
-    
+
     # Create parameters (proper scale, etc.), and simulate model
     for (i in 1:nrow(samp)){
         fp <- create_hts_param(samp[i,], fp)
@@ -123,7 +126,7 @@ simul.run <- function(samp, fp, progress = NULL){
 # Simulation of the dataset
 #' @export
 simul.test <- function(opt, fp, sim = 3000, likdat = NULL,
-                       SIR = FALSE, nsir = 50000, with_replacement = TRUE, 
+                       SIR = FALSE, nsir = 50000, with_replacement = TRUE,
                        sir_progress = NULL, run_progress = NULL){
 
     samp <- simul.sample(opt$hessian, opt$par, fp, sim = sim, likdat = likdat,
@@ -131,13 +134,13 @@ simul.test <- function(opt, fp, sim = 3000, likdat = NULL,
     simul.run(samp, fp, progress = run_progress)
 }
 
-# Get the confidence interval for the data, first for parameters, second for 
+# Get the confidence interval for the data, first for parameters, second for
 # the data itself
 getCI <- function(df) {
   n_col <- ncol(df)
   # Function for the confidence interval of the estimates
   CI <- apply(X = df[,(6:n_col)], MARGIN = 1,
-              FUN = quantile, probs = c(0.025, 0.975), na.rm = TRUE)
+              FUN = stats::quantile, probs = c(0.025, 0.975), na.rm = TRUE)
   lower <- CI[1,]
   upper <- CI[2,]
   df1 <- data.frame(df[c(1:5)], lower, upper)

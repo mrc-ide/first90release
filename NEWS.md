@@ -1,6 +1,7 @@
 # first90 1.6.10
 
 * Implement recovery to next higher CD4 category following ART interruption for those on ART greater than one year.
+* Qualify package names, fix some R CMD warnings and notes
 
 # first90 1.6.9
 

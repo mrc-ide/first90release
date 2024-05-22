@@ -54,9 +54,9 @@ prb_dx_one_yr <- function(fp, year = c(2000:2022), age = "15-24", sex = "male", 
       ind_yr <- year[n] - fp$ss$proj_start + 1
       
       # what is the average age of incident HIV infection
-      avg_age15 <- 14 + weighted.mean(1:10, w = fp$infections[1:10, ind_sex, ind_yr])
-      avg_age25 <- 14 + weighted.mean(11:20, w = fp$infections[11:20, ind_sex, ind_yr])
-      avg_age35 <- 14 + weighted.mean(21:35, w = fp$infections[21:35, ind_sex, ind_yr])
+      avg_age15 <- 14 + stats::weighted.mean(1:10, w = fp$infections[1:10, ind_sex, ind_yr])
+      avg_age25 <- 14 + stats::weighted.mean(11:20, w = fp$infections[11:20, ind_sex, ind_yr])
+      avg_age35 <- 14 + stats::weighted.mean(21:35, w = fp$infections[21:35, ind_sex, ind_yr])
       
       # Testing rates by CD4 category
       test_rate15 <- fp$diagn_rate[, 1, ind_sex, ind_th, ind_yr]
@@ -186,7 +186,7 @@ pool_prb_dx_one_yr <- function(mod, fp, year = c(2000:2022),
           denom$w_e[denom$agegr == time_mat$age[i] & denom$sex == time_mat$sex[i]]
       } }
     time_mat_sel <- time_mat[time_mat$age %in% age & time_mat$sex %in% sex, ]
-    val$prb1yr[val$year == year[n]] <- weighted.mean(time_mat_sel$prb1, w = time_mat_sel$w)    
+    val$prb1yr[val$year == year[n]] <- stats::weighted.mean(time_mat_sel$prb1, w = time_mat_sel$w)
   }
   return(val)
 }
@@ -217,7 +217,7 @@ simul_pool_prb_dx_one_yr <- function(samp, mod, fp, year = c(2010:2022),
                     prb1yr = NA, prb1yr_lci = NA, prb1yr_uci = NA)
   
   for (n in 1:n_year) {
-    uncertainty <- quantile(val_df$prb1yr[val_df$year == year[n]], probs = c(0.5, 0.025, 0.975))
+    uncertainty <- stats::quantile(val_df$prb1yr[val_df$year == year[n]], probs = c(0.5, 0.025, 0.975))
     val$prb1yr[val$year == year[n]] <- uncertainty[1]
     val$prb1yr_lci[val$year == year[n]] <- uncertainty[2]
     val$prb1yr_uci[val$year == year[n]] <- uncertainty[3]

@@ -60,16 +60,16 @@ create_hts_param <- function(theta, fp) {
   n_k1 <- length(knots) - 1 # we remove 1995
   n_k2 <- n_k1 + length(knots_rr_dxunt)
   rate_f <- exp(theta[1:n_k1])
-  rr_dxunt <- plogis(theta[(n_k1 + 1):n_k2]) * 8 # Range is 0-8
-  rr_m <- plogis(theta[(n_k2 + 1):(n_k2 + 2)]) * 1.1
-  rr_test <- 0.95 + plogis(theta[(n_k2 + 3):(n_k2 + 4)]) * 7.05 # Range is 1-8
-  rr_plhiv <- 0.05 + plogis(theta[n_k2 + 5]) * (1.95 - 0.05)
-  rr_dxart <- plogis(theta[n_k2 + 6]) 
-  rr_25m <- 0.1 + plogis(theta[n_k2 + 7]) * (6 - 0.1)
-  rr_35m <- 0.1 + plogis(theta[n_k2 + 8]) * (6 - 0.1)
-  rr_25f <- 0.1 + plogis(theta[n_k2 + 9]) * (6 - 0.1)
-  rr_35f <- 0.1 + plogis(theta[n_k2 + 10]) * (6 - 0.1)
-  pr_oidx <- 0.25 + (plogis(theta[n_k2 + 11]) * (1.75 - 0.25))
+  rr_dxunt <- stats::plogis(theta[(n_k1 + 1):n_k2]) * 8 # Range is 0-8
+  rr_m <- stats::plogis(theta[(n_k2 + 1):(n_k2 + 2)]) * 1.1
+  rr_test <- 0.95 + stats::plogis(theta[(n_k2 + 3):(n_k2 + 4)]) * 7.05 # Range is 1-8
+  rr_plhiv <- 0.05 + stats::plogis(theta[n_k2 + 5]) * (1.95 - 0.05)
+  rr_dxart <- stats::plogis(theta[n_k2 + 6])
+  rr_25m <- 0.1 + stats::plogis(theta[n_k2 + 7]) * (6 - 0.1)
+  rr_35m <- 0.1 + stats::plogis(theta[n_k2 + 8]) * (6 - 0.1)
+  rr_25f <- 0.1 + stats::plogis(theta[n_k2 + 9]) * (6 - 0.1)
+  rr_35f <- 0.1 + stats::plogis(theta[n_k2 + 10]) * (6 - 0.1)
+  pr_oidx <- 0.25 + (stats::plogis(theta[n_k2 + 11]) * (1.75 - 0.25))
   
   # Age function for males and females
   agefn_m <- c(rep(1, 3), rep(rr_25m, 2), rep(rr_35m, 3), rr_35m * 0.8112) # last age group is 50+
@@ -77,15 +77,15 @@ create_hts_param <- function(theta, fp) {
   
   # Time trends in testing rates
   fp$t_hts_start <- as.integer(1995 - fp$ss$proj_start + 1L)
-  base_rate_f <- approx(knots, c(0, rate_f), seq_len(fp$ss$PROJ_YEARS), rule = 2)$y
+  base_rate_f <- stats::approx(knots, c(0, rate_f), seq_len(fp$ss$PROJ_YEARS), rule = 2)$y
   
   knots_rr_m <- c(2005, 2012) - fp$ss$proj_start + 1L
-  rr_m <- approx(knots_rr_m, rr_m, seq_len(fp$ss$PROJ_YEARS), rule = 2)$y
+  rr_m <- stats::approx(knots_rr_m, rr_m, seq_len(fp$ss$PROJ_YEARS), rule = 2)$y
   base_rate_m <- base_rate_f * rr_m
   
   # Retest with time 
   knots_rr_test <- c(2005, 2010, 2015) - fp$ss$proj_start + 1L
-  rate_rr_test <- exp(approx(knots_rr_test, log(c(1, rr_test)), seq_len(fp$ss$PROJ_YEARS), rule = 2)$y)
+  rate_rr_test <- exp(stats::approx(knots_rr_test, log(c(1, rr_test)), seq_len(fp$ss$PROJ_YEARS), rule = 2)$y)
   
   ## Testing rate for HIV negative population:
   ## 1: never tested
@@ -147,7 +147,7 @@ create_hts_param <- function(theta, fp) {
   
   ## Relative testing among aware
   # Re-testing rate among PLHIV aware (not on ART)
-  rate_dxunt <- approx(knots_rr_dxunt, rr_dxunt, seq_len(fp$ss$PROJ_YEARS), rule = 2)$y
+  rate_dxunt <- stats::approx(knots_rr_dxunt, rr_dxunt, seq_len(fp$ss$PROJ_YEARS), rule = 2)$y
   
   diagn_rate_dxunt <- sweep(diagn_rate[,,,3,, drop = FALSE], 5, rate_dxunt, "*")
   diagn_rate[,,,3,] <- diagn_rate_dxunt 
@@ -162,4 +162,3 @@ create_hts_param <- function(theta, fp) {
   
   fp
 }
-

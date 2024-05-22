@@ -4,8 +4,7 @@ Please edit that file and run `knitr::knit("README.Rmd") from the root of this d
 
 # first90
 
-[![Travis-CI Build
-Status](https://travis-ci.com/mrc-ide/first90release.svg?branch=master)](https://travis-ci.com/mrc-ide/first90release)
+![R CMD check](https://github.com/mrc-ide/first90release/actions/workflows/R-CMD-check.yml/badge.svg)
 
 UNAIDS put forward the ambitious 90-90-90 target to end the AIDS
 epidemic by 2030. This target aims for 90% of people living with HIV
