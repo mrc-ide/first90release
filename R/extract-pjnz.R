@@ -16,7 +16,7 @@ first90_read_csv_character <- function(file) {
 #' @return a list
 #'
 #' @export
-extract_pjnz <- function(pjnz = NULL, dp_file= NULL, pjn_file = NULL){
+extract_pjnz <- function(pjnz = NULL, dp_file= NULL, pjn_file = NULL) {
 
   if(!is.null(pjnz) && is.null(dp_file) && is.null(pjn_file)) {
     dp_file <- file_in_zip(pjnz, ".DP$")
@@ -164,14 +164,14 @@ extract_pjnz <- function(pjnz = NULL, dp_file= NULL, pjn_file = NULL){
 #'
 #' @export
 
-combine_inputs <- function(lst){
+combine_inputs <- function(lst) {
 
   stopifnot(vapply(lst, "[[", integer(1), "yr_start") == lst[[1]]$yr_start,
             vapply(lst, "[[", integer(1), "yr_end") == lst[[1]]$yr_end)
 
   ## # Convert any ART percentage inputs to counts
   lst <- lapply(lst, 
-                function(x){
+                function(x) {
                   isperc <- x$art15plus_numperc == 1
                   x$art15plus_num[isperc] <- x$art15plus_needart[isperc] * x$art15plus_num[isperc] / 100
                   x$art15plus_numperc[] <- 0
@@ -277,19 +277,19 @@ combine_inputs <- function(lst){
 
 #' Internal helper functions
 #' 
-exists_dptag <- function(dp, tag, tagcol=1){tag %in% dp[,tagcol]}
+exists_dptag <- function(dp, tag, tagcol=1) {tag %in% dp[,tagcol]}
 
-dpsub <- function(dp, tag, rows, cols, tagcol=1){
+dpsub <- function(dp, tag, rows, cols, tagcol=1) {
   dp[which(dp[,tagcol]==tag)+rows, cols]
 }
 
-specpop_dimnames <- function(proj_years){
+specpop_dimnames <- function(proj_years) {
   list(age = 0:80,
        sex = c("male", "female"),
        year = proj_years )
 }
 
-agegr_labels <- function(){
+agegr_labels <- function() {
   c("0-4", "5-9", "10-14", "15-19", "20-24", "25-29", "30-34", 
     "35-39", "40-44", "45-49", "50-54", "55-59", "60-64", "65-69", 
     "70-74", "75-79", "80+")
@@ -305,7 +305,7 @@ fAG <- 7  # fertile age groups
 #' Extract arrays from Spectrum DP file
 #'
 #' @export
-get_dp_totpop <- function(dp, proj_years){
+get_dp_totpop <- function(dp, proj_years) {
 
   dn <- specpop_dimnames(proj_years)  
   col_idx <- 3 + seq_along(proj_years)
@@ -325,7 +325,7 @@ get_dp_totpop <- function(dp, proj_years){
   totpop
 }
 
-get_dp_hivpop <- function(dp, proj_years){
+get_dp_hivpop <- function(dp, proj_years) {
 
   dn <- specpop_dimnames(proj_years)
   col_idx <- 3 + seq_along(proj_years)
@@ -340,7 +340,7 @@ get_dp_hivpop <- function(dp, proj_years){
   hivpop
 }
 
-get_dp_artpop <- function(dp, proj_years){
+get_dp_artpop <- function(dp, proj_years) {
 
   dn <- specpop_dimnames(proj_years)
   col_idx <- 3 + seq_along(proj_years)
@@ -354,7 +354,7 @@ get_dp_artpop <- function(dp, proj_years){
   artpop
 }
 
-get_dp_infections5yr <- function(dp, proj_years){
+get_dp_infections5yr <- function(dp, proj_years) {
 
   dn <- list(agegr = agegr_labels(), sex = c("male", "female"), year = proj_years)
 
@@ -365,7 +365,7 @@ get_dp_infections5yr <- function(dp, proj_years){
   v
 }
 
-get_dp_infections <- function(dp, proj_years){
+get_dp_infections <- function(dp, proj_years) {
 
   dn <- specpop_dimnames(proj_years)
   v <- dpsub(dp, "<NewInfectionsBySingleAge MV>", 2:244, 3+seq_along(proj_years))
@@ -383,7 +383,7 @@ get_dp_infections <- function(dp, proj_years){
 #' separate Sx for age 80. The population projection model in EPP-ASM needs
 #' to be updated to handle this.
 #' 
-get_dp_Sx <- function(dp, proj_years){
+get_dp_Sx <- function(dp, proj_years) {
 
   dn <- specpop_dimnames(proj_years)
   col_idx <- 3 + seq_along(proj_years)
@@ -397,7 +397,7 @@ get_dp_Sx <- function(dp, proj_years){
   Sx
 }
 
-get_dp_totnetmig <- function(dp, proj_years){
+get_dp_totnetmig <- function(dp, proj_years) {
 
   col_idx <- 3 + seq_along(proj_years)
 
@@ -411,7 +411,7 @@ get_dp_totnetmig <- function(dp, proj_years){
   totnetmig
 }
 
-get_dp_netmigagedist <- function(dp, proj_years){
+get_dp_netmigagedist <- function(dp, proj_years) {
 
   col_idx <- 3 + seq_along(proj_years)
 
@@ -431,7 +431,7 @@ get_dp_netmigagedist <- function(dp, proj_years){
 #' Get sex ratio at birth
 #'
 #' @export
-get_dp_srb <- function(dp, proj_years){
+get_dp_srb <- function(dp, proj_years) {
 
   srb <- dpsub(dp, "<SexBirthRatio MV>", 2, 3+seq_along(proj_years))
   srb <- as.numeric(srb)
@@ -443,7 +443,7 @@ get_dp_srb <- function(dp, proj_years){
 #' Get age-specific fertility rate by single-year
 #'
 #' @export
-get_dp_tfr <- function(dp, proj_years){
+get_dp_tfr <- function(dp, proj_years) {
 
   tfr <- dpsub(dp, "<TFR MV>", 2, 3+seq_along(proj_years))
   tfr <- as.numeric(tfr)
@@ -451,7 +451,7 @@ get_dp_tfr <- function(dp, proj_years){
   tfr
 }
 
-get_dp_asfd <- function(dp, proj_years){
+get_dp_asfd <- function(dp, proj_years) {
   
   asfd <- dpsub(dp, "<ASFR MV>", 3:9, 3+seq_along(proj_years))
   asfd <- as.numeric(unlist(asfd))/100
@@ -463,7 +463,7 @@ get_dp_asfd <- function(dp, proj_years){
   asfd
 }
 
-get_dp_births <- function(dp, proj_years){
+get_dp_births <- function(dp, proj_years) {
   births <- dpsub(dp, "<Births MV>", 2, 3+seq_along(proj_years))
   births <- as.numeric(births)
   names(births) <- proj_years
@@ -474,11 +474,11 @@ get_dp_births <- function(dp, proj_years){
 #' Extract AIM module parameters
 #' 
 
-get_dp_frr <- function(dp, proj_years){
+get_dp_frr <- function(dp, proj_years) {
 
   col_idx <- 3 + seq_along(proj_years)
   
-  if(exists_dptag(dp, "<HIVTFR MV>")){
+  if(exists_dptag(dp, "<HIVTFR MV>")) {
     fert_rat <- vapply(dpsub(dp, "<HIVTFR MV>", 2:8, col_idx), as.numeric, numeric(fAG))
     dimnames(fert_rat) <- list(agegr = agegr_labels()[4:10], year = proj_years)
   } else if(exists_dptag(dp, "<HIVTFR MV2>")) {
@@ -520,13 +520,13 @@ get_dp_frr <- function(dp, proj_years){
        frr_scalar = frr_scalar)
 }
 
-get_dp_incrr_sex <- function(dp, proj_years){
+get_dp_incrr_sex <- function(dp, proj_years) {
   incrr_sex <- as.numeric(dpsub(dp, "<HIVSexRatio MV>", 2, 3 + seq_along(proj_years)))
   names(incrr_sex) <- proj_years
   incrr_sex
 }
 
-get_dp_incrr_age <- function(dp, proj_years){
+get_dp_incrr_age <- function(dp, proj_years) {
 
   col_idx <- 3 + seq_along(proj_years)
   
@@ -541,7 +541,7 @@ get_dp_incrr_age <- function(dp, proj_years){
   incrr_age
 }
 
-get_dp_cd4_initdist<- function(dp){
+get_dp_cd4_initdist<- function(dp) {
 
   cd4_initdist <- array(NA, c(DS, 4, NG),
                         list(cd4stage=1:DS,
@@ -554,7 +554,7 @@ get_dp_cd4_initdist<- function(dp){
   cd4_initdist
 }
 
-get_dp_cd4_prog<- function(dp){
+get_dp_cd4_prog<- function(dp) {
 
   cd4_prog <- array(NA, c(DS-1, 4, NG),
                     list(cd4stage=1:(DS-1),
@@ -567,7 +567,7 @@ get_dp_cd4_prog<- function(dp){
   cd4_prog
 }
 
-get_dp_cd4_mort<- function(dp){
+get_dp_cd4_mort<- function(dp) {
 
   cd4_mort <- array(NA, c(DS, 4, NG),
                     list(cd4stage=1:DS,
@@ -580,7 +580,7 @@ get_dp_cd4_mort<- function(dp){
   cd4_mort
 }
 
-get_dp_art_mort <- function(dp){
+get_dp_art_mort <- function(dp) {
 
   art_mort <- array(NA, c(TS, DS, 4, NG),
                     list(artdur=c("ART0MOS", "ART6MOS", "ART1YR"),
@@ -607,7 +607,7 @@ get_dp_art_mort <- function(dp){
   art_mort
 }
 
-get_dp_age14hivpop <- function(dp, proj_years){
+get_dp_age14hivpop <- function(dp, proj_years) {
 
   PAED_DS <- 6 # number of paediatric stages of infection
   age14hivpop <- as.numeric(unlist(dpsub(dp, "<ChAged14ByCD4Cat MV>", 1+1:(NG*PAED_DS*(4+TS)), 3+seq_along(proj_years))))
@@ -620,7 +620,7 @@ get_dp_age14hivpop <- function(dp, proj_years){
   age14hivpop
 }
 
-get_dp_art_alloc_method <- function(dp){
+get_dp_art_alloc_method <- function(dp) {
 
   if(exists_dptag(dp, "<NewARTPatAllocationMethod MV2>"))
     art_alloc_method <- as.integer(dpsub(dp, "<NewARTPatAllocationMethod MV2>", 2, 4))
@@ -630,7 +630,7 @@ get_dp_art_alloc_method <- function(dp){
   art_alloc_method
 }
 
-get_dp_art_prop_alloc <- function(dp){
+get_dp_art_prop_alloc <- function(dp) {
 
   if(exists_dptag(dp, "<NewARTPatAlloc MV>"))
     art_prop_alloc <- as.numeric(dpsub(dp, "<NewARTPatAlloc MV>", 2, 4:5))
@@ -641,7 +641,7 @@ get_dp_art_prop_alloc <- function(dp){
   art_prop_alloc
 }
 
-get_dp_scale_cd4_mort <- function(dp){
+get_dp_scale_cd4_mort <- function(dp) {
 
   vers_str <- dpsub(dp, "<ValidVers MV>", 2, 4)
   version <- sub("^([0-9\\.]+).*", "\\1", vers_str)
@@ -657,12 +657,12 @@ get_dp_scale_cd4_mort <- function(dp){
   scale_cd4_mort
 }
 
-get_dp_artmx_timerr <- function(dp, proj_years){
+get_dp_artmx_timerr <- function(dp, proj_years) {
 
   col_idx <- 3 + seq_along(proj_years)
   
   artmx_timerr <- array(1.0, c(3, length(proj_years)), list(artdur=c("ART0MOS", "ART6MOS", "ART1YR"), year = proj_years))
-  if(exists_dptag(dp, "<MortalityRates MV>")){
+  if(exists_dptag(dp, "<MortalityRates MV>")) {
     val <- as.numeric(dpsub(dp, "<MortalityRates MV>", 2, col_idx))
     artmx_timerr["ART0MOS", ] <- val
     artmx_timerr["ART6MOS", ] <- val
@@ -688,7 +688,7 @@ get_dp_artmx_timerr <- function(dp, proj_years){
 #' @param asfd array of proportion of births by 5 year age group 15-49
 #'
 #' @return array of age-specific fertility rate by single-year of age 15-49.
-calc_asfr <- function(tfr, asfd){
+calc_asfr <- function(tfr, asfd) {
 
   ## Normalise the ASFD to sum exactly to 1.0
   asfd_sum <- colSums(asfd)
@@ -702,7 +702,7 @@ calc_asfr <- function(tfr, asfd){
   asfr
 }
 
-calc_netmigr <- function(totnetmig, netmigagedist, Sx){
+calc_netmigr <- function(totnetmig, netmigagedist, Sx) {
 
   ## Normalise netmigagedist to sum to exactly 1.0
   netmigagedist_sum <- colSums(netmigagedist)
@@ -736,7 +736,7 @@ calc_netmigr <- function(totnetmig, netmigagedist, Sx){
 #' @details
 #' `pjn` should be via `first90_read_csv_character(pjn_file)`
 #' @export
-get_pjn_country <- function(pjn){
+get_pjn_country <- function(pjn) {
   cc <- as.integer(pjn[which(pjn[, 1] == "<Projection Parameters>") + 2, 4])
   idx <- which(spectrum5_countrylist$Code == cc)
   return(spectrum5_countrylist$Country[idx])
@@ -747,7 +747,7 @@ get_pjn_country <- function(pjn){
 #' @details
 #' `pjn` should be via `first90_read_csv_character(pjn_file)`
 #' @export
-get_pjn_region <- function(pjn){
+get_pjn_region <- function(pjn) {
   region <- pjn[which(pjn[, 1] == "<Projection Parameters - Subnational Region Name2>") + 2, 4]
   if (is.na(region) || region == "") 
     return(NULL)
@@ -755,7 +755,7 @@ get_pjn_region <- function(pjn){
     return(region)
 }
 
-get_pjn_iso3 <- function(pjn){
+get_pjn_iso3 <- function(pjn) {
   cc <- as.integer(pjn[which(pjn[, 1] == "<Projection Parameters>") + 2, 4])
   idx <- which(spectrum5_countrylist$Code == cc)
   return(spectrum5_countrylist$Code[idx])
@@ -768,7 +768,7 @@ file_in_zip <- function(zfile, ext){
 }
 
 #' @export 
-read_country <- function(pjnz = NULL, pjn_file = NULL){
+read_country <- function(pjnz = NULL, pjn_file = NULL) {
 
   if(!is.null(pjnz) && is.null(pjn_file))
     pjn_file <- file_in_zip(pjnz, ".PJN$")
@@ -780,7 +780,7 @@ read_country <- function(pjnz = NULL, pjn_file = NULL){
 }
 
 #' @export 
-read_region <- function(pjnz = NULL, pjn_file = NULL){
+read_region <- function(pjnz = NULL, pjn_file = NULL) {
 
   if(!is.null(pjnz) && is.null(pjn_file))
     pjn_file <- file_in_zip(pjnz, ".PJN$")

@@ -22,7 +22,7 @@ create_hts_param <- function(theta, fp) {
   # theta_fx <- c(0.05, 0.12, 0.27, 0.27, rep(0.9, 3))
     theta_fx <- c(   0,    0, 0.27, 0.27, rep(0.9, 3)) 
     
-## We name the parameters to be fitted
+  ## We name the parameters to be fitted
   ## Every year new estimates are produced, we need to add one knot
   ## 
   ## # HOTFIX 14 Dec 2020:

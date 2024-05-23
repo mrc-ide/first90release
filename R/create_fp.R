@@ -7,7 +7,8 @@ create_fp <- function(projp,
                       popadjust = TRUE,
                       artelig200adj=TRUE,
                       who34percelig=0,
-                      projection_period = NULL){
+                      projection_period = NULL,
+                      art_dropout_recover_cd4 = NULL) {
 
 
   ## ########################## ##
@@ -165,6 +166,14 @@ create_fp <- function(projp,
   ## percentage of those with CD4 <350 who are based on WHO Stage III/IV infection
   fp$who34percelig <- who34percelig
 
+  if (is.null(art_dropout_recover_cd4)) {
+    fp$art_dropout_recover_cd4 <- projp$spectrum_version >= "6.14"
+  } else {
+    stopifnot(is.logical(art_dropout_recover_cd4))
+    fp$art_dropout_recover_cd4 <- art_dropout_recover_cd4
+  }
+
+  
   fp$art_dropout <- projp$art_dropout[as.character(proj_start:proj_end)]/100
   fp$median_cd4init <- projp$median_cd4init[as.character(proj_start:proj_end)]
   fp$med_cd4init_input <- as.integer(fp$median_cd4init > 0)
@@ -209,15 +218,16 @@ create_fp <- function(projp,
   for(g in 1:NG)
     for(i in 2:PROJ_YEARS){
 
-      if((hiv14[g,i-1] - art14[g,i-1]) > 0)
+      if((hiv14[g,i-1] - art14[g,i-1]) > 0) {
         fp$paedsurv_cd4dist[,g,i] <- hiv_noart14[,g,i-1] %*% cd4convert / (hiv14[g,i-1] - art14[g,i-1])
-      if(art14[g,i-1]){
+      }
+      if(art14[g,i-1]) {
         fp$paedsurv_artcd4dist[,,g,i] <- artpop14[,,g,i-1] %*% cd4convert / art14[g,i-1]
 
         ## if age 14 has ART population in CD4 above adult eligibilty, assign to highest adult
         ## ART eligibility category.
         idx <- fp$artcd4elig_idx[i]
-        if(idx > 1){
+        if(idx > 1) {
           fp$paedsurv_artcd4dist[,idx,g,i] <- fp$paedsurv_artcd4dist[,idx,g,i] + rowSums(fp$paedsurv_artcd4dist[,1:(idx-1),g,i, drop=FALSE])
           fp$paedsurv_artcd4dist[,1:(idx-1),g,i] <- 0
         }
@@ -232,7 +242,7 @@ create_fp <- function(projp,
 
 #'  Beers coefficients to distribute from 5-year to single-year of age
 #'
-create_beers <- function(n5yr){
+create_beers <- function(n5yr) {
 
   ## Beer's coefficients for disaggregating 5 year age groups into
   ## single-year age groups (from John Stover)

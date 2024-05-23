@@ -110,7 +110,7 @@ select_hts <- function(survey_hts, cnt, age_group) {
   dat_fall <- NULL
   dat_mall <- NULL
 
-  if(length(other_survey)){
+  if(length(other_survey)) {
     for (i in 1:length(other_survey)){
       age_strat_f <- unique(survey_hts$agegr[survey_hts$country == cnt & survey_hts$hivstatus == "all" & survey_hts$surveyid == other_survey[i] &
                                              survey_hts$sex == "female" & survey_hts$outcome == "evertest"])
@@ -239,7 +239,7 @@ add_ss_indices <- function(dat, ss) {
 #' @param pjnz_in a list of outputs from extract_pjnz
 #'
 #' @export
-prepare_inputs_from_extracts <- function(pjnz_in){
+prepare_inputs_from_extracts <- function(pjnz_in) {
 
   pjnz_aggr <- combine_inputs(pjnz_in)
 
@@ -290,14 +290,14 @@ prepare_inputs_from_extracts <- function(pjnz_in){
 #' pjnzlist <- "~/Documents/Data/Spectrum files/2018 final/SSA/Malawi_2018_version_8.PJNZ"
 #'
 #' @export
-prepare_inputs <- function(pjnzlist){
+prepare_inputs <- function(pjnzlist) {
 
   pjnz_in <- lapply(pjnzlist, extract_pjnz)
   prepare_inputs_from_extracts(pjnz_in)
 }
 
 
-add_fp <- function(v, fp){
+add_fp <- function(v, fp) {
   fp[names(v)] <- v
   fp
 }
@@ -341,13 +341,13 @@ create_paedsurv_inputs <- function(projp, ss, artcd4elig_idx) {
 
       if((hiv14[g,i-1] - art14[g,i-1]) > 0)
         val$paedsurv_cd4dist[,g,i] <- hiv_noart14[,g,i-1] %*% cd4convert / (hiv14[g,i-1] - art14[g,i-1])
-      if(art14[g,i-1]){
+      if(art14[g,i-1]) {
         val$paedsurv_artcd4dist[,,g,i] <- artpop14[,,g,i-1] %*% cd4convert / art14[g,i-1]
 
         ## if age 14 has ART population in CD4 above adult eligibilty, assign to highest adult
         ## ART eligibility category.
         idx <- artcd4elig_idx[i]
-        if(idx > 1){
+        if(idx > 1) {
           val$paedsurv_artcd4dist[,idx,g,i] <- val$paedsurv_artcd4dist[,idx,g,i] + rowSums(val$paedsurv_artcd4dist[,1:(idx-1),g,i, drop=FALSE])
           val$paedsurv_artcd4dist[,1:(idx-1),g,i] <- 0
         }
@@ -357,18 +357,19 @@ create_paedsurv_inputs <- function(projp, ss, artcd4elig_idx) {
   val
 }
 
-.fp_targetpop <- function(totpop, ss){
+.fp_targetpop <- function(totpop, ss) {
 
   v <- list()
 
   proj_start <- ss$proj_start
   proj_end <- proj_start + ss$PROJ_YEARS - 1L
 
-  if(!length(setdiff(proj_start:proj_end, dimnames(totpop)[[3]]))){
+  if(!length(setdiff(proj_start:proj_end, dimnames(totpop)[[3]]))) {
     v$entrantpop <- totpop[ss$AGE_START,,as.character(proj_start:proj_end)]
     v$targetpop <- totpop[ss$AGE_START+1:ss$pAG,,as.character(proj_start:proj_end)]
-  } else
+  } else {
     stop("targetpop does not span proj_start:proj_end")
+  }
 
   v
 }
