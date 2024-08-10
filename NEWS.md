@@ -1,3 +1,9 @@
+# first90 1.6.11
+
+* Fix bug in R version of simmod() where new infections previously tested negative were
+  subtracted from (instead of added to) the hiv positive. Implementation in C++ version was 
+  correct (thanks Andrey Kutsyh).
+
 # first90 1.6.10
 
 * Implement recovery to next higher CD4 category following ART interruption for those on ART greater than one year.
