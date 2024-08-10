@@ -250,7 +250,7 @@ simmod <- function(fp, VERSION = "C") {
           testneg_infections_ha <- infections_ha * (testnegpop[,,hivn.idx,i] / hivn_pop_ha)
 
           grad_tn[ , , hivn.idx] <- grad_tn[ , , hivn.idx] - testneg_infections_ha
-          grad_tn[ , , hivp.idx] <- grad_tn[ , , hivp.idx] - testneg_infections_ha
+          grad_tn[ , , hivp.idx] <- grad_tn[ , , hivp.idx] + testneg_infections_ha
         }
 
         ## Do new diagnoses
