@@ -64,7 +64,7 @@ ll_prgdat <- function(mod, fp, dat) {
 ## -- UPDATE HERE --
 ## * max_year = <current_year> incremented each year
 
-art_constraint_penalty <- function(mod, fp, max_year = 2022) {
+art_constraint_penalty <- function(mod, fp, max_year = 2023) {
   ind_year <- c(2000:max_year) - fp$ss$proj_start + 1L
   tot_late <- apply(attr(mod, "late_diagnoses")[,,, ind_year], 4, sum)
   tot_untreated_pop <- apply(attr(mod, "hivpop")[,,, ind_year], 4, sum)
@@ -74,7 +74,7 @@ art_constraint_penalty <- function(mod, fp, max_year = 2022) {
   return(penalty)
 }
 # Include this in ll_hts if you want to incorporate the likelihood constraint on ART.
-  # val_art_penalty <- art_constraint_penalty(mod, fp, max_year = 2022)
+  # val_art_penalty <- art_constraint_penalty(mod, fp, max_year = 2023)
   # val <- val1 + val2 + val3 + val_prior + val_art_penalty
 
 # Function to prepare the data for input in the likelihood function.

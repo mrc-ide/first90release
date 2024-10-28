@@ -37,7 +37,7 @@ select_prgmdata <- function(prgm_dat, cnt, age_group) {
     ## * year vector needs to be extended to output results to current year
 
     prg_dat <- data.frame(country = cnt,
-                          year = 2010:2022,
+                          year = 2010:2023,
                           agegr = '15-99', sex = 'both',
                           tot = NA, totpos = NA,
                           vct = NA, vctpos = NA, anc = NA, ancpos = NA)
