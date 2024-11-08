@@ -13,7 +13,7 @@ stopifnot(c(par_med_f15to24rate, par_med_diagnrr, par_med_other) == par_med)
   
 # Every year new estimates are produced, we need to add one knot
 # -- UPDATE HERE --
-n_k <- length(2000:2023)
+n_k <- length(2000:2024)
 # -- UPDATE ABOVE --
 
 # Starting parameters
@@ -40,4 +40,4 @@ stopifnot(length(theta0) == n_k + n_k-10 + 11)
 stopifnot(length(theta1) == n_k + n_k-10 + 11)
 
 usethis::use_data(theta0, overwrite = TRUE)
-write.table(theta0, "theta0-2023.csv", row.names = FALSE, col.names = FALSE)
+write.table(theta0, "theta0-2024.csv", row.names = FALSE, col.names = FALSE)

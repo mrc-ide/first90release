@@ -1,5 +1,7 @@
 # first90 1.7.0
 
+* Extend theta0 initial values for additional year random-walk parameters.
+
 * Implement new excess non-AIDS mortality among PLHIV implemented in 
   Spectrum 6.38 for 2025 UNAIDS HIV estimates.
 
