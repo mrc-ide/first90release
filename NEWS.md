@@ -1,5 +1,7 @@
 # first90 1.7.0
 
+* Update output plots and tables to 2024.
+
 * Extend theta0 initial values for additional year random-walk parameters.
 
 * Implement new excess non-AIDS mortality among PLHIV implemented in 

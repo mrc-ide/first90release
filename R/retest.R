@@ -102,7 +102,7 @@ number_retests <- function(mod, fp, df) {
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
 plot_retest_test_neg <- function(mod, fp, likdat, cnt, relative = F, 
-                                 yr_pred = 2023,
+                                 yr_pred = 2024,
                                  plot_title = TRUE) {
   end_date <- fp$ss$proj_start + fp$ss$PROJ_YEARS - 1L
   out_retest <- expand.grid(year = 2000:end_date, 
@@ -165,7 +165,7 @@ plot_retest_test_neg <- function(mod, fp, likdat, cnt, relative = F,
 ## -- UPDATE HERE --
 ## * update yr_pred to current year
 plot_retest_test_pos <- function(mod, fp, likdat, cnt, relative = F, 
-                                 yr_pred = 2023,
+                                 yr_pred = 2024,
                                  plot_legend = TRUE, plot_title = TRUE) {
   end_date <- fp$ss$proj_start + fp$ss$PROJ_YEARS - 1L
   out_retest <- expand.grid(year = 2000:end_date, 
@@ -235,7 +235,7 @@ plot_retest_test_pos <- function(mod, fp, likdat, cnt, relative = F,
 
 ## -- UPDATE HERE --
 ## * update retest to current year
-plot_prv_pos_yld <- function(mod, fp, likdat, cnt, yr_pred = 2023, 
+plot_prv_pos_yld <- function(mod, fp, likdat, cnt, yr_pred = 2024, 
                              plot_legend = TRUE,
                              plot_title = TRUE) {
   
