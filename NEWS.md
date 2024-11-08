@@ -1,3 +1,7 @@
+# first90 1.7.0
+
+* Fix bug in R version for end-year net migration in first year of ART eligibility
+
 # first90 1.6.11
 
 * Update plots and tables to end in 2023.

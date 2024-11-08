@@ -543,7 +543,7 @@ simmod <- function(fp, VERSION = "C") {
       hiv.mr.prob <- apply(mr.prob * pop[,,hivp.idx,i], 2, ctapply, ag.idx, sum) /  apply(pop[,,hivp.idx,i], 2, ctapply, ag.idx, sum)
       hiv.mr.prob[is.nan(hiv.mr.prob)] <- 0
 
-      if(i > fp$t_hts_start) {
+      if(i >= fp$t_hts_start) {
         hivn.mr.prob <- apply(mr.prob * pop[,,hivn.idx,i], 2, ctapply, ag.idx, sum) /  apply(pop[,,hivn.idx,i], 2, ctapply, ag.idx, sum)
         hivn.mr.prob[is.nan(hivn.mr.prob)] <- 0
       }
@@ -551,13 +551,13 @@ simmod <- function(fp, VERSION = "C") {
       pop[,,,i] <- sweep(pop[,,,i], 1:2, mr.prob, "*")
       
       hivpop[,,,i] <- sweep(hivpop[,,,i], 2:3, hiv.mr.prob, "*")
-      if(i > fp$t_hts_start) {
+      if(i >= fp$t_hts_start) {
         testnegpop[,, hivn.idx,i] <- testnegpop[,,hivn.idx,i] * hivn.mr.prob
         testnegpop[,, hivp.idx,i] <- testnegpop[,,hivp.idx,i] * hiv.mr.prob
         
         diagnpop[,,,i] <- sweep(diagnpop[,,,i], 2:3, hiv.mr.prob, "*")
       }
-      if(i > fp$tARTstart)
+      if(i >= fp$tARTstart)
         artpop[,,,,i] <- sweep(artpop[,,,,i], 3:4, hiv.mr.prob, "*")
     }
 
