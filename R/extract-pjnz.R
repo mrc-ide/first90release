@@ -101,6 +101,9 @@ extract_pjnz <- function(pjnz = NULL, dp_file= NULL, pjn_file = NULL) {
   v$cd4_mort <- get_dp_cd4_mort(dp)
   v$art_mort <- get_dp_art_mort(dp)
   v$artmx_timerr <- get_dp_artmx_timerr(dp, proj_years)
+
+  ## # Excess non-AIDS mortality
+  v <- c(v, get_dp_nonaids_excessmort(dp))
   
   ## # ART programme data
   v$art15plus_numperc <- array(as.numeric(unlist(dpsub(dp, "<HAARTBySexPerNum MV>", 4:5, col_idx))), lengths(dn), dn)
@@ -605,6 +608,45 @@ get_dp_art_mort <- function(dp) {
   }
 
   art_mort
+}
+
+get_dp_nonaids_excessmort <- function(dp) {
+
+  ## Non-AIDS excess mortality by CD4
+  ## * Added in Spectrum 6.37 beta 17
+  ## * Initiated to default 0.0; will update witgh values from .DP if tag <AdultNonAIDSExcessMort MV> exists
+  ##
+  ## Formatting note from Rob Glaubius:
+  ## New tag <AdultNonAIDSExcessMort MV> stores the new rates.
+  ## These are organized into four rows for
+  ##   1) men off ART,
+  ##   2) men on ART,
+  ##   3) women off ART,
+  ##   4) women on ART.
+  ## 
+  ## Each row is laid out left-to-right in the same as our other adult HIV-related mortality rates:
+  ## * 15-24: CD4>500, 350-500, …, <50
+  ## * 25-34: CD4>500, 350-500, …, <50
+  ## * 35-44: CD4>500, 350-500, …, <50
+  ## * 45-54: CD4>500, 350-500, …, <50
+  ##
+
+  dn <- list(cd4stage=1:DS,
+             agecat=c("15-24", "25-34", "35-44", "45+"),
+             sex=c("male", "female"))
+
+  val <- list()
+  val$cd4_nonaids_excess_mort <- array(0.0, c(DS, 4, NG), dn)
+  val$art_nonaids_excess_mort <- array(0.0, c(DS, 4, NG), dn)
+
+  if(exists_dptag(dp, "<AdultNonAIDSExcessMort MV>")) {
+    val$cd4_nonaids_excess_mort[,,"male"] <- array(as.numeric(dpsub(dp, "<AdultNonAIDSExcessMort MV>", 2, 4:31)), c(DS, 4))
+    val$art_nonaids_excess_mort[,,"male"] <- array(as.numeric(dpsub(dp, "<AdultNonAIDSExcessMort MV>", 3, 4:31)), c(DS, 4))
+    val$cd4_nonaids_excess_mort[,,"female"] <- array(as.numeric(dpsub(dp, "<AdultNonAIDSExcessMort MV>", 4, 4:31)), c(DS, 4))
+    val$art_nonaids_excess_mort[,,"female"] <- array(as.numeric(dpsub(dp, "<AdultNonAIDSExcessMort MV>", 5, 4:31)), c(DS, 4))    
+  }
+
+  val
 }
 
 get_dp_age14hivpop <- function(dp, proj_years) {

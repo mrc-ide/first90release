@@ -1,5 +1,27 @@
 # first90 1.7.0
 
+* Implement new excess non-AIDS mortality among PLHIV implemented in 
+  Spectrum 6.38 for 2025 UNAIDS HIV estimates.
+
+  Spectrum 6.38 implements rates of non-AIDS excess mortality by sex, 
+  age group, CD4 category and ART status. By default these mortality rates 
+  are applied in concentrated epidemic countries and defaulted to zero in
+  African HIV epidemic settings.
+
+  Spectrum outputs for non-AIDS deaths among PLHIV in AIM include non-AIDS 
+  excess deaths. EPP-ASM deaths outputs are updated accordingly.
+
+  To ensure backward compatibility, excess non-AIDS mortality are initialized 
+  to 0.0 and replaced with values read from Spectrum if the relevant values
+  exist in the .DP file.
+
+  `simmod()` updated to incorporate excess non-AIDS mortality among PLHIV. 
+  Internally new model parameters arrays `cd4_nonaids_excess_mort` and 
+  `art_nonaids_excess_mort` follow the same dimensions and stratification 
+  of `cd4_mort` and `art_mort` arrays. These represent expansions of the 
+  arrays saved in Spectrum-AIM, to all age groups and ART duration categories, 
+  consistent with handling of the `cd4_mort` and `art_mort` arrays.
+
 * Fix bug in R version for end-year net migration in first year of ART eligibility
 
 # first90 1.6.11
