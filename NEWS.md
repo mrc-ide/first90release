@@ -28,9 +28,15 @@
 
 * Fix bug in R version for end-year net migration in first year of ART eligibility
 
-# first90 1.6.11
+# first90 1.6.12
 
 * Update plots and tables to end in 2023.
+
+# first90 1.6.11
+
+* Fix bug in R version of simmod() where new infections previously tested negative were
+  subtracted from (instead of added to) the hiv positive. Implementation in C++ version was 
+  correct (thanks Andrey Kutsyh).
 
 # first90 1.6.10
 
