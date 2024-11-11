@@ -48,6 +48,17 @@ simmod <- function(fp, VERSION = "C") {
   hivdeaths <- array(0, c(pAG, NG, PROJ_YEARS))
   natdeaths <- array(0, c(pAG, NG, PROJ_YEARS))
 
+  excessnonaidsdeaths <- array(0.0, c(pAG, NG, PROJ_YEARS))
+
+  aidsdeaths_noart <- array(0.0, c(hDS, hAG, NG, PROJ_YEARS))
+  natdeaths_noart <- array(0.0, c(hDS, hAG, NG, PROJ_YEARS))
+  excessnonaidsdeaths_noart <- array(0.0, c(hDS, hAG, NG, PROJ_YEARS))
+
+  aidsdeaths_art <- array(0.0, c(hTS, hDS, hAG, NG, PROJ_YEARS))
+  natdeaths_art <- array(0.0, c(hTS, hDS, hAG, NG, PROJ_YEARS))
+  excessnonaidsdeaths_art <- array(0.0, c(hTS, hDS, hAG, NG, PROJ_YEARS))
+
+
   hivpopdeaths <- array(0, c(hDS, hAG, NG, PROJ_YEARS))
   artpopdeaths <- array(0, c(hTS, hDS, hAG, NG, PROJ_YEARS))
 
@@ -207,12 +218,21 @@ simmod <- function(fp, VERSION = "C") {
         cd4mx_scale <- hivpop[,,,i] / (hivpop[,,,i] + colSums(artpop[,,,,i]))
         cd4mx_scale[!is.finite(cd4mx_scale)] <- 1.0
         cd4_mort_ts <- fp$cd4_mort * cd4mx_scale
-      } else
+      } else {
         cd4_mort_ts <- fp$cd4_mort
+      }
 
-      grad <- grad - cd4_mort_ts * hivpop[,,,i]              # HIV mortality, untreated
-      hivdeaths.ts <- cd4_mort_ts * hivpop[,,,i]
+      hivdeaths.ts <- cd4_mort_ts * hivpop[,,,i]  # HIV mortality, untreated
+      grad <- grad - hivdeaths.ts              
       hivdeaths_hAG.ts <- colSums(hivdeaths.ts)
+      aidsdeaths_noart[,,,i] <- aidsdeaths_noart[,,,i] + DT * hivdeaths.ts
+      
+      ## Non-AIDS excess mortality
+      nonaids_excess.ts <- fp$cd4_nonaids_excess_mort * hivpop[,,,i]
+      grad <- grad - nonaids_excess.ts
+      nonaids_excess_hAG.ts <- DT * colSums(nonaids_excess.ts)
+      excessnonaidsdeaths_noart[,,,i] <- excessnonaidsdeaths_noart[,,,i] + DT * nonaids_excess.ts
+
 
       ## ---- Distributing new infections in disease model ----
       if(fp$eppmod == "directinfections_hts") {
@@ -260,6 +280,9 @@ simmod <- function(fp, VERSION = "C") {
         prop_tn_hivp[!is.finite(prop_tn_hivp)] <- 0.0
         grad_tn[ , , hivp.idx] <- grad_tn[ , , hivp.idx] - hivdeaths_hAG.ts * prop_tn_hivp
 
+        ## Remove non-AIDS excess deaths among tested negative pop
+        grad_tn[ , , hivp.idx] <- grad_tn[ , , hivp.idx] - excess_nonaids_hAG.ts * prop_tn_hivp
+
         undiagnosed_i <- (hivpop[,,,i] - diagnpop[,,,i])
         prop_testneg <- testnegpop[ , , hivp.idx, i] / colSums(undiagnosed_i)
         prop_testneg[is.na(prop_testneg) | prop_testneg > 1 | prop_testneg < 0] <- 0
@@ -283,6 +306,7 @@ simmod <- function(fp, VERSION = "C") {
         grad_diagn[-1,,] <- grad_diagn[-1,,] + fp$cd4_prog * diagnpop[-hDS,,,i]      # add cd4 stage progression (untreated)
 
         grad_diagn <- grad_diagn - fp$cd4_mort * diagnpop[,,,i]                      # HIV mortality, untreated
+        grad_diagn <- grad_diagn - fp$cd4_nonaids_excess_mort * diagnpop[,,,i]       # Non-AIDS excess mortality
 
         diagnoses[,,,i] <- diagnoses[,,,i] + DT * (diagn_naive + diagn_testneg)
 
@@ -291,7 +315,7 @@ simmod <- function(fp, VERSION = "C") {
       }
 
       hivpop[,,,i] <- hivpop[,,,i] + DT*grad
-      hivpopdeaths[,,, i] <- hivpopdeaths[,,, i] + DT * hivdeaths.ts
+      hivpopdeaths[,,, i] <- hivpopdeaths[,,, i] + DT * (hivdeaths.ts + nonaids_excess.ts)
 
 
       ## ART population
@@ -308,8 +332,15 @@ simmod <- function(fp, VERSION = "C") {
 
         hivdeaths_hAG.ts <- hivdeaths_hAG.ts + colSums(artdeaths.ts,,2)
 
+        nonaids_excess_onart.ts <- fp$art_nonaids_excess_mort * artpop[,,,,i]
+        gradART <- gradART - nonaids_excess_onart.ts
+        nonaids_excess_hAG.ts <- nonaids_excess_hAG.ts +
+          DT * colSums(nonaids_excess_onart.ts,,2)
+        excessnonaidsdeaths_art[,,,,i] <- excessnonaidsdeaths_art[,,,,i] +
+          DT * nonaids_excess_onart.ts
+        
         artpop[,,,, i] <- artpop[,,,, i] + DT * gradART
-        artpopdeaths[,,,, i] <- artpopdeaths[,,,, i] + DT * artdeaths.ts
+        artpopdeaths[,,,, i] <- artpopdeaths[,,,, i] + DT * (artdeaths.ts + nonaids_excess_onart.ts)
 
         ## ART dropout
         ## remove proportion from all adult ART groups back to untreated pop
@@ -496,6 +527,10 @@ simmod <- function(fp, VERSION = "C") {
       pop[,,hivp.idx,i] <- pop[,,hivp.idx,i] - hivdeaths_p.ts
       hivdeaths[,,i] <- hivdeaths[,,i] + hivdeaths_p.ts
 
+      nonaids_excess_p.ts <- apply(nonaids_excess_hAG.ts, 2, rep, h.ag.span) * apply(pop[,,hivp.idx,i], 2, calc.agdist)  # Non-AIDS excess deaths by single-year age
+      pop[,,hivp.idx,i] <- pop[,,hivp.idx,i] - nonaids_excess_p.ts
+      excessnonaidsdeaths[,,i] <- excessnonaidsdeaths[,,i] + nonaids_excess_p.ts      
+
     }
     # ---- End Disease Model ----
 
@@ -543,7 +578,7 @@ simmod <- function(fp, VERSION = "C") {
       hiv.mr.prob <- apply(mr.prob * pop[,,hivp.idx,i], 2, ctapply, ag.idx, sum) /  apply(pop[,,hivp.idx,i], 2, ctapply, ag.idx, sum)
       hiv.mr.prob[is.nan(hiv.mr.prob)] <- 0
 
-      if(i > fp$t_hts_start) {
+      if(i >= fp$t_hts_start) {
         hivn.mr.prob <- apply(mr.prob * pop[,,hivn.idx,i], 2, ctapply, ag.idx, sum) /  apply(pop[,,hivn.idx,i], 2, ctapply, ag.idx, sum)
         hivn.mr.prob[is.nan(hivn.mr.prob)] <- 0
       }
@@ -551,13 +586,13 @@ simmod <- function(fp, VERSION = "C") {
       pop[,,,i] <- sweep(pop[,,,i], 1:2, mr.prob, "*")
       
       hivpop[,,,i] <- sweep(hivpop[,,,i], 2:3, hiv.mr.prob, "*")
-      if(i > fp$t_hts_start) {
+      if(i >= fp$t_hts_start) {
         testnegpop[,, hivn.idx,i] <- testnegpop[,,hivn.idx,i] * hivn.mr.prob
         testnegpop[,, hivp.idx,i] <- testnegpop[,,hivp.idx,i] * hiv.mr.prob
         
         diagnpop[,,,i] <- sweep(diagnpop[,,,i], 2:3, hiv.mr.prob, "*")
       }
-      if(i > fp$tARTstart)
+      if(i >= fp$tARTstart)
         artpop[,,,,i] <- sweep(artpop[,,,,i], 3:4, hiv.mr.prob, "*")
     }
 
@@ -621,6 +656,17 @@ simmod <- function(fp, VERSION = "C") {
 
   attr(pop, "hivpopdeaths") <- hivpopdeaths
   attr(pop, "artpopdeaths") <- artpopdeaths
+
+  attr(pop, "excessnonaidsdeaths") <- excessnonaidsdeaths
+
+  attr(pop, "aidsdeaths_noart") <- aidsdeaths_noart
+  attr(pop, "natdeaths_noart") <- natdeaths_noart
+  attr(pop, "excessnonaidsdeaths_noart") <- excessnonaidsdeaths_noart
+  
+  attr(pop, "aidsdeaths_art") <- aidsdeaths_art
+  attr(pop, "natdeaths_art") <- natdeaths_art
+  attr(pop, "excessnonaidsdeaths_art") <- excessnonaidsdeaths_art
+  
 
   attr(pop, "hivtests") <- hivtests
   attr(pop, "diagnoses") <- diagnoses
