@@ -131,10 +131,6 @@ create_fp <- function(projp,
   fp$art_mort <- projp$art_mort[,,projp.h.ag,]
   fp$artmx_timerr <- projp$artmx_timerr
 
-  fp$cd4_nonaids_excess_mort <- projp$cd4_nonaids_excess_mort[,projp.h.ag,]
-  fp$art_nonaids_excess_mort <- array(0.0, dim(fp$art_mort))
-  fp$art_nonaids_excess_mort[] <- rep(projp$art_nonaids_excess_mort[,projp.h.ag,], each = hTS)
-
   frr_agecat <- as.integer(rownames(projp$fert_rat))
   frr_agecat[frr_agecat == 18] <- 17
   fert_rat.h.ag <- findInterval(AGE_START + cumsum(h.ag.span[h.fert.idx]) - h.ag.span[h.fert.idx], frr_agecat)
