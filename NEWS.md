@@ -19,7 +19,20 @@
   
 * Patch ART dropout implementation. Spectrum converts input ART dropout percent to an 
   annual rate using [dropout rate] = -log(1.0 - [input percent]).
+
+* Implement Spectrum ART allocation.
   
+  There has been a longstanding discrepancy betweeen EPP-ASM and Spectrum in ART allocation.
+  For ART allocation by 'expected mortality', EPP-ASM allocated according to mortality by CD4
+  and age.
+  
+  Spectrum allocates ART in a two step process: first, ART is allocated by CD4 category based
+  on the 'expected mortality' and 'proportional to eligibility' weight. Second, within 
+  CD4 categories, ART is allocated by age solely proportional to number in each age 
+  group (propotional to eligibility).
+  
+  This has modest overall difference, but was a source of numerical differences between 
+  Spectrum and EPP-ASM.
 
 # first90 1.7.0
 
