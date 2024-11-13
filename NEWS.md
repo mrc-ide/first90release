@@ -17,6 +17,10 @@
   application of the ratios; if the .DP file does not contain the checkbox 
   flag, then the ratio is applied.
   
+* Patch ART dropout implementation. Spectrum converts input ART dropout percent to an 
+  annual rate using [dropout rate] = -log(1.0 - [input percent]).
+  
+
 # first90 1.7.0
 
 * Update output plots and tables to 2024.
