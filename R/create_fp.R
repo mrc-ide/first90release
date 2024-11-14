@@ -131,9 +131,16 @@ create_fp <- function(projp,
   fp$art_mort <- projp$art_mort[,,projp.h.ag,]
   fp$artmx_timerr <- projp$artmx_timerr
 
-  fp$cd4_nonaids_excess_mort <- projp$cd4_nonaids_excess_mort[,projp.h.ag,]
+  if (!is.null(projp$cd4_nonaids_excess_mort)) {
+    fp$cd4_nonaids_excess_mort <- projp$cd4_nonaids_excess_mort[,projp.h.ag,]
+  } else {
+    fp$cd4_nonaids_excess_mort <- array(0.0, dim(fp$cd4_mort))
+  }
+  
   fp$art_nonaids_excess_mort <- array(0.0, dim(fp$art_mort))
-  fp$art_nonaids_excess_mort[] <- rep(projp$art_nonaids_excess_mort[,projp.h.ag,], each = hTS)
+  if (!is.null(projp$art_nonaids_excess_mort)) {
+    fp$art_nonaids_excess_mort[] <- rep(projp$art_nonaids_excess_mort[,projp.h.ag,], each = hTS)
+  }
 
   frr_agecat <- as.integer(rownames(projp$fert_rat))
   frr_agecat[frr_agecat == 18] <- 17
