@@ -125,16 +125,52 @@ extract_pjnz <- function(pjnz = NULL, dp_file= NULL, pjn_file = NULL) {
   ## * Enabled / disabled by checkbox flag ("<AdultARTAdjFactorFlag>")
   ## * Scaling factor only applies to number inputs, not percentages (John Stover email, 20 Feb 2023)
   ##   -> Even if scaling factor specified in a year with percentage input, ignore it.
+  ##
+  ## 
+  ## ** UPDATE Spectrum 6.37 beta 18 **
+  ##
+  ## Two changes to the adult ART adjustment were implemented in Spectrum 6.37 beta 18:
+  ##
+  ## * ART adjustments were moved the main Spectrum editor and the flag variable
+  ##   "<AdultARTAdjFactorFlag>" was removed from the .DP file.
+  ## * New tag "<AdultPatsAllocToFromOtherRegion>" was added allowing for input
+  ##   of absolute count adjustment
+  ##
+  ## New logic to account for these changes:
+  ## * Initialise values to defaults 1.0 for relative adjustment and 0.0
+  ##   for absolute adjustment.
+  ## * Only check flag variable if it exists. If adjustment variable exists
+  ##   but flag variable does not exist, use the adjustment.
+  ##
 
-  if (exists_dptag(dp, "<AdultARTAdjFactorFlag>") &&
-        dpsub(dp, "<AdultARTAdjFactorFlag>", 2, 4) == 1) {
+  ## Initialise
+  adult_artadj_factor <- array(1.0, dim(v$art15plus_num))
+  adult_artadj_absolute <- array(0.0, dim(v$art15plus_num))
 
-    adult_artadj_factor <- array(as.numeric(unlist(dpsub(dp, "<AdultARTAdjFactor>", 3:4, col_idx))), lengths(dn), dn)
+  ## Flag to use adjustment
+  use_artadj <- exists_dptag(dp, "<AdultARTAdjFactor>") &&
+    (!exists_dptag(dp, "<AdultARTAdjFactorFlag>") ||
+        (exists_dptag(dp, "<AdultARTAdjFactorFlag>") &&
+           dpsub(dp, "<AdultARTAdjFactorFlag>", 2, 4) == 1))
 
+  if (use_artadj) {
+
+    adult_artadj_factor <- sapply(dpsub(dp, "<AdultARTAdjFactor>", 3:4, col_idx), as.numeric)
+
+    if(exists_dptag(dp, "<AdultPatsAllocToFromOtherRegion>")) {
+      adult_artadj_absolute <- sapply(dpsub(dp, "<AdultPatsAllocToFromOtherRegion>", 3:4, col_idx), as.numeric)
+    }
+    
     ## Only apply if is number (! is percentage)
     adult_artadj_factor <- adult_artadj_factor ^ as.numeric(!v$art15plus_numperc)
+    adult_artadj_absolute <- adult_artadj_absolute * as.numeric(!v$art15plus_numperc)
+    
+    ## First add absolute adjustment, then apply scalar adjustment (Spectrum procedure)
+    tmp_art15plus_num <- v$art15plus_num
+    tmp_art15plus_num <- tmp_art15plus_num + adult_artadj_absolute
+    tmp_art15plus_num <- tmp_art15plus_num * adult_artadj_factor
 
-    v$art15plus_num <- v$art15plus_num * adult_artadj_factor
+    v$art15plus_num <- tmp_art15plus_num
   }
 
   v$art15plus_eligthresh <- stats::setNames(as.numeric(dpsub(dp, "<CD4ThreshHoldAdults MV>", 2, col_idx)), proj_years)

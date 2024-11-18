@@ -131,9 +131,16 @@ create_fp <- function(projp,
   fp$art_mort <- projp$art_mort[,,projp.h.ag,]
   fp$artmx_timerr <- projp$artmx_timerr
 
-  fp$cd4_nonaids_excess_mort <- projp$cd4_nonaids_excess_mort[,projp.h.ag,]
+  if (!is.null(projp$cd4_nonaids_excess_mort)) {
+    fp$cd4_nonaids_excess_mort <- projp$cd4_nonaids_excess_mort[,projp.h.ag,]
+  } else {
+    fp$cd4_nonaids_excess_mort <- array(0.0, dim(fp$cd4_mort))
+  }
+  
   fp$art_nonaids_excess_mort <- array(0.0, dim(fp$art_mort))
-  fp$art_nonaids_excess_mort[] <- rep(projp$art_nonaids_excess_mort[,projp.h.ag,], each = hTS)
+  if (!is.null(projp$art_nonaids_excess_mort)) {
+    fp$art_nonaids_excess_mort[] <- rep(projp$art_nonaids_excess_mort[,projp.h.ag,], each = hTS)
+  }
 
   frr_agecat <- as.integer(rownames(projp$fert_rat))
   frr_agecat[frr_agecat == 18] <- 17
@@ -177,8 +184,9 @@ create_fp <- function(projp,
     fp$art_dropout_recover_cd4 <- art_dropout_recover_cd4
   }
 
+  ## Convert input percent dropout in 12 months to an annual rate (Rob Glaubius email 25 July 2024)
+  fp$art_dropout <- -log(1.0 - projp$art_dropout[as.character(proj_start:proj_end)]/100)
   
-  fp$art_dropout <- projp$art_dropout[as.character(proj_start:proj_end)]/100
   fp$median_cd4init <- projp$median_cd4init[as.character(proj_start:proj_end)]
   fp$med_cd4init_input <- as.integer(fp$median_cd4init > 0)
   fp$med_cd4init_cat <- replace(findInterval(-fp$median_cd4init, - c(1000, 500, 350, 250, 200, 100, 50)),

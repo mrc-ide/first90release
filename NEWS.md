@@ -1,3 +1,39 @@
+# first90 1.7.1
+
+* Implement Spectrum adult ART adjustment by absolute count. This is a user 
+  input that adjust the number on ART count by an absolute value. It is
+  intended to be used to account for clients receiving services in or
+  from another region; typically with subnational Spectrum files.
+  
+  If both absolute count and ratio adjustments are specified in the same
+  year, the absolute count is applied first and then ratio is applied. 
+  If ART is specified as a percentage, then adjustments do not have any 
+  influence.
+  
+  Previously entered ART adjustments were applied or not via a checkbox in
+  Spectrum. The checkbox has been removed in Spectrum 6.38 beta 18. For 
+  backward compatability with previously simulated Spectrum outputs, if the 
+  checkbox flag exists in the .DP file, it is still used to determine 
+  application of the ratios; if the .DP file does not contain the checkbox 
+  flag, then the ratio is applied.
+  
+* Patch ART dropout implementation. Spectrum converts input ART dropout percent to an 
+  annual rate using [dropout rate] = -log(1.0 - [input percent]).
+
+* Implement Spectrum ART allocation.
+  
+  There has been a longstanding discrepancy betweeen EPP-ASM and Spectrum in ART allocation.
+  For ART allocation by 'expected mortality', EPP-ASM allocated according to mortality by CD4
+  and age.
+  
+  Spectrum allocates ART in a two step process: first, ART is allocated by CD4 category based
+  on the 'expected mortality' and 'proportional to eligibility' weight. Second, within 
+  CD4 categories, ART is allocated by age solely proportional to number in each age 
+  group (propotional to eligibility).
+  
+  This has modest overall difference, but was a source of numerical differences between 
+  Spectrum and EPP-ASM.
+
 # first90 1.7.0
 
 * Update output plots and tables to 2024.
