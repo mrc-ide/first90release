@@ -50,7 +50,7 @@
 #define INCIDPOP_15TO49 0 // age range corresponding to incidence input
 #define INCIDPOP_15PLUS 1
 
-#define PROJPERIOD_MIDYEAR 0   // mid-year projection period 
+#define PROJPERIOD_MIDYEAR 0   // mid-year projection period
 #define PROJPERIOD_CALENDAR 1  // calendar-year projection (Spectrum 6.2 update; December 2022)
 
 using namespace boost;
@@ -114,7 +114,7 @@ extern "C" {
     multi_array_ref<double, 3> cd4_mort(REAL(getListElement(s_fp, "cd4_mort")), extents[NG][hAG][hDS]);
     multi_array_ref<double, 3> cd4_nonaids_excess_mort(REAL(getListElement(s_fp, "cd4_nonaids_excess_mort")), extents[NG][hAG][hDS]);
     multi_array_ref<double, 4> art_mort(REAL(getListElement(s_fp, "art_mort")), extents[NG][hAG][hDS][hTS]);
-    multi_array_ref<double, 4> art_nonaids_excess_mort(REAL(getListElement(s_fp, "art_nonaids_excess_mort")), extents[NG][hAG][hDS][hTS]);    
+    multi_array_ref<double, 4> art_nonaids_excess_mort(REAL(getListElement(s_fp, "art_nonaids_excess_mort")), extents[NG][hAG][hDS][hTS]);
     multi_array_ref<double, 2> artmx_timerr(REAL(getListElement(s_fp, "artmx_timerr")), extents[PROJ_YEARS][hTS]);
 
     // sub-fertility
@@ -180,191 +180,191 @@ extern "C" {
     multi_array_ref<double, 4> paedsurv_artcd4dist(REAL(getListElement(s_fp, "paedsurv_artcd4dist")), extents[PROJ_YEARS][NG][hDS][hTS]);
 
     // initialize output
-    SEXP s_pop = PROTECT(allocVector(REALSXP, pAG * NG * pDS * PROJ_YEARS));
-    SEXP s_pop_dim = PROTECT(allocVector(INTSXP, 4));
+    SEXP s_pop = PROTECT(Rf_allocVector(REALSXP, pAG * NG * pDS * PROJ_YEARS));
+    SEXP s_pop_dim = PROTECT(Rf_allocVector(INTSXP, 4));
     INTEGER(s_pop_dim)[0] = pAG;
     INTEGER(s_pop_dim)[1] = NG;
     INTEGER(s_pop_dim)[2] = pDS;
     INTEGER(s_pop_dim)[3] = PROJ_YEARS;
-    setAttrib(s_pop, R_DimSymbol, s_pop_dim);
-    memset(REAL(s_pop), 0, length(s_pop)*sizeof(double));
+    Rf_setAttrib(s_pop, R_DimSymbol, s_pop_dim);
+    memset(REAL(s_pop), 0, Rf_length(s_pop)*sizeof(double));
 
-    SEXP s_hivpop = PROTECT(allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
-    SEXP s_hivpop_dim = PROTECT(allocVector(INTSXP, 4));
+    SEXP s_hivpop = PROTECT(Rf_allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
+    SEXP s_hivpop_dim = PROTECT(Rf_allocVector(INTSXP, 4));
     INTEGER(s_hivpop_dim)[0] = hDS;
     INTEGER(s_hivpop_dim)[1] = hAG;
     INTEGER(s_hivpop_dim)[2] = NG;
     INTEGER(s_hivpop_dim)[3] = PROJ_YEARS;
-    setAttrib(s_hivpop, R_DimSymbol, s_hivpop_dim);
-    setAttrib(s_pop, install("hivpop"), s_hivpop);
+    Rf_setAttrib(s_hivpop, R_DimSymbol, s_hivpop_dim);
+    Rf_setAttrib(s_pop, Rf_install("hivpop"), s_hivpop);
     multi_array_ref<double, 4> hivpop(REAL(s_hivpop), extents[PROJ_YEARS][NG][hAG][hDS]);
-    memset(REAL(s_hivpop), 0, length(s_hivpop)*sizeof(double));
+    memset(REAL(s_hivpop), 0, Rf_length(s_hivpop)*sizeof(double));
 
-    SEXP s_testnegpop = PROTECT(allocVector(REALSXP, hAG * NG * pDS * PROJ_YEARS));
-    SEXP s_testnegpop_dim = PROTECT(allocVector(INTSXP, 4));
+    SEXP s_testnegpop = PROTECT(Rf_allocVector(REALSXP, hAG * NG * pDS * PROJ_YEARS));
+    SEXP s_testnegpop_dim = PROTECT(Rf_allocVector(INTSXP, 4));
     INTEGER(s_testnegpop_dim)[0] = hAG;
     INTEGER(s_testnegpop_dim)[1] = NG;
     INTEGER(s_testnegpop_dim)[2] = pDS;
     INTEGER(s_testnegpop_dim)[3] = PROJ_YEARS;
-    setAttrib(s_testnegpop, R_DimSymbol, s_testnegpop_dim);
-    setAttrib(s_pop, install("testnegpop"), s_testnegpop);
+    Rf_setAttrib(s_testnegpop, R_DimSymbol, s_testnegpop_dim);
+    Rf_setAttrib(s_pop, Rf_install("testnegpop"), s_testnegpop);
     multi_array_ref<double, 4> testnegpop(REAL(s_testnegpop), extents[PROJ_YEARS][pDS][NG][hAG]);
-    memset(REAL(s_testnegpop), 0, length(s_testnegpop)*sizeof(double));
+    memset(REAL(s_testnegpop), 0, Rf_length(s_testnegpop)*sizeof(double));
 
-    SEXP s_diagnpop = PROTECT(allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
-    SEXP s_diagnpop_dim = PROTECT(allocVector(INTSXP, 4));
+    SEXP s_diagnpop = PROTECT(Rf_allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
+    SEXP s_diagnpop_dim = PROTECT(Rf_allocVector(INTSXP, 4));
     INTEGER(s_diagnpop_dim)[0] = hDS;
     INTEGER(s_diagnpop_dim)[1] = hAG;
     INTEGER(s_diagnpop_dim)[2] = NG;
     INTEGER(s_diagnpop_dim)[3] = PROJ_YEARS;
-    setAttrib(s_diagnpop, R_DimSymbol, s_diagnpop_dim);
-    setAttrib(s_pop, install("diagnpop"), s_diagnpop);
+    Rf_setAttrib(s_diagnpop, R_DimSymbol, s_diagnpop_dim);
+    Rf_setAttrib(s_pop, Rf_install("diagnpop"), s_diagnpop);
     multi_array_ref<double, 4> diagnpop(REAL(s_diagnpop), extents[PROJ_YEARS][NG][hAG][hDS]);
-    memset(REAL(s_diagnpop), 0, length(s_diagnpop)*sizeof(double));
+    memset(REAL(s_diagnpop), 0, Rf_length(s_diagnpop)*sizeof(double));
 
-    SEXP s_artpop = PROTECT(allocVector(REALSXP, hTS * hDS * hAG * NG * PROJ_YEARS));
-    SEXP s_artpop_dim = PROTECT(allocVector(INTSXP, 5));
+    SEXP s_artpop = PROTECT(Rf_allocVector(REALSXP, hTS * hDS * hAG * NG * PROJ_YEARS));
+    SEXP s_artpop_dim = PROTECT(Rf_allocVector(INTSXP, 5));
     INTEGER(s_artpop_dim)[0] = hTS;
     INTEGER(s_artpop_dim)[1] = hDS;
     INTEGER(s_artpop_dim)[2] = hAG;
     INTEGER(s_artpop_dim)[3] = NG;
     INTEGER(s_artpop_dim)[4] = PROJ_YEARS;
-    setAttrib(s_artpop, R_DimSymbol, s_artpop_dim);
-    setAttrib(s_pop, install("artpop"), s_artpop);
+    Rf_setAttrib(s_artpop, R_DimSymbol, s_artpop_dim);
+    Rf_setAttrib(s_pop, Rf_install("artpop"), s_artpop);
     multi_array_ref<double, 5> artpop(REAL(s_artpop), extents[PROJ_YEARS][NG][hAG][hDS][hTS]);
-    memset(REAL(s_artpop), 0, length(s_artpop)*sizeof(double));
+    memset(REAL(s_artpop), 0, Rf_length(s_artpop)*sizeof(double));
 
-    SEXP s_infections = PROTECT(allocVector(REALSXP, pAG * NG * PROJ_YEARS));
-    SEXP s_infections_dim = PROTECT(allocVector(INTSXP, 3));
+    SEXP s_infections = PROTECT(Rf_allocVector(REALSXP, pAG * NG * PROJ_YEARS));
+    SEXP s_infections_dim = PROTECT(Rf_allocVector(INTSXP, 3));
     INTEGER(s_infections_dim)[0] = pAG;
     INTEGER(s_infections_dim)[1] = NG;
     INTEGER(s_infections_dim)[2] = PROJ_YEARS;
-    setAttrib(s_infections, R_DimSymbol, s_infections_dim);
-    setAttrib(s_pop, install("infections"), s_infections);
+    Rf_setAttrib(s_infections, R_DimSymbol, s_infections_dim);
+    Rf_setAttrib(s_pop, Rf_install("infections"), s_infections);
     multi_array_ref<double, 3> infections(REAL(s_infections), extents[PROJ_YEARS][NG][pAG]);
-    memset(REAL(s_infections), 0, length(s_infections)*sizeof(double));
+    memset(REAL(s_infections), 0, Rf_length(s_infections)*sizeof(double));
 
-    SEXP s_hivdeaths = PROTECT(allocVector(REALSXP, pAG * NG * PROJ_YEARS));
-    SEXP s_hivdeaths_dim = PROTECT(allocVector(INTSXP, 3));
+    SEXP s_hivdeaths = PROTECT(Rf_allocVector(REALSXP, pAG * NG * PROJ_YEARS));
+    SEXP s_hivdeaths_dim = PROTECT(Rf_allocVector(INTSXP, 3));
     INTEGER(s_hivdeaths_dim)[0] = pAG;
     INTEGER(s_hivdeaths_dim)[1] = NG;
     INTEGER(s_hivdeaths_dim)[2] = PROJ_YEARS;
-    setAttrib(s_hivdeaths, R_DimSymbol, s_hivdeaths_dim);
-    setAttrib(s_pop, install("hivdeaths"), s_hivdeaths);
+    Rf_setAttrib(s_hivdeaths, R_DimSymbol, s_hivdeaths_dim);
+    Rf_setAttrib(s_pop, Rf_install("hivdeaths"), s_hivdeaths);
     multi_array_ref<double, 3> hivdeaths(REAL(s_hivdeaths), extents[PROJ_YEARS][NG][pAG]);
-    memset(REAL(s_hivdeaths), 0, length(s_hivdeaths)*sizeof(double));
+    memset(REAL(s_hivdeaths), 0, Rf_length(s_hivdeaths)*sizeof(double));
 
-    SEXP s_hivpopdeaths = PROTECT(allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
-    SEXP s_hivpopdeaths_dim = PROTECT(allocVector(INTSXP, 4));
+    SEXP s_hivpopdeaths = PROTECT(Rf_allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
+    SEXP s_hivpopdeaths_dim = PROTECT(Rf_allocVector(INTSXP, 4));
     INTEGER(s_hivpopdeaths_dim)[0] = hDS;
     INTEGER(s_hivpopdeaths_dim)[1] = hAG;
     INTEGER(s_hivpopdeaths_dim)[2] = NG;
     INTEGER(s_hivpopdeaths_dim)[3] = PROJ_YEARS;
-    setAttrib(s_hivpopdeaths, R_DimSymbol, s_hivpopdeaths_dim);
-    setAttrib(s_pop, install("hivpopdeaths"), s_hivpopdeaths);
+    Rf_setAttrib(s_hivpopdeaths, R_DimSymbol, s_hivpopdeaths_dim);
+    Rf_setAttrib(s_pop, Rf_install("hivpopdeaths"), s_hivpopdeaths);
     multi_array_ref<double, 4> hivpopdeaths(REAL(s_hivpopdeaths), extents[PROJ_YEARS][NG][hAG][hDS]);
-    memset(REAL(s_hivpopdeaths), 0, length(s_hivpopdeaths)*sizeof(double));
+    memset(REAL(s_hivpopdeaths), 0, Rf_length(s_hivpopdeaths)*sizeof(double));
 
-    SEXP s_artpopdeaths = PROTECT(allocVector(REALSXP, hTS * hDS * hAG * NG * PROJ_YEARS));
-    SEXP s_artpopdeaths_dim = PROTECT(allocVector(INTSXP, 5));
+    SEXP s_artpopdeaths = PROTECT(Rf_allocVector(REALSXP, hTS * hDS * hAG * NG * PROJ_YEARS));
+    SEXP s_artpopdeaths_dim = PROTECT(Rf_allocVector(INTSXP, 5));
     INTEGER(s_artpopdeaths_dim)[0] = hTS;
     INTEGER(s_artpopdeaths_dim)[1] = hDS;
     INTEGER(s_artpopdeaths_dim)[2] = hAG;
     INTEGER(s_artpopdeaths_dim)[3] = NG;
     INTEGER(s_artpopdeaths_dim)[4] = PROJ_YEARS;
-    setAttrib(s_artpopdeaths, R_DimSymbol, s_artpopdeaths_dim);
-    setAttrib(s_pop, install("artpopdeaths"), s_artpopdeaths);
+    Rf_setAttrib(s_artpopdeaths, R_DimSymbol, s_artpopdeaths_dim);
+    Rf_setAttrib(s_pop, Rf_install("artpopdeaths"), s_artpopdeaths);
     multi_array_ref<double, 5> artpopdeaths(REAL(s_artpopdeaths), extents[PROJ_YEARS][NG][hAG][hDS][hTS]);
-    memset(REAL(s_artpopdeaths), 0, length(s_artpopdeaths)*sizeof(double));
+    memset(REAL(s_artpopdeaths), 0, Rf_length(s_artpopdeaths)*sizeof(double));
 
-    SEXP s_natdeaths = PROTECT(allocVector(REALSXP, pAG * NG * PROJ_YEARS));
-    SEXP s_natdeaths_dim = PROTECT(allocVector(INTSXP, 3));
+    SEXP s_natdeaths = PROTECT(Rf_allocVector(REALSXP, pAG * NG * PROJ_YEARS));
+    SEXP s_natdeaths_dim = PROTECT(Rf_allocVector(INTSXP, 3));
     INTEGER(s_natdeaths_dim)[0] = pAG;
     INTEGER(s_natdeaths_dim)[1] = NG;
     INTEGER(s_natdeaths_dim)[2] = PROJ_YEARS;
-    setAttrib(s_natdeaths, R_DimSymbol, s_natdeaths_dim);
-    setAttrib(s_pop, install("natdeaths"), s_natdeaths);
+    Rf_setAttrib(s_natdeaths, R_DimSymbol, s_natdeaths_dim);
+    Rf_setAttrib(s_pop, Rf_install("natdeaths"), s_natdeaths);
     multi_array_ref<double, 3> natdeaths(REAL(s_natdeaths), extents[PROJ_YEARS][NG][pAG]);
-    memset(REAL(s_natdeaths), 0, length(s_natdeaths)*sizeof(double));
+    memset(REAL(s_natdeaths), 0, Rf_length(s_natdeaths)*sizeof(double));
 
-    SEXP s_excessnonaidsdeaths = PROTECT(allocVector(REALSXP, pAG * NG * PROJ_YEARS));
-    SEXP s_excessnonaidsdeaths_dim = PROTECT(allocVector(INTSXP, 3));
+    SEXP s_excessnonaidsdeaths = PROTECT(Rf_allocVector(REALSXP, pAG * NG * PROJ_YEARS));
+    SEXP s_excessnonaidsdeaths_dim = PROTECT(Rf_allocVector(INTSXP, 3));
     INTEGER(s_excessnonaidsdeaths_dim)[0] = pAG;
     INTEGER(s_excessnonaidsdeaths_dim)[1] = NG;
     INTEGER(s_excessnonaidsdeaths_dim)[2] = PROJ_YEARS;
-    setAttrib(s_excessnonaidsdeaths, R_DimSymbol, s_excessnonaidsdeaths_dim);
-    setAttrib(s_pop, install("excessnonaidsdeaths"), s_excessnonaidsdeaths);
+    Rf_setAttrib(s_excessnonaidsdeaths, R_DimSymbol, s_excessnonaidsdeaths_dim);
+    Rf_setAttrib(s_pop, Rf_install("excessnonaidsdeaths"), s_excessnonaidsdeaths);
     multi_array_ref<double, 3> excessnonaidsdeaths(REAL(s_excessnonaidsdeaths), extents[PROJ_YEARS][NG][pAG]);
-    memset(REAL(s_excessnonaidsdeaths), 0, length(s_excessnonaidsdeaths)*sizeof(double));
+    memset(REAL(s_excessnonaidsdeaths), 0, Rf_length(s_excessnonaidsdeaths)*sizeof(double));
 
-    SEXP s_aidsdeaths_noart = PROTECT(allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
-    SEXP s_aidsdeaths_noart_dim = PROTECT(allocVector(INTSXP, 4));
+    SEXP s_aidsdeaths_noart = PROTECT(Rf_allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
+    SEXP s_aidsdeaths_noart_dim = PROTECT(Rf_allocVector(INTSXP, 4));
     INTEGER(s_aidsdeaths_noart_dim)[0] = hDS;
     INTEGER(s_aidsdeaths_noart_dim)[1] = hAG;
     INTEGER(s_aidsdeaths_noart_dim)[2] = NG;
     INTEGER(s_aidsdeaths_noart_dim)[3] = PROJ_YEARS;
-    setAttrib(s_aidsdeaths_noart, R_DimSymbol, s_aidsdeaths_noart_dim);
-    setAttrib(s_pop, install("aidsdeaths_noart"), s_aidsdeaths_noart);
+    Rf_setAttrib(s_aidsdeaths_noart, R_DimSymbol, s_aidsdeaths_noart_dim);
+    Rf_setAttrib(s_pop, Rf_install("aidsdeaths_noart"), s_aidsdeaths_noart);
     multi_array_ref<double, 4> aidsdeaths_noart(REAL(s_aidsdeaths_noart), extents[PROJ_YEARS][NG][hAG][hDS]);
-    memset(REAL(s_aidsdeaths_noart), 0, length(s_aidsdeaths_noart)*sizeof(double));
+    memset(REAL(s_aidsdeaths_noart), 0, Rf_length(s_aidsdeaths_noart)*sizeof(double));
 
-    SEXP s_natdeaths_noart = PROTECT(allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
-    SEXP s_natdeaths_noart_dim = PROTECT(allocVector(INTSXP, 4));
+    SEXP s_natdeaths_noart = PROTECT(Rf_allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
+    SEXP s_natdeaths_noart_dim = PROTECT(Rf_allocVector(INTSXP, 4));
     INTEGER(s_natdeaths_noart_dim)[0] = hDS;
     INTEGER(s_natdeaths_noart_dim)[1] = hAG;
     INTEGER(s_natdeaths_noart_dim)[2] = NG;
     INTEGER(s_natdeaths_noart_dim)[3] = PROJ_YEARS;
-    setAttrib(s_natdeaths_noart, R_DimSymbol, s_natdeaths_noart_dim);
-    setAttrib(s_pop, install("natdeaths_noart"), s_natdeaths_noart);
+    Rf_setAttrib(s_natdeaths_noart, R_DimSymbol, s_natdeaths_noart_dim);
+    Rf_setAttrib(s_pop, Rf_install("natdeaths_noart"), s_natdeaths_noart);
     multi_array_ref<double, 4> natdeaths_noart(REAL(s_natdeaths_noart), extents[PROJ_YEARS][NG][hAG][hDS]);
-    memset(REAL(s_natdeaths_noart), 0, length(s_natdeaths_noart)*sizeof(double));
+    memset(REAL(s_natdeaths_noart), 0, Rf_length(s_natdeaths_noart)*sizeof(double));
 
-    SEXP s_excessnonaidsdeaths_noart = PROTECT(allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
-    SEXP s_excessnonaidsdeaths_noart_dim = PROTECT(allocVector(INTSXP, 4));
+    SEXP s_excessnonaidsdeaths_noart = PROTECT(Rf_allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
+    SEXP s_excessnonaidsdeaths_noart_dim = PROTECT(Rf_allocVector(INTSXP, 4));
     INTEGER(s_excessnonaidsdeaths_noart_dim)[0] = hDS;
     INTEGER(s_excessnonaidsdeaths_noart_dim)[1] = hAG;
     INTEGER(s_excessnonaidsdeaths_noart_dim)[2] = NG;
     INTEGER(s_excessnonaidsdeaths_noart_dim)[3] = PROJ_YEARS;
-    setAttrib(s_excessnonaidsdeaths_noart, R_DimSymbol, s_excessnonaidsdeaths_noart_dim);
-    setAttrib(s_pop, install("excessnonaidsdeaths_noart"), s_excessnonaidsdeaths_noart);
+    Rf_setAttrib(s_excessnonaidsdeaths_noart, R_DimSymbol, s_excessnonaidsdeaths_noart_dim);
+    Rf_setAttrib(s_pop, Rf_install("excessnonaidsdeaths_noart"), s_excessnonaidsdeaths_noart);
     multi_array_ref<double, 4> excessnonaidsdeaths_noart(REAL(s_excessnonaidsdeaths_noart), extents[PROJ_YEARS][NG][hAG][hDS]);
-    memset(REAL(s_excessnonaidsdeaths_noart), 0, length(s_excessnonaidsdeaths_noart)*sizeof(double));
+    memset(REAL(s_excessnonaidsdeaths_noart), 0, Rf_length(s_excessnonaidsdeaths_noart)*sizeof(double));
 
-    SEXP s_aidsdeaths_art = PROTECT(allocVector(REALSXP, hTS * hDS * hAG * NG * PROJ_YEARS));
-    SEXP s_aidsdeaths_art_dim = PROTECT(allocVector(INTSXP, 5));
+    SEXP s_aidsdeaths_art = PROTECT(Rf_allocVector(REALSXP, hTS * hDS * hAG * NG * PROJ_YEARS));
+    SEXP s_aidsdeaths_art_dim = PROTECT(Rf_allocVector(INTSXP, 5));
     INTEGER(s_aidsdeaths_art_dim)[0] = hTS;
     INTEGER(s_aidsdeaths_art_dim)[1] = hDS;
     INTEGER(s_aidsdeaths_art_dim)[2] = hAG;
     INTEGER(s_aidsdeaths_art_dim)[3] = NG;
     INTEGER(s_aidsdeaths_art_dim)[4] = PROJ_YEARS;
-    setAttrib(s_aidsdeaths_art, R_DimSymbol, s_aidsdeaths_art_dim);
-    setAttrib(s_pop, install("aidsdeaths_art"), s_aidsdeaths_art);
+    Rf_setAttrib(s_aidsdeaths_art, R_DimSymbol, s_aidsdeaths_art_dim);
+    Rf_setAttrib(s_pop, Rf_install("aidsdeaths_art"), s_aidsdeaths_art);
     multi_array_ref<double, 5> aidsdeaths_art(REAL(s_aidsdeaths_art), extents[PROJ_YEARS][NG][hAG][hDS][hTS]);
-    memset(REAL(s_aidsdeaths_art), 0, length(s_aidsdeaths_art)*sizeof(double));
+    memset(REAL(s_aidsdeaths_art), 0, Rf_length(s_aidsdeaths_art)*sizeof(double));
 
-    SEXP s_natdeaths_art = PROTECT(allocVector(REALSXP, hTS * hDS * hAG * NG * PROJ_YEARS));
-    SEXP s_natdeaths_art_dim = PROTECT(allocVector(INTSXP, 5));
+    SEXP s_natdeaths_art = PROTECT(Rf_allocVector(REALSXP, hTS * hDS * hAG * NG * PROJ_YEARS));
+    SEXP s_natdeaths_art_dim = PROTECT(Rf_allocVector(INTSXP, 5));
     INTEGER(s_natdeaths_art_dim)[0] = hTS;
     INTEGER(s_natdeaths_art_dim)[1] = hDS;
     INTEGER(s_natdeaths_art_dim)[2] = hAG;
     INTEGER(s_natdeaths_art_dim)[3] = NG;
     INTEGER(s_natdeaths_art_dim)[4] = PROJ_YEARS;
-    setAttrib(s_natdeaths_art, R_DimSymbol, s_natdeaths_art_dim);
-    setAttrib(s_pop, install("natdeaths_art"), s_natdeaths_art);
+    Rf_setAttrib(s_natdeaths_art, R_DimSymbol, s_natdeaths_art_dim);
+    Rf_setAttrib(s_pop, Rf_install("natdeaths_art"), s_natdeaths_art);
     multi_array_ref<double, 5> natdeaths_art(REAL(s_natdeaths_art), extents[PROJ_YEARS][NG][hAG][hDS][hTS]);
-    memset(REAL(s_natdeaths_art), 0, length(s_natdeaths_art)*sizeof(double));
+    memset(REAL(s_natdeaths_art), 0, Rf_length(s_natdeaths_art)*sizeof(double));
 
-    SEXP s_excessnonaidsdeaths_art = PROTECT(allocVector(REALSXP, hTS * hDS * hAG * NG * PROJ_YEARS));
-    SEXP s_excessnonaidsdeaths_art_dim = PROTECT(allocVector(INTSXP, 5));
+    SEXP s_excessnonaidsdeaths_art = PROTECT(Rf_allocVector(REALSXP, hTS * hDS * hAG * NG * PROJ_YEARS));
+    SEXP s_excessnonaidsdeaths_art_dim = PROTECT(Rf_allocVector(INTSXP, 5));
     INTEGER(s_excessnonaidsdeaths_art_dim)[0] = hTS;
     INTEGER(s_excessnonaidsdeaths_art_dim)[1] = hDS;
     INTEGER(s_excessnonaidsdeaths_art_dim)[2] = hAG;
     INTEGER(s_excessnonaidsdeaths_art_dim)[3] = NG;
     INTEGER(s_excessnonaidsdeaths_art_dim)[4] = PROJ_YEARS;
-    setAttrib(s_excessnonaidsdeaths_art, R_DimSymbol, s_excessnonaidsdeaths_art_dim);
-    setAttrib(s_pop, install("excessnonaidsdeaths_art"), s_excessnonaidsdeaths_art);
+    Rf_setAttrib(s_excessnonaidsdeaths_art, R_DimSymbol, s_excessnonaidsdeaths_art_dim);
+    Rf_setAttrib(s_pop, Rf_install("excessnonaidsdeaths_art"), s_excessnonaidsdeaths_art);
     multi_array_ref<double, 5> excessnonaidsdeaths_art(REAL(s_excessnonaidsdeaths_art), extents[PROJ_YEARS][NG][hAG][hDS][hTS]);
-    memset(REAL(s_excessnonaidsdeaths_art), 0, length(s_excessnonaidsdeaths_art)*sizeof(double));
+    memset(REAL(s_excessnonaidsdeaths_art), 0, Rf_length(s_excessnonaidsdeaths_art)*sizeof(double));
 
     // 0: negative, never tested
     // 1: negative, previously tested
@@ -372,74 +372,74 @@ extern "C" {
     // 3: positive, previously tested negative
     // 4: positive, diagnosed and untreated
     // 5: positive, on ART
-    SEXP s_hivtests = PROTECT(allocVector(REALSXP, hAG * NG * 6 * PROJ_YEARS));
-    SEXP s_hivtests_dim = PROTECT(allocVector(INTSXP, 4));
+    SEXP s_hivtests = PROTECT(Rf_allocVector(REALSXP, hAG * NG * 6 * PROJ_YEARS));
+    SEXP s_hivtests_dim = PROTECT(Rf_allocVector(INTSXP, 4));
     INTEGER(s_hivtests_dim)[0] = hAG;
     INTEGER(s_hivtests_dim)[1] = NG;
     INTEGER(s_hivtests_dim)[2] = 6;
     INTEGER(s_hivtests_dim)[3] = PROJ_YEARS;
-    setAttrib(s_hivtests, R_DimSymbol, s_hivtests_dim);
-    setAttrib(s_pop, install("hivtests"), s_hivtests);
+    Rf_setAttrib(s_hivtests, R_DimSymbol, s_hivtests_dim);
+    Rf_setAttrib(s_pop, Rf_install("hivtests"), s_hivtests);
     multi_array_ref<double, 4> hivtests(REAL(s_hivtests), extents[PROJ_YEARS][6][NG][hAG]);
-    memset(REAL(s_hivtests), 0, length(s_hivtests)*sizeof(double));
+    memset(REAL(s_hivtests), 0, Rf_length(s_hivtests)*sizeof(double));
 
-    SEXP s_diagnoses = PROTECT(allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
-    SEXP s_diagnoses_dim = PROTECT(allocVector(INTSXP, 4));
+    SEXP s_diagnoses = PROTECT(Rf_allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
+    SEXP s_diagnoses_dim = PROTECT(Rf_allocVector(INTSXP, 4));
     INTEGER(s_diagnoses_dim)[0] = hDS;
     INTEGER(s_diagnoses_dim)[1] = hAG;
     INTEGER(s_diagnoses_dim)[2] = NG;
     INTEGER(s_diagnoses_dim)[3] = PROJ_YEARS;
-    setAttrib(s_diagnoses, R_DimSymbol, s_diagnoses_dim);
-    setAttrib(s_pop, install("diagnoses"), s_diagnoses);
+    Rf_setAttrib(s_diagnoses, R_DimSymbol, s_diagnoses_dim);
+    Rf_setAttrib(s_pop, Rf_install("diagnoses"), s_diagnoses);
     multi_array_ref<double, 4> diagnoses(REAL(s_diagnoses), extents[PROJ_YEARS][NG][hAG][hDS]);
-    memset(REAL(s_diagnoses), 0, length(s_diagnoses)*sizeof(double));
+    memset(REAL(s_diagnoses), 0, Rf_length(s_diagnoses)*sizeof(double));
 
-    SEXP s_late_diagnoses = PROTECT(allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
-    SEXP s_late_diagnoses_dim = PROTECT(allocVector(INTSXP, 4));
+    SEXP s_late_diagnoses = PROTECT(Rf_allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
+    SEXP s_late_diagnoses_dim = PROTECT(Rf_allocVector(INTSXP, 4));
     INTEGER(s_late_diagnoses_dim)[0] = hDS;
     INTEGER(s_late_diagnoses_dim)[1] = hAG;
     INTEGER(s_late_diagnoses_dim)[2] = NG;
     INTEGER(s_late_diagnoses_dim)[3] = PROJ_YEARS;
-    setAttrib(s_late_diagnoses, R_DimSymbol, s_late_diagnoses_dim);
-    setAttrib(s_pop, install("late_diagnoses"), s_late_diagnoses);
+    Rf_setAttrib(s_late_diagnoses, R_DimSymbol, s_late_diagnoses_dim);
+    Rf_setAttrib(s_pop, Rf_install("late_diagnoses"), s_late_diagnoses);
     multi_array_ref<double, 4> late_diagnoses(REAL(s_late_diagnoses), extents[PROJ_YEARS][NG][hAG][hDS]);
-    memset(REAL(s_late_diagnoses), 0, length(s_late_diagnoses)*sizeof(double));
+    memset(REAL(s_late_diagnoses), 0, Rf_length(s_late_diagnoses)*sizeof(double));
 
-    SEXP s_artinits = PROTECT(allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
-    SEXP s_artinits_dim = PROTECT(allocVector(INTSXP, 4));
+    SEXP s_artinits = PROTECT(Rf_allocVector(REALSXP, hDS * hAG * NG * PROJ_YEARS));
+    SEXP s_artinits_dim = PROTECT(Rf_allocVector(INTSXP, 4));
     INTEGER(s_artinits_dim)[0] = hDS;
     INTEGER(s_artinits_dim)[1] = hAG;
     INTEGER(s_artinits_dim)[2] = NG;
     INTEGER(s_artinits_dim)[3] = PROJ_YEARS;
-    setAttrib(s_artinits, R_DimSymbol, s_artinits_dim);
-    setAttrib(s_pop, install("artinits"), s_artinits);
+    Rf_setAttrib(s_artinits, R_DimSymbol, s_artinits_dim);
+    Rf_setAttrib(s_pop, Rf_install("artinits"), s_artinits);
     multi_array_ref<double, 4> artinits(REAL(s_artinits), extents[PROJ_YEARS][NG][hAG][hDS]);
-    memset(REAL(s_artinits), 0, length(s_artinits)*sizeof(double));
+    memset(REAL(s_artinits), 0, Rf_length(s_artinits)*sizeof(double));
 
-    SEXP s_popadjust = PROTECT(allocVector(REALSXP, pAG * NG * PROJ_YEARS));
-    SEXP s_popadjust_dim = PROTECT(allocVector(INTSXP, 3));
+    SEXP s_popadjust = PROTECT(Rf_allocVector(REALSXP, pAG * NG * PROJ_YEARS));
+    SEXP s_popadjust_dim = PROTECT(Rf_allocVector(INTSXP, 3));
     INTEGER(s_popadjust_dim)[0] = pAG;
     INTEGER(s_popadjust_dim)[1] = NG;
     INTEGER(s_popadjust_dim)[2] = PROJ_YEARS;
-    setAttrib(s_popadjust, R_DimSymbol, s_popadjust_dim);
-    setAttrib(s_pop, install("popadjust"), s_popadjust);
+    Rf_setAttrib(s_popadjust, R_DimSymbol, s_popadjust_dim);
+    Rf_setAttrib(s_pop, Rf_install("popadjust"), s_popadjust);
     multi_array_ref<double, 3> popadjust(REAL(s_popadjust), extents[PROJ_YEARS][NG][pAG]);
-    memset(REAL(s_popadjust), 0, length(s_popadjust)*sizeof(double));
+    memset(REAL(s_popadjust), 0, Rf_length(s_popadjust)*sizeof(double));
 
-    SEXP s_prev15to49 = PROTECT(allocVector(REALSXP, PROJ_YEARS));
-    setAttrib(s_pop, install("prev15to49"), s_prev15to49);
+    SEXP s_prev15to49 = PROTECT(Rf_allocVector(REALSXP, PROJ_YEARS));
+    Rf_setAttrib(s_pop, Rf_install("prev15to49"), s_prev15to49);
     double *prev15to49 = REAL(s_prev15to49);
     prev15to49[0] = 0.0;
 
-    SEXP s_incid15to49 = PROTECT(allocVector(REALSXP, PROJ_YEARS));
-    setAttrib(s_pop, install("incid15to49"), s_incid15to49);
+    SEXP s_incid15to49 = PROTECT(Rf_allocVector(REALSXP, PROJ_YEARS));
+    Rf_setAttrib(s_pop, Rf_install("incid15to49"), s_incid15to49);
     double *incid15to49 = REAL(s_incid15to49);
-    memset(incid15to49, 0, length(s_incid15to49)*sizeof(double));
+    memset(incid15to49, 0, Rf_length(s_incid15to49)*sizeof(double));
 
-    SEXP s_entrantprev_out = PROTECT(allocVector(REALSXP, PROJ_YEARS));
-    setAttrib(s_pop, install("entrantprev"), s_entrantprev_out);
+    SEXP s_entrantprev_out = PROTECT(Rf_allocVector(REALSXP, PROJ_YEARS));
+    Rf_setAttrib(s_pop, Rf_install("entrantprev"), s_entrantprev_out);
     double *entrantprev_out = REAL(s_entrantprev_out);
-    memset(entrantprev_out, 0, length(s_entrantprev_out)*sizeof(double));
+    memset(entrantprev_out, 0, Rf_length(s_entrantprev_out)*sizeof(double));
 
     double *hivn15to49 = (double*) R_alloc(PROJ_YEARS, sizeof(double));
     double *hivp15to49 = (double*) R_alloc(PROJ_YEARS, sizeof(double));
@@ -594,7 +594,7 @@ extern "C" {
 	      pop[t][HIVN][g][a] += nmig_a;
 	      double hmig_a = migrate_a * pop[t][HIVP][g][a];
 	      pop[t][HIVP][g][a] += hmig_a;
-	      
+
 	      deathsmig_ha += hmig_a;
 	      if(t > t_hts_start) {
 		deathsmig_hivn_ha += nmig_a;
@@ -605,7 +605,7 @@ extern "C" {
 
           // migration and deaths for hivpop
           double deathmigrate_ha = hivpop_ha > 0 ? deathsmig_ha / hivpop_ha : 0.0;
-	  
+
           if(t > t_hts_start) {
             double deathmigrate_hivn_ha = hivnpop_ha > 0 ? deathsmig_hivn_ha / hivnpop_ha : 0.0;
             testnegpop[t][HIVN][g][ha] *= 1+deathmigrate_hivn_ha;
@@ -650,7 +650,7 @@ extern "C" {
         memset(hivdeaths_ha, 0, sizeof(double)*NG*hAG);
 
 	double nonaids_excess_ha[NG][hAG];
-        memset(nonaids_excess_ha, 0, sizeof(double)*NG*hAG);	
+        memset(nonaids_excess_ha, 0, sizeof(double)*NG*hAG);
 
         // untreated population
 
@@ -675,7 +675,7 @@ extern "C" {
 	      double excess_nonaids_deaths = cd4_nonaids_excess_mort[g][ha][hm] * hivpop[t][g][ha][hm];
               nonaids_excess_ha[g][ha] += DT * excess_nonaids_deaths;
 	      excessnonaidsdeaths_noart[t][g][ha][hm] += DT * excess_nonaids_deaths;
-	      
+
               grad[g][ha][hm] = -(aids_deaths + excess_nonaids_deaths);
             }
             for(int hm = 1; hm < hDS; hm++){
@@ -811,7 +811,7 @@ extern "C" {
 		  double nonaids_deaths = art_nonaids_excess_mort[g][ha][hm][hu] * artpop[t][g][ha][hm][hu];
 		  nonaids_excess_ha[g][ha] += DT * nonaids_deaths;
 		  excessnonaidsdeaths_art[t][g][ha][hm][hu] += DT * nonaids_deaths;
-		  
+
                   gradART[hu] = -(aids_deaths + nonaids_deaths);
                 }
 
@@ -831,7 +831,7 @@ extern "C" {
                   for(int hu = 0; hu < hTS; hu++){
 
 		    double dropout_ts = DT * art_dropout[t] * artpop[t][g][ha][hm][hu];
-		    
+
 		    if (bin_art_dropout_recover_cd4 && hu >= 2 && hm >= 1) {
 		      // recover people on ART >1 year to one higher CD4 category
 		      hivpop[t][g][ha][hm-1] += dropout_ts;
@@ -844,7 +844,7 @@ extern "C" {
 			diagnpop[t][g][ha][hm] += dropout_ts;
 		      }
 		    }
-		    
+
                     artpop[t][g][ha][hm][hu] -= dropout_ts;
                   }
           }
@@ -859,16 +859,16 @@ extern "C" {
 	    // The first step: allocate initiation by CD4 category (_hm) requires
 	    // tabulating number eligible and expected mortality within each CD4
 	    // category (aggregated over all ages).
-	    
+
 	    double Xart_15plus = 0.0; // Total currently on ART
-	    
+
 	    double artelig_hahm[hAG_15PLUS][hDS];
 	    double artelig_hm[hDS];
 	    double Xartelig_15plus = 0.0;
-	    
+
 	    double expect_mort_artelig_hm[hDS];
 	    double expect_mort_artelig15plus = 0.0;
-	    
+
 	    // Initialise to zero
 	    memset(artelig_hm, 0, hDS * sizeof(double));
 	    memset(expect_mort_artelig_hm, 0, hDS * sizeof(double));
@@ -883,16 +883,16 @@ extern "C" {
 		    (hm >= hIDX_CD4_350) ?
 		    1.0 - (1.0-specpop_percelig[t]) * (1.0-who34percelig) :
 		    specpop_percelig[t];
-		  
+
 		  double artelig_hahm_tmp = prop_elig * hivpop[t][g][ha][hm];
 		  artelig_hahm[ha-hIDX_15PLUS][hm] = artelig_hahm_tmp;
 		  artelig_hm[hm] += artelig_hahm_tmp;
 		  Xartelig_15plus += artelig_hahm_tmp;
-		  
+
 		  double expect_mort_hahm = cd4_mort[g][ha][hm] * artelig_hahm_tmp;
 		  expect_mort_artelig_hm[hm] += expect_mort_hahm;
 		  expect_mort_artelig15plus += expect_mort_hahm;
-		  
+
                 }
                 for(int hu = 0; hu < hTS; hu++)
                   Xart_15plus += artpop[t][g][ha][hm][hu];
@@ -911,9 +911,9 @@ extern "C" {
                 for(int hm = anyelig_idx; hm < cd4elig_idx; hm++){
                   double pw_elig_hahm = births_by_ha[ha-hIDX_FERT] * frr_cd4[t][ha-hIDX_FERT][hm] * hivpop[t][g][ha][hm] / frr_pop_ha;
                   artelig_hahm[ha-hIDX_15PLUS][hm] += pw_elig_hahm;
-		  artelig_hm[hm] += pw_elig_hahm;		  
+		  artelig_hm[hm] += pw_elig_hahm;
                   Xartelig_15plus += pw_elig_hahm;
-		  
+
 		  double pw_expect_mort_hahm = cd4_mort[g][ha][hm] * pw_elig_hahm;
 		  expect_mort_artelig_hm[hm] += pw_expect_mort_hahm;
                   expect_mort_artelig15plus += pw_expect_mort_hahm;
@@ -924,7 +924,7 @@ extern "C" {
             // calculate number on ART at end of ts, based on number or percent
             double artnum_hts = 0.0;
             if (projection_period_int == PROJPERIOD_MIDYEAR && DT*(hts+1) < 0.5){
-	      
+
               if(!art15plus_isperc[t-2][g] && !art15plus_isperc[t-1][g]){ // both numbers
                 artnum_hts = (0.5-DT*(hts+1))*artnum15plus[t-2][g] + (DT*(hts+1)+0.5)*artnum15plus[t-1][g];
               } else if(art15plus_isperc[t-2][g] && art15plus_isperc[t-1][g]){ // both percentages
@@ -936,7 +936,7 @@ extern "C" {
                 artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
               }
             } else {
-	      
+
 	      // If the projection period is calendar year (>= Spectrum v6.2), this condition is
  	      // always followed, and it interpolates between end of last year and current year (+ 1.0).
  	      // If projection period was mid-year (<= Spectrum v6.19), the second half of the projection
@@ -947,11 +947,11 @@ extern "C" {
  	      if (projection_period_int == PROJPERIOD_MIDYEAR) {
  		art_interp_w -= 0.5;
  	      }
-	      
+
               if(!art15plus_isperc[t-1][g] && !art15plus_isperc[t][g]){ // both numbers
 		artnum_hts = (1.0 - art_interp_w)*artnum15plus[t-1][g] + art_interp_w*artnum15plus[t][g];
               } else if(art15plus_isperc[t-1][g] && art15plus_isperc[t][g]){ // both percentages
-		double artcov_hts = (1.0 - art_interp_w)*artnum15plus[t-1][g] + art_interp_w*artnum15plus[t][g];		
+		double artcov_hts = (1.0 - art_interp_w)*artnum15plus[t-1][g] + art_interp_w*artnum15plus[t][g];
                 artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
               } else if(!art15plus_isperc[t-1][g] && art15plus_isperc[t][g]){ // transition from number to percentage
                 double curr_coverage = Xart_15plus / (Xart_15plus + Xartelig_15plus);
@@ -1090,35 +1090,35 @@ extern "C" {
                     undiagnosed_ha += hivpop[t][g][ha][hm] - diagnpop[t][g][ha][hm];
 
                 for(int hm = anyelig_idx; hm < hDS; hm++){
-		  
+
 		  // ART allocation step 2: within CD4 category, allocate
 		  // by age proportional to eligibility
 		  if (artelig_hm[hm] > 0.0) {
-		    
+
 		    double artinit_hahm = artinit_hm[hm] *
 		      artelig_hahm[ha-hIDX_15PLUS][hm] / artelig_hm[hm];
-		    
+
 		    if(artinit_hahm > artelig_hahm[ha-hIDX_15PLUS][hm])
 		      artinit_hahm = artelig_hahm[ha-hIDX_15PLUS][hm];
 		    if(artinit_hahm > hivpop[t][g][ha][hm] + DT * grad[g][ha][hm])
 		      artinit_hahm = hivpop[t][g][ha][hm] + DT * grad[g][ha][hm];
-		    
+
 		    if(t >= t_hts_start){
 		      double new_diagn = artinit_hahm > diagnpop[t][g][ha][hm] ? artinit_hahm - diagnpop[t][g][ha][hm] : 0;
-		      
+
 		      new_diagn_ha += new_diagn;
 		      diagnpop[t][g][ha][hm] -= artinit_hahm - new_diagn;
                     diagnoses[t][g][ha][hm] += new_diagn;
                     late_diagnoses[t][g][ha][hm] += new_diagn;
 		    }
-		    
-		    
+
+
 		    hivpop[t][g][ha][hm] -= artinit_hahm;
 		    artpop[t][g][ha][hm][ART0MOS] += artinit_hahm;
 		    artinits[t][g][ha][hm] += artinit_hahm;
 		  }
 		}
-		
+
                 // Remove share of excess ART initiations from either diagnpop or testnegpop
                 if(t >= t_hts_start && new_diagn_ha > 0){
 
@@ -1170,7 +1170,7 @@ extern "C" {
           for(int ha = 0; ha < hAG; ha++){
             if(hivpop_ha[ha] > 0){
               double hivqx_ha = hivdeaths_ha[g][ha] / hivpop_ha[ha];
-	      double nonaids_excess_qx_ha = nonaids_excess_ha[g][ha] / hivpop_ha[ha];	      
+	      double nonaids_excess_qx_ha = nonaids_excess_ha[g][ha] / hivpop_ha[ha];
               for(int i = 0; i < hAG_SPAN[ha]; i++){
                 hivdeaths[t][g][a] += pop[t][HIVP][g][a] * hivqx_ha;
 		excessnonaidsdeaths[t][g][a] += pop[t][HIVP][g][a] * nonaids_excess_qx_ha;
@@ -1240,35 +1240,35 @@ extern "C" {
 
       // Net migration for calendar-year projection option with end-year migration
       if (projection_period_int == PROJPERIOD_CALENDAR) {
-	
+
 	for(int g = 0; g < NG; g++){
 	  int a = 0;
 	  for(int ha = 0; ha < hAG; ha++){
 	    double mig_ha = 0, hivpop_ha = 0;
 	    double mig_hivn_ha = 0.0, hivnpop_ha = 0.0;
-	    
+
 	    for(int i = 0; i < hAG_SPAN[ha]; i++){
-	      
+
 	      hivpop_ha += pop[t][HIVP][g][a];
 	      hivnpop_ha += pop[t][HIVN][g][a];
-	      
+
 	      // net migration
 	      double migrate_a = netmigr[t][g][a] / (pop[t][HIVN][g][a] + pop[t][HIVP][g][a]);
 	      double nmig_a = migrate_a * pop[t][HIVN][g][a];
 	      pop[t][HIVN][g][a] += nmig_a;
 	      double hmig_a = migrate_a * pop[t][HIVP][g][a];
 	      pop[t][HIVP][g][a] += hmig_a;
-	      
+
 	      mig_ha += hmig_a;
 	      if (t >= t_hts_start) {
 		mig_hivn_ha += nmig_a;
 	      }
 	      a++;
 	    }
-	    
+
 	    // migration for hivpop
 	    double migrate_ha = hivpop_ha > 0 ? mig_ha / hivpop_ha : 0.0;
-	    
+
 	    if(t >= t_hts_start) {
 	      double migrate_hivn_ha = hivnpop_ha > 0 ? mig_hivn_ha / hivnpop_ha : 0.0;
 	      testnegpop[t][HIVN][g][ha] *= 1+migrate_hivn_ha;
@@ -1285,7 +1285,7 @@ extern "C" {
 	    } // loop over hm
 	  } // loop over ha
 	} // loop over g
-      } // if (projection_period_int == PROJPERIOD_CALENDAR)      
+      } // if (projection_period_int == PROJPERIOD_CALENDAR)
 
       // adjust population to match target population
       if(bin_popadjust){
@@ -1356,24 +1356,24 @@ extern "C" {
 
 SEXP getListElement(SEXP list, const char *str)
 {
-  SEXP elmt = R_NilValue, names = getAttrib(list, R_NamesSymbol);
+  SEXP elmt = R_NilValue, names = Rf_getAttrib(list, R_NamesSymbol);
   int i;
-  for ( i = 0; i < length(list); i++ )
+  for ( i = 0; i < Rf_length(list); i++ )
     if ( strcmp(CHAR(STRING_ELT(names, i)), str) == 0 ) {
       elmt = VECTOR_ELT(list, i);
       break;
     }
 
   if ( elmt == R_NilValue )
-    error("%s missing from list", str);
+    Rf_error("%s missing from list", str);
 
   return elmt;
 }
 
 int checkListElement(SEXP list, const char *str)
 {
-  SEXP names = getAttrib(list, R_NamesSymbol);
-  for (int i = 0; i < length(list); i++ )
+  SEXP names = Rf_getAttrib(list, R_NamesSymbol);
+  for (int i = 0; i < Rf_length(list); i++ )
     if (strcmp(CHAR(STRING_ELT(names, i)), str) == 0 )
       return 1;
 

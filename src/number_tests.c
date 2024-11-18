@@ -17,42 +17,42 @@ SEXP number_testsC(SEXP s_mod,
 		   SEXP s_h_ag_span,
 		   //Mathieu added
 		   SEXP s_late_diagnoses){
- 
-  int nval = length(s_haidx);
-  SEXP s_pop = PROTECT(allocVector(REALSXP, nval));
-  SEXP s_tests = PROTECT(allocVector(REALSXP, nval));
 
-  SEXP s_out = PROTECT(allocVector(VECSXP, 2));
+  int nval = Rf_length(s_haidx);
+  SEXP s_pop = PROTECT(Rf_allocVector(REALSXP, nval));
+  SEXP s_tests = PROTECT(Rf_allocVector(REALSXP, nval));
+
+  SEXP s_out = PROTECT(Rf_allocVector(VECSXP, 2));
   SET_VECTOR_ELT(s_out, 0, s_pop);
   SET_VECTOR_ELT(s_out, 1, s_tests);
-  
-  int *dm = INTEGER(getAttrib(s_mod, R_DimSymbol));;
+
+  int *dm = INTEGER(Rf_getAttrib(s_mod, R_DimSymbol));;
   double *mod = REAL(s_mod);
-  
-  int *dtn = INTEGER(getAttrib(s_testnegpop, R_DimSymbol));;
-  double *testnegpop = REAL(s_testnegpop);  
 
-  int *dh = INTEGER(getAttrib(s_hivpop, R_DimSymbol));;
-  double *hivpop = REAL(s_hivpop);  
+  int *dtn = INTEGER(Rf_getAttrib(s_testnegpop, R_DimSymbol));;
+  double *testnegpop = REAL(s_testnegpop);
 
-  int *ddg = INTEGER(getAttrib(s_diagnpop, R_DimSymbol));;
-  double *diagnpop = REAL(s_diagnpop);  
-  
-  int *da = INTEGER(getAttrib(s_artpop, R_DimSymbol));;
+  int *dh = INTEGER(Rf_getAttrib(s_hivpop, R_DimSymbol));;
+  double *hivpop = REAL(s_hivpop);
+
+  int *ddg = INTEGER(Rf_getAttrib(s_diagnpop, R_DimSymbol));;
+  double *diagnpop = REAL(s_diagnpop);
+
+  int *da = INTEGER(Rf_getAttrib(s_artpop, R_DimSymbol));;
   double *artpop = REAL(s_artpop);
 
-  int *dhr = INTEGER(getAttrib(s_hts_rate, R_DimSymbol));;
+  int *dhr = INTEGER(Rf_getAttrib(s_hts_rate, R_DimSymbol));;
   double *hts_rate = REAL(s_hts_rate);
 
-  int *ddr = INTEGER(getAttrib(s_diagn_rate, R_DimSymbol));;
-  double *diagn_rate = REAL(s_diagn_rate);  
-  
+  int *ddr = INTEGER(Rf_getAttrib(s_diagn_rate, R_DimSymbol));;
+  double *diagn_rate = REAL(s_diagn_rate);
+
   //Mathieu added
-  int *ldr = INTEGER(getAttrib(s_late_diagnoses, R_DimSymbol));; 
-  double *late_diagnoses = REAL(s_late_diagnoses);  
+  int *ldr = INTEGER(Rf_getAttrib(s_late_diagnoses, R_DimSymbol));;
+  double *late_diagnoses = REAL(s_late_diagnoses);
 
   for(int i = 0; i < nval; i++){
-    
+
     int sidx = INTEGER(s_sidx)[i];
     int s1 = (sidx == 2) ? 1 : 0;
     int s2 = (sidx == 1) ? 1 : 2;
@@ -71,14 +71,14 @@ SEXP number_testsC(SEXP s_mod,
 
 	// testing among HIV-
 	if(hvidx != 2) {
-	  
+
 	  double pop_ha = 0.0, tested_ha;
 	  int pag = INTEGER(s_agfirst_idx)[ha] - 1;
 	  for(int a = 0; a < INTEGER(s_h_ag_span)[ha]; a++)
 	    pop_ha += mod[pag + a + dm[0] * (sx + dm[1] * (0 + dm[2] * yidx))];
 
 	  tested_ha = testnegpop[ha + dtn[0] * (sx + dtn[1] * (0 + dtn[2] * yidx))];
-	  
+
 	  tests += (pop_ha - tested_ha) * hts_rate[ha + dhr[0] * (sx + dhr[1] * (0 + dtn[2] * yidx))];
 	  tests += tested_ha * hts_rate[ha + dhr[0] * (sx + dhr[1] * (1 + dtn[2] * yidx))];
 	  pop += pop_ha;
@@ -104,14 +104,14 @@ SEXP number_testsC(SEXP s_mod,
 
 	    double naive_ha_hm = undiagnosed_ha_hm * (1 - prop_testneg);
 	    double testneg_ha_hm = undiagnosed_ha_hm * prop_testneg;
-	    
+
 	    tests += naive_ha_hm * diagn_rate[m + ddr[0] * (ha + ddr[1] * (sx + ddr[2] * (0 + ddr[3] * yidx)))];
 	    tests += testneg_ha_hm * diagn_rate[m + ddr[0] * (ha + ddr[1] * (sx + ddr[2] * (1 + ddr[3] * yidx)))];
 	    tests += diagnpop[idx] * diagn_rate[m + ddr[0] * (ha + ddr[1] * (sx + ddr[2] * (2 + ddr[3] * yidx)))];
 	    tests += artpop_ha_hm * diagn_rate[m + ddr[0] * (ha + ddr[1] * (sx + ddr[2] * (3 + ddr[3] * yidx)))];
       // Mathieu added
       tests += late_diagnoses[m + ddr[0] * (ha + ddr[1] * (sx + ddr[2] * yidx))];
-      
+
 	    pop += hivpop[idx] + artpop_ha_hm;
 	  }
 	}
