@@ -13,19 +13,19 @@ SEXP evertestC(SEXP s_mod,
                SEXP s_agfirst_idx,
                SEXP s_h_ag_span){
 
-  int nval = length(s_haidx);
-  SEXP s_val = PROTECT(allocVector(REALSXP, nval));
+  int nval = Rf_length(s_haidx);
+  SEXP s_val = PROTECT(Rf_allocVector(REALSXP, nval));
 
-  int *dm = INTEGER(getAttrib(s_mod, R_DimSymbol));;
+  int *dm = INTEGER(Rf_getAttrib(s_mod, R_DimSymbol));;
   double *mod = REAL(s_mod);
 
-  int *dtn = INTEGER(getAttrib(s_testnegpop, R_DimSymbol));;
+  int *dtn = INTEGER(Rf_getAttrib(s_testnegpop, R_DimSymbol));;
   double *testnegpop = REAL(s_testnegpop);
 
-  int *ddg = INTEGER(getAttrib(s_diagnpop, R_DimSymbol));;
+  int *ddg = INTEGER(Rf_getAttrib(s_diagnpop, R_DimSymbol));;
   double *diagnpop = REAL(s_diagnpop);
 
-  int *da = INTEGER(getAttrib(s_artpop, R_DimSymbol));;
+  int *da = INTEGER(Rf_getAttrib(s_artpop, R_DimSymbol));;
   double *artpop = REAL(s_artpop);
 
   for(int i = 0; i < nval; i++){
@@ -90,16 +90,16 @@ SEXP diagnosedC(SEXP s_mod,
 		SEXP s_agfirst_idx,
 		SEXP s_h_ag_span){
 
-  int nval = length(s_haidx);
-  SEXP s_val = PROTECT(allocVector(REALSXP, nval));
+  int nval = Rf_length(s_haidx);
+  SEXP s_val = PROTECT(Rf_allocVector(REALSXP, nval));
 
-  int *dm = INTEGER(getAttrib(s_mod, R_DimSymbol));;
+  int *dm = INTEGER(Rf_getAttrib(s_mod, R_DimSymbol));;
   double *mod = REAL(s_mod);
 
-  int *ddg = INTEGER(getAttrib(s_diagnpop, R_DimSymbol));;
+  int *ddg = INTEGER(Rf_getAttrib(s_diagnpop, R_DimSymbol));;
   double *diagnpop = REAL(s_diagnpop);
 
-  int *da = INTEGER(getAttrib(s_artpop, R_DimSymbol));;
+  int *da = INTEGER(Rf_getAttrib(s_artpop, R_DimSymbol));;
   double *artpop = REAL(s_artpop);
 
   for(int i = 0; i < nval; i++){
@@ -133,7 +133,7 @@ SEXP diagnosedC(SEXP s_mod,
     }
     REAL(s_val)[i] = diagnosed / hivpop;
   }
-  
+
   UNPROTECT(1);
   return(s_val);
 }
