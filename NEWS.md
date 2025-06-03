@@ -1,3 +1,10 @@
+# first90 1.8.0
+
+* Implement ART mortality rate multiplier, added to Spectrum in 2023 in the
+  [Advanced options] -> [Adult transition parameters] -> [HIV mortality with ART].
+  Stored in the .DP file under tag `<MortalityRatesMultiplier MV>`.
+
+
 # first90 1.7.1
 
 * Implement Spectrum adult ART adjustment by absolute count. This is a user 

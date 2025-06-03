@@ -128,7 +128,7 @@ create_fp <- function(projp,
   fp$cd4_initdist <- projp$cd4_initdist[,projp.h.ag,]
   fp$cd4_prog <- (1-exp(-projp$cd4_prog[,projp.h.ag,] / hiv_steps_per_year)) * hiv_steps_per_year
   fp$cd4_mort <- projp$cd4_mort[,projp.h.ag,]
-  fp$art_mort <- projp$art_mort[,,projp.h.ag,]
+  fp$art_mort <- projp$artmx_multiplier * projp$art_mort[,,projp.h.ag,]
   fp$artmx_timerr <- projp$artmx_timerr
 
   if (!is.null(projp$cd4_nonaids_excess_mort)) {

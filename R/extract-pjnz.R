@@ -101,6 +101,7 @@ extract_pjnz <- function(pjnz = NULL, dp_file= NULL, pjn_file = NULL) {
   v$cd4_mort <- get_dp_cd4_mort(dp)
   v$art_mort <- get_dp_art_mort(dp)
   v$artmx_timerr <- get_dp_artmx_timerr(dp, proj_years)
+  v$artmx_multiplier <- get_dp_artmx_multiplier(dp, proj_years)
 
   ## # Excess non-AIDS mortality
   v <- c(v, get_dp_nonaids_excessmort(dp))
@@ -753,6 +754,16 @@ get_dp_artmx_timerr <- function(dp, proj_years) {
   }
 
   artmx_timerr
+}
+
+get_dp_artmx_multiplier <- function(dp, proj_years) {
+  
+  artmx_multiplier <- 1.0
+  if (exists_dptag(dp, "<MortalityRatesMultiplier MV>")) {
+    artmx_multiplier <- as.numeric(dpsub(dp, "<MortalityRatesMultiplier MV>", 2, 4))
+  }
+
+  artmx_multiplier
 }
 
 
