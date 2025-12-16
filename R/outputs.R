@@ -15,16 +15,17 @@
 #' @export
 number_tests <- function(mod, fp, df, tested12m = FALSE, VERSION = "C") {
 
-  if(tested12m){
+  if (tested12m) {
     hts_prop <- 1 - exp(-fp$hts_rate)
     diagn_prop <- 1 - exp(-fp$diagn_rate)
   }
   
-  if(VERSION != "R"){
+  if (VERSION != "R") {
     
-    if(tested12m)
-      stop("tested12m option is not implemented in C version")
-    
+    if (tested12m) {
+      stop("tested12m option is not implemented in C version")      
+    }
+
     val <- .Call(number_testsC,
                  mod,
                  attr(mod, "testnegpop"),
@@ -50,41 +51,46 @@ number_tests <- function(mod, fp, df, tested12m = FALSE, VERSION = "C") {
 
     tests <- pop <- numeric(length(df$haidx))
 
-    if(tested12m)
+    if (tested12m) { 
       ntested12m <- numeric(length(df$haidx))
-
-    for(i in seq_along(df$haidx)) {
+    }
+    
+    for (i in seq_along(df$haidx)) {
 
       haidx <- df$haidx[i] + 1:df$hagspan[i] - 1
-      sidx <- if(df$sidx[i] == 0) 1:2 else df$sidx[i]
+      sidx <- ifelse(df$sidx[i] == 0, 1:2, df$sidx[i])
 
       paidx <- fp$ss$agfirst.idx[df$haidx[i]] + 1:sum(fp$ss$h.ag.span[haidx]) - 1
             
-      if(df$hvidx[i] %in% c(0, 1)){ # testing among HIV-
+      if (df$hvidx[i] %in% c(0, 1)) { # testing among HIV-
 
         pop_hivn_ha <- apply(mod[paidx, sidx, fp$ss$hivn.idx, df$yidx[i], drop = FALSE], 2:3, fastmatch::ctapply, fp$ss$ag.idx[paidx], sum)
         tested_ha <- attr(mod, "testnegpop")[haidx, sidx, fp$ss$hivn.idx, df$yidx[i], drop = FALSE]
 
         tests[i] <- tests[i] +
-          sum((c(pop_hivn_ha) - c(tested_ha)) * fp$hts_rate[haidx, sidx, 1, df$yidx[i]]) + # among untested HIV- population
-          sum(tested_ha * fp$hts_rate[haidx, sidx, 2, df$yidx[i], drop = FALSE])  # among previously tested HIV- population
+          # among untested HIV- population
+          sum((c(pop_hivn_ha) - c(tested_ha)) * fp$hts_rate[haidx, sidx, 1, df$yidx[i]]) +
+          # among previously tested HIV- population
+          sum(tested_ha * fp$hts_rate[haidx, sidx, 2, df$yidx[i], drop = FALSE]) 
 
-        if(tested12m)
+        if (tested12m) { 
           ntested12m[i] <- ntested12m[i] +
-            sum((c(pop_hivn_ha) - c(tested_ha)) * hts_prop[haidx, sidx, 1, df$yidx[i]]) + # among untested HIV- population
-            sum(tested_ha * hts_prop[haidx, sidx, 2, df$yidx[i], drop = FALSE])  # among previously tested HIV- population
+            # among untested HIV- population
+            sum((c(pop_hivn_ha) - c(tested_ha)) * hts_prop[haidx, sidx, 1, df$yidx[i]]) +
+            # among previously tested HIV- population
+            sum(tested_ha * hts_prop[haidx, sidx, 2, df$yidx[i], drop = FALSE])  
+        }
         
         pop[i] <- pop[i] + sum(pop_hivn_ha)
         
       }
       
-      if(df$hvidx[i] %in% c(0, 2)){ # testing among HIV+
+      if (df$hvidx[i] %in% c(0, 2)) { # testing among HIV+
 
         hivpop_ha_hm <- attr(mod, "hivpop")[ , df$haidx[i] + 1:df$hagspan[i] - 1, sidx, df$yidx[i], drop = FALSE]
         diagn_ha_hm <- attr(mod, "diagnpop")[ , df$haidx[i] + 1:df$hagspan[i] - 1, sidx, df$yidx[i], drop = FALSE]
         artpop_ha_hm <- colSums(attr(mod, "artpop")[ , , df$haidx[i] + 1:df$hagspan[i] - 1, sidx, df$yidx[i], drop = FALSE])
 
-        
         ## Calculation proportion ever tested among undiagnosed
         undiagnosed_ha_hm <- hivpop_ha_hm - diagn_ha_hm
         testneg_ha <- attr(mod, "testnegpop")[haidx, sidx, fp$ss$hivp.idx, df$yidx[i], drop = FALSE]
@@ -100,13 +106,14 @@ number_tests <- function(mod, fp, df, tested12m = FALSE, VERSION = "C") {
           sum(artpop_ha_hm * c(fp$diagn_rate[ , haidx, sidx, 4, df$yidx[i]])) +
           sum(attr(mod, "late_diagnoses")[, haidx, sidx, df$yidx[i]])
 
-        if(tested12m)
+        if (tested12m) {
           ntested12m[i] <- ntested12m[i] +
             sum(naive_ha_hm * c(diagn_prop[ , haidx, sidx, 1, df$yidx[i]])) +
             sum(testneg_ha_hm * c(diagn_prop[ , haidx, sidx, 2, df$yidx[i]])) +
             sum(diagn_ha_hm * c(diagn_prop[ , haidx, sidx, 3, df$yidx[i]])) +
             sum(artpop_ha_hm * c(diagn_prop[ , haidx, sidx, 4, df$yidx[i]]))
-        
+        }
+      
         pop[i] <- pop[i] +
           sum(hivpop_ha_hm) +
           sum(artpop_ha_hm)
@@ -114,8 +121,10 @@ number_tests <- function(mod, fp, df, tested12m = FALSE, VERSION = "C") {
     }
   
     val <- data.frame(pop = pop, tests = tests)
-    if(tested12m)
-      val$ntested12m <- ntested12m
+    if (tested12m) {
+       val$ntested12m <- ntested12m
+    }
+     
   }
 
   val
@@ -125,7 +134,7 @@ number_tests <- function(mod, fp, df, tested12m = FALSE, VERSION = "C") {
 total_tests <- function(mod, df) {
   all_diag <- NA
   length(all_diag) <- length(df$haidx)
-  for(i in seq_along(df$haidx)) {
+  for (i in seq_along(df$haidx)) {
     hivdx <- switch(df$hivstatus[i], 
                     all = 1:6,
                     negative = 1:2,
@@ -134,11 +143,8 @@ total_tests <- function(mod, df) {
     sidx <- if(df$sidx[i] == 0) 1:2 else df$sidx[i]
     
     all_diag[i] <- colSums(attr(mod, "hivtests")[haidx, sidx, hivdx, df$yidx[i], drop = FALSE],,3)
-    
-    # We add late diag if hivstatus is all or positive  
-    if (df$hivstatus[i] != 'negative') {
-      late_diag <- colSums(attr(mod, "late_diagnoses")[, haidx, sidx, df$yidx[i], drop = FALSE],,3)
-      all_diag[i] <- all_diag[i] + late_diag }
+    # Note that we do not need to add late diagnoses. 
+    # Late diagnoses are already included in the array "hivtests" (see function simmod() in script eppasm.R)
   }
   return(all_diag)
 }
@@ -202,7 +208,7 @@ evertest <- function(mod, fp, df, VERSION = "C") {
 
     val <- numeric(length(df$haidx))
 
-    for(i in seq_along(df$haidx)) {
+    for (i in seq_along(df$haidx)) {
       
       haidx <- df$haidx[i] + 1:df$hagspan[i] - 1
       sidx <- if(df$sidx[i] == 0) 1:2 else df$sidx[i]
@@ -212,12 +218,12 @@ evertest <- function(mod, fp, df, VERSION = "C") {
       tested <- 0
       pop <- 0
       
-      if(df$hvidx[i] %in% c(0, 1)){
+      if (df$hvidx[i] %in% c(0, 1)) {
         tested <- tested + sum(attr(mod, "testnegpop")[haidx, sidx, fp$ss$hivn.idx, df$yidx[i]])
         pop <- pop + sum(mod[paidx, sidx, fp$ss$hivn.idx, df$yidx[i]])
       }
       
-      if(df$hvidx[i] %in% c(0, 2)){
+      if (df$hvidx[i] %in% c(0, 2)) {
         tested <- tested +
           sum(attr(mod, "testnegpop")[haidx, sidx, fp$ss$hivp.idx, df$yidx[i]]) +
           sum(attr(mod, "diagnpop")[ , df$haidx[i] + 1:df$hagspan[i] - 1, sidx, df$yidx[i]]) +
@@ -273,7 +279,7 @@ evertest <- function(mod, fp, df, VERSION = "C") {
 #' @useDynLib first90 diagnosedC
 diagnosed <- function(mod, fp, df, VERSION = "C") {
 
-  if(VERSION != "R") {
+  if (VERSION != "R") {
 
     val <- .Call(diagnosedC,
              mod,
@@ -290,7 +296,7 @@ diagnosed <- function(mod, fp, df, VERSION = "C") {
 
     val <- numeric(length(df$haidx))
 
-    for(i in seq_along(df$haidx)) {
+    for (i in seq_along(df$haidx)) {
       
       haidx <- df$haidx[i] + 1:df$hagspan[i] - 1
       sidx <- if(df$sidx[i] == 0) 1:2 else df$sidx[i]
@@ -312,7 +318,7 @@ nb_aware <- function(mod, fp, df) {
   
     val <- numeric(length(df$haidx))
     
-    for(i in seq_along(df$haidx)) {
+    for (i in seq_along(df$haidx)) {
       
       haidx <- df$haidx[i] + 1:df$hagspan[i] - 1
       sidx <- if(df$sidx[i] == 0) 1:2 else df$sidx[i]
@@ -347,7 +353,7 @@ nb_aware <- function(mod, fp, df) {
 #' 
 number_diagnoses <- function(mod, fp, df, VERSION = "R") {
 
-  if(VERSION != "R")
+  if (VERSION != "R")
 
     stop("C version not yet implemented")
 
@@ -355,7 +361,7 @@ number_diagnoses <- function(mod, fp, df, VERSION = "R") {
 
     diagnoses <- diagnoses_mod <- late_diagnoses <- numeric(length(df$haidx))
 
-    for(i in seq_along(df$haidx)) {
+    for (i in seq_along(df$haidx)) {
 
       haidx <- df$haidx[i] + 1:df$hagspan[i] - 1
       sidx <- if(df$sidx[i] == 0) 1:2 else df$sidx[i]
@@ -394,5 +400,5 @@ artcov15to49 <- function (mod, sex = 'both') {
         , 4)
     n_hiv <- colSums(attr(mod, "hivpop")[, 1:8, sexid, , drop = FALSE], 
         , 3)
-    return(n_art/(n_hiv + n_art))
+    return(n_art / (n_hiv + n_art))
 }
